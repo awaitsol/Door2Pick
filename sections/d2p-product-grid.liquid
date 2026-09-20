@@ -187,14 +187,39 @@
 
             {%- if s.show_add_to_cart -%}
               {%- if variant.available -%}
-                {%- form 'product', product, id: null, class: 'd2p-card__form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
-                  <input type="hidden" name="id" value="{{ variant.id }}">
-                  <input type="hidden" name="quantity" value="1">
-                  <button class="d2p-card__add" type="submit" name="add">
-                    <span aria-hidden="true">{{- 'icon-add-to-cart.svg' | inline_asset_content -}}</span>
-                    {{ s.add_to_cart_label | default: 'Add to Cart' }}
-                  </button>
-                {%- endform -%}
+                {%- comment -%}
+                  product-form-component is the theme's own AJAX add-to-cart.
+                  It needs the section and product ids, the submit handler, a
+                  live region for screen-reader feedback and ref="variantId" on
+                  the hidden input. A plain form would reload the page instead
+                  of opening the cart drawer.
+                {%- endcomment -%}
+                <product-form-component
+                  data-section-id="{{ section.id }}"
+                  data-product-id="{{ product.id }}"
+                  on:submit="/handleSubmit"
+                  class="d2p-card__form-component"
+                >
+                  <div
+                    class="visually-hidden"
+                    aria-live="assertive"
+                    role="status"
+                    aria-atomic="true"
+                    ref="liveRegion"
+                  ></div>
+                  {%- form 'product', product, id: null, class: 'd2p-card__form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                    <input type="hidden" name="id" ref="variantId" value="{{ variant.id }}">
+                    <input
+                      type="hidden"
+                      name="quantity"
+                      value="{% if variant.quantity_rule.min %}{{ variant.quantity_rule.min }}{% else %}1{% endif %}"
+                    >
+                    <button class="d2p-card__add" type="submit" name="add">
+                      <span aria-hidden="true">{{- 'icon-add-to-cart.svg' | inline_asset_content -}}</span>
+                      {{ s.add_to_cart_label | default: 'Add to Cart' }}
+                    </button>
+                  {%- endform -%}
+                </product-form-component>
               {%- else -%}
                 <button class="d2p-card__add d2p-card__add--disabled" type="button" disabled>
                   {{ 'products.product.sold_out' | t }}

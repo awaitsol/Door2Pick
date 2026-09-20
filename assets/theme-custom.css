@@ -201,3 +201,32 @@ footer a:hover {
     margin-inline-end: 0;
   }
 }
+
+/* =======================================================================
+ * Payment icons
+ *
+ * shop.enabled_payment_types renders whatever providers are activated in
+ * the Shopify admin, as full-colour SVGs. On the dark footer they need a
+ * light plate to stay legible — the card brands are designed for white.
+ * ======================================================================= */
+
+.payment-icons__item svg {
+  background: #ffffff;
+  border-radius: 3px;
+  padding: 2px;
+  block-size: 24px;
+  inline-size: auto;
+}
+
+/* =======================================================================
+ * Cart drawer
+ * ======================================================================= */
+
+.cart__checkout-button {
+  inline-size: 100%;
+}
+
+/* Accelerated buttons (Shop Pay, PayPal, Google Pay) sit under Checkout. */
+.additional-checkout-buttons {
+  margin-block-start: 10px;
+}
