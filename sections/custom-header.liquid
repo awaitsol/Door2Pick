@@ -36,6 +36,8 @@
   endcomment
 -%}
 
+<script type="module" src="{{ 'cart-icon.js' | asset_url }}" fetchpriority="low"></script>
+
 <div class="d2p-header" style="
   --d2p-h-utility-bg: {{ s.utility_background }};
   --d2p-h-utility-fg: {{ s.utility_text }};
@@ -149,10 +151,18 @@
           </a>
         {%- endif -%}
 
+        {%- comment -%}
+          The count uses the theme's own <cart-icon> element and cart-bubble
+          snippet rather than custom markup, so cart-icon.js keeps it in sync
+          after an add-to-cart without a page reload. Styling is scoped through
+          .d2p-header__cart below.
+        {%- endcomment -%}
         {%- capture cart_inner -%}
           <span class="d2p-header__action-icon" aria-hidden="true">
-            {{- 'icon-cart.svg' | inline_asset_content -}}
-            <span class="d2p-header__cart-count">{{ cart.item_count }}</span>
+            <cart-icon class="d2p-header__cart{% unless cart == empty %} d2p-header__cart--has-items{% endunless %}">
+              <span class="svg-wrapper">{{- 'icon-cart.svg' | inline_asset_content -}}</span>
+              {%- render 'cart-bubble', limit: 100 -%}
+            </cart-icon>
           </span>
           <span class="d2p-header__action-label">{{ s.cart_label | default: 'Cart' }}</span>
         {%- endcapture -%}
@@ -608,27 +618,56 @@
   .d2p-header__action-icon {
     position: relative;
     display: flex;
+    align-items: flex-end;
+    /* Matches the cart box height so both labels share a baseline. */
+    block-size: 30px;
   }
 
-  .d2p-header__action-icon svg {
+  .d2p-header__action-icon > svg {
     inline-size: 26px;
     block-size: 26px;
   }
 
-  .d2p-header__cart-count {
+  /* Cart icon and its count bubble.
+   *
+   * The bubble is the theme's own `cart-bubble` snippet, so cart-icon.js keeps
+   * it current after an add-to-cart. It sizes itself (20px, aspect-ratio 1)
+   * and paints through a `__background` child at inset: 0, so the only things
+   * to set here are position and colour — overriding its width or background
+   * directly breaks the circle into a clipped wedge.
+   *
+   * The element is sized to hold both the icon and the bubble's overhang, so
+   * nothing is clipped and the icon row stays evenly spaced.
+   */
+  .d2p-header__cart {
+    position: relative;
+    display: block;
+    inline-size: 34px;
+    block-size: 30px;
+    --cart-bubble-background: var(--d2p-h-accent);
+    --cart-bubble-text: var(--d2p-h-accent-fg);
+  }
+
+  .d2p-header__cart .svg-wrapper {
     position: absolute;
-    inset-block-start: -6px;
-    inset-inline-end: -9px;
-    min-inline-size: 19px;
-    block-size: 19px;
-    padding-inline: 4px;
-    border-radius: 999px;
-    background: var(--d2p-h-accent);
-    color: var(--d2p-h-accent-fg);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    line-height: 19px;
-    text-align: center;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    inline-size: 26px;
+    block-size: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .d2p-header__cart .svg-wrapper svg {
+    inline-size: 26px;
+    block-size: 26px;
+  }
+
+  .d2p-header__cart .cart-bubble {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
   }
 
   /* ---------- categories pill ---------- */

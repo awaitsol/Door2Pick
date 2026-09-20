@@ -64,7 +64,7 @@
           "type": "nav_link",
           "settings": {
             "label": "New Arrivals",
-            "link": "/collections/all"
+            "link": "/collections/new-arrivals"
           }
         },
         "n4": {

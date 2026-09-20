@@ -40,6 +40,21 @@
     assign coll = s.collection
   elsif s.collection_handle != blank
     assign coll = collections[s.collection_handle]
+
+    comment
+      Handles are easy to get wrong, so if the handle misses, match the
+      section heading against collection titles before giving up.
+    endcomment
+    if coll == blank and s.heading != blank
+      assign wanted = s.heading | downcase | strip
+      for c in collections
+        assign c_title = c.title | downcase | strip
+        if c_title == wanted
+          assign coll = c
+          break
+        endif
+      endfor
+    endif
   endif
 
   assign products = coll.products

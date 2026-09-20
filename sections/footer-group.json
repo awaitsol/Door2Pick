@@ -599,7 +599,7 @@
             "d2p_quick_l": {
               "type": "text",
               "settings": {
-                "text": "<p><a href=\"/\">Home</a></p><p><a href=\"/collections/all\">Shop</a></p><p><a href=\"/collections/all\">New Arrivals</a></p><p><a href=\"/pages/shipping\">Track Order</a></p><p><a href=\"/pages/contact\">Contact Us</a></p>",
+                "text": "<p><a href=\"/\">Home</a></p><p><a href=\"/collections/all\">Shop</a></p><p><a href=\"/collections/new-arrivals\">New Arrivals</a></p><p><a href=\"/pages/shipping\">Track Order</a></p><p><a href=\"/pages/contact\">Contact Us</a></p>",
                 "width": "100%",
                 "max_width": "none",
                 "alignment": "left",

@@ -124,9 +124,9 @@
         "background_color": "#0B0B0D",
         "padding_top": 40,
         "padding_bottom": 40,
-        "use_all_products": true,
-        "collection_handle": "",
-        "fallback_to_all": true
+        "use_all_products": false,
+        "collection_handle": "new-arrivals",
+        "fallback_to_all": false
       }
     },
     "promos_1": {
