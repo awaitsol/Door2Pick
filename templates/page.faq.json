@@ -1,0 +1,595 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "title": {
+          "type": "text",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "2.5rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.color1 }}"
+          },
+          "blocks": {}
+        },
+        "intro": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Answers to the questions we are asked most. Still stuck? <a href='/pages/contact'>Get in touch</a>.</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.foreground }}"
+          },
+          "blocks": {}
+        },
+        "ordering_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Ordering</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1.25rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 16,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.color1 }}"
+          },
+          "blocks": {}
+        },
+        "ordering": {
+          "type": "accordion",
+          "blocks": {
+            "ord_0": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "How do I place an order?",
+                "open_by_default": true,
+                "icon": "box",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Add what you want to your cart, open the cart drawer and choose Checkout. You can pay as a guest — an account is optional.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ord_1": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Can I change or cancel an order?",
+                "open_by_default": false,
+                "icon": "stopwatch",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Contact us as soon as possible. If the order has not yet shipped we can usually amend or cancel it.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ord_2": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Do you sell authentic products?",
+                "open_by_default": false,
+                "icon": "check_box",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Yes. Everything we list is sourced from authorised suppliers.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            }
+          },
+          "block_order": [
+            "ord_0",
+            "ord_1",
+            "ord_2"
+          ],
+          "settings": {
+            "icon": "plus",
+            "dividers": true,
+            "divider_color": "{{ settings.color_palette.color2 }}",
+            "type_preset": "h6",
+            "background_color": "#00000000",
+            "text_color": "{{ settings.color_palette.foreground }}",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "{{ settings.color_palette.color2 }}",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "delivery_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Delivery</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1.25rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 16,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.color1 }}"
+          },
+          "blocks": {}
+        },
+        "delivery": {
+          "type": "accordion",
+          "blocks": {
+            "del_0": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "How long does delivery take?",
+                "open_by_default": true,
+                "icon": "truck",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Orders are dispatched within 1–2 working days. Delivery typically takes 2–5 working days depending on your city.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "del_1": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Do you ship nationwide?",
+                "open_by_default": false,
+                "icon": "plane",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Yes, we deliver across the country.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "del_2": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "How much is shipping?",
+                "open_by_default": false,
+                "icon": "price_tag",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Delivery is free on orders over Rs. 3,000. Below that a flat fee applies, shown at checkout before you pay.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            }
+          },
+          "block_order": [
+            "del_0",
+            "del_1",
+            "del_2"
+          ],
+          "settings": {
+            "icon": "plus",
+            "dividers": true,
+            "divider_color": "{{ settings.color_palette.color2 }}",
+            "type_preset": "h6",
+            "background_color": "#00000000",
+            "text_color": "{{ settings.color_palette.foreground }}",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "{{ settings.color_palette.color2 }}",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "returns_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Returns & refunds</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1.25rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 16,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.color1 }}"
+          },
+          "blocks": {}
+        },
+        "returns": {
+          "type": "accordion",
+          "blocks": {
+            "ret_0": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "What is your returns window?",
+                "open_by_default": true,
+                "icon": "return",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Seven days from delivery, provided the item is unused and in its original packaging.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ret_1": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "How do I return something?",
+                "open_by_default": false,
+                "icon": "box",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Contact us with your order number and we will arrange collection or give you a return address.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ret_2": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "When will I get my refund?",
+                "open_by_default": false,
+                "icon": "recycle",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Refunds are issued within 5–7 working days of the returned item reaching us.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            }
+          },
+          "block_order": [
+            "ret_0",
+            "ret_1",
+            "ret_2"
+          ],
+          "settings": {
+            "icon": "plus",
+            "dividers": true,
+            "divider_color": "{{ settings.color_palette.color2 }}",
+            "type_preset": "h6",
+            "background_color": "#00000000",
+            "text_color": "{{ settings.color_palette.foreground }}",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "{{ settings.color_palette.color2 }}",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "intro",
+        "ordering_h",
+        "ordering",
+        "delivery_h",
+        "delivery",
+        "returns_h",
+        "returns"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 48,
+        "padding-block-end": 72
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

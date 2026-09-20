@@ -1,0 +1,101 @@
+{%- doc -%}
+  Renders one inline SVG icon for the Door2Pick header.
+
+  The theme's own icon set covers cart, account, search, menu and carets, but
+  has nothing for product categories or the utility bar, so those are drawn
+  here. All use currentColor and a 24x24 viewBox, so they inherit size and
+  colour from their container.
+
+  @param {string} name - Icon name: truck, sparkle, shield, return, headset,
+    diamond, house, phone, pot, flame, tag, gift, grid, heart, star.
+
+  @example
+  {% render 'd2p-icon', name: 'diamond' %}
+{%- enddoc -%}
+
+{%- case name -%}
+  {%- when 'truck' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/>
+      <circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/>
+    </svg>
+
+  {%- when 'sparkle' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>
+      <path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>
+    </svg>
+
+  {%- when 'shield' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M12 3l7 3v5.5c0 4-3 7.5-7 8.5-4-1-7-4.5-7-8.5V6z"/>
+      <path d="M9.2 12l2 2 3.6-3.8"/>
+    </svg>
+
+  {%- when 'return' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M4 9h11a4.5 4.5 0 0 1 0 9h-5"/><path d="M7.5 5.5L4 9l3.5 3.5"/>
+    </svg>
+
+  {%- when 'headset' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M5 13v-1a7 7 0 0 1 14 0v1"/>
+      <rect x="3" y="13" width="3.6" height="5.5" rx="1.2"/>
+      <rect x="17.4" y="13" width="3.6" height="5.5" rx="1.2"/>
+      <path d="M19 18.5v.8a2.2 2.2 0 0 1-2.2 2.2H13"/>
+    </svg>
+
+  {%- when 'diamond' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18"/><path d="M9.5 9L12 20 14.5 9 12 4z"/>
+    </svg>
+
+  {%- when 'house' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>
+    </svg>
+
+  {%- when 'phone' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M10.8 5.6h2.4"/><path d="M11 18.4h2"/>
+    </svg>
+
+  {%- when 'pot' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M4 9h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/>
+      <path d="M2.5 11.5h1.5M20 11.5h1.5"/><path d="M9 6.2V4.6M15 6.2V4.6M12 6.2V4"/>
+    </svg>
+
+  {%- when 'flame' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.2 1.8-4.2C9.8 9.4 11 7.5 12 3z"/>
+      <path d="M12 20a2.6 2.6 0 0 0 2.6-2.6c0-1.7-2.6-3.6-2.6-3.6s-2.6 1.9-2.6 3.6A2.6 2.6 0 0 0 12 20z"/>
+    </svg>
+
+  {%- when 'tag' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M3.5 12.5l8-8H20v8.5l-8 8z"/><circle cx="16" cy="8" r="1.4"/>
+    </svg>
+
+  {%- when 'heart' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M12 20s-7-4.4-7-9.2A4 4 0 0 1 12 8a4 4 0 0 1 7 2.8C19 15.6 12 20 12 20z"/>
+    </svg>
+
+  {%- when 'star' -%}
+    <svg viewBox="0 0 24 24" fill="currentColor" focusable="false">
+      <path d="M12 3.6l2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.8z"/>
+    </svg>
+
+  {%- when 'grid' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/>
+      <rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>
+    </svg>
+
+  {%- when 'gift' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <rect x="3.5" y="9" width="17" height="4"/><path d="M5 13h14v7H5z"/><path d="M12 9v11"/>
+      <path d="M12 9S10.5 5 8.6 5a2 2 0 0 0 0 4"/><path d="M12 9s1.5-4 3.4-4a2 2 0 0 1 0 4"/>
+    </svg>
+{%- endcase -%}

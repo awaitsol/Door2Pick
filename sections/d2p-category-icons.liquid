@@ -1,0 +1,221 @@
+{%- comment -%}
+  Circular category icons with labels underneath — the quick-jump row that
+  sits directly beneath the hero.
+
+  Each block takes an image (an uploaded picture, as in the design) or falls
+  back to one of the theme's own line icons, so the row is usable before any
+  category artwork exists.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign items = section.blocks | where: 'type', 'category'
+-%}
+
+{%- if items.size > 0 -%}
+  <div class="d2p-cats" style="
+    --d2p-cats-bg: {{ s.background_color }};
+    padding-block-start: {{ s.padding_top }}px;
+    padding-block-end: {{ s.padding_bottom }}px;
+  ">
+    <div class="d2p-cats__inner">
+      {%- if s.heading != blank -%}
+        <h2 class="d2p-cats__heading">{{ s.heading }}</h2>
+      {%- endif -%}
+
+      <ul class="d2p-cats__list">
+        {%- for block in items -%}
+          <li class="d2p-cats__item" {{ block.shopify_attributes }}>
+            <a class="d2p-cats__link" href="{{ block.settings.link }}">
+              <span class="d2p-cats__ring">
+                {%- if block.settings.image != blank -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 240
+                    | image_tag: class: 'd2p-cats__image', alt: '', widths: '80, 120, 160, 240', loading: 'lazy'
+                  }}
+                {%- else -%}
+                  <span class="d2p-cats__icon" aria-hidden="true">
+                    {%- render 'd2p-icon', name: block.settings.icon -%}
+                  </span>
+                {%- endif -%}
+              </span>
+              <span class="d2p-cats__label">{{ block.settings.label }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-cats {
+    background: var(--d2p-cats-bg);
+  }
+
+  .d2p-cats__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .d2p-cats__heading {
+    margin: 0 0 20px;
+    text-align: center;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  }
+
+  .d2p-cats__list {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(16px, 5vw, 72px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .d2p-cats__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .d2p-cats__item {
+    flex: 0 0 auto;
+  }
+
+  .d2p-cats__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .d2p-cats__ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 88px;
+    block-size: 88px;
+    border: 1px solid var(--d2p-gold, #e8c27a);
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgb(255 255 255 / 3%);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .d2p-cats__link:hover .d2p-cats__ring {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px -14px rgb(232 194 122 / 60%);
+  }
+
+  .d2p-cats__image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .d2p-cats__icon {
+    color: var(--d2p-gold, #e8c27a);
+  }
+
+  .d2p-cats__icon svg {
+    inline-size: 38px;
+    block-size: 38px;
+    display: block;
+  }
+
+  .d2p-cats__label {
+    font-size: 0.875rem;
+    text-align: center;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .d2p-cats__link:hover .d2p-cats__label {
+    color: var(--d2p-gold, #e8c27a);
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-cats__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-cats__list {
+      justify-content: flex-start;
+      gap: 24px;
+    }
+
+    .d2p-cats__ring {
+      inline-size: 66px;
+      block-size: 66px;
+    }
+
+    .d2p-cats__icon svg {
+      inline-size: 28px;
+      block-size: 28px;
+    }
+
+    .d2p-cats__label {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-cats__ring,
+    .d2p-cats__label {
+      transition: none;
+    }
+
+    .d2p-cats__link:hover .d2p-cats__ring {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Category icons",
+  "tag": "section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 32 }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Falls back to the icon below when empty." },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "diamond", "label": "Jewellery" },
+            { "value": "house", "label": "Home decor" },
+            { "value": "phone", "label": "Tech" },
+            { "value": "pot", "label": "Kitchen" },
+            { "value": "flame", "label": "Trending" },
+            { "value": "sparkle", "label": "New" },
+            { "value": "tag", "label": "Deals" },
+            { "value": "gift", "label": "Gifts" }
+          ],
+          "default": "diamond"
+        },
+        { "type": "text", "id": "label", "label": "Label", "default": "Category" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Category icons", "blocks": [{ "type": "category" }] }]
+}
+{% endschema %}

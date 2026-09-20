@@ -1,0 +1,322 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "title": {
+          "type": "text",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "2.5rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.color1 }}"
+          },
+          "blocks": {}
+        },
+        "intro": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Seven days to change your mind. No restocking fees.</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1.125rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000000",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0,
+            "text_color": "{{ settings.color_palette.foreground }}"
+          },
+          "blocks": {}
+        },
+        "detail": {
+          "type": "accordion",
+          "blocks": {
+            "ret_0": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "What can be returned",
+                "open_by_default": true,
+                "icon": "return",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Any unused item in its original packaging, within seven days of delivery. Earrings and other pierced jewellery cannot be returned once opened, for hygiene reasons.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ret_1": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "How to start a return",
+                "open_by_default": false,
+                "icon": "box",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Email us with your order number and the item you want to return. We will confirm within one working day and arrange collection.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ret_2": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Refund timing",
+                "open_by_default": false,
+                "icon": "recycle",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Once the item reaches us and passes inspection, refunds are issued to the original payment method within 5–7 working days.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ret_3": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Exchanges",
+                "open_by_default": false,
+                "icon": "ruler",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>We exchange for a different size or colour where stock allows. Tell us when you start the return.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            },
+            "ret_4": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Faulty items",
+                "open_by_default": false,
+                "icon": "check_box",
+                "width": 24
+              },
+              "blocks": {
+                "body": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>If something arrives damaged or faulty, contact us within 48 hours. We cover return shipping and replace or refund in full.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "background_color": "#00000000",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0,
+                    "text_color": "{{ settings.color_palette.foreground }}"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "body"
+              ]
+            }
+          },
+          "block_order": [
+            "ret_0",
+            "ret_1",
+            "ret_2",
+            "ret_3",
+            "ret_4"
+          ],
+          "settings": {
+            "icon": "plus",
+            "dividers": true,
+            "divider_color": "{{ settings.color_palette.color2 }}",
+            "type_preset": "h6",
+            "background_color": "#00000000",
+            "text_color": "{{ settings.color_palette.foreground }}",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "{{ settings.color_palette.color2 }}",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "cta": {
+          "type": "button",
+          "settings": {
+            "label": "Start a return",
+            "link": "/pages/contact",
+            "open_in_new_tab": false,
+            "style_class": "button",
+            "width": "fit-content",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 100
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "intro",
+        "detail",
+        "cta"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 48,
+        "padding-block-end": 72
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

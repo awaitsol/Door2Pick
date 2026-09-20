@@ -1,0 +1,203 @@
+/*
+ * Door2Pick — dark luxury identity (store-wide)
+ *
+ * Palette:
+ *   page      #0B0B0D    surface   #141416    border  #26262A
+ *   text      #EDE7DB    muted     #A9A296
+ *   gold      #C9A45C    gradient  #E3C989 -> #A67C3D
+ *
+ * Contrast (WCAG AA, 4.5:1 for text):
+ *   ivory on page 15.97  ·  gold on page 8.38  ·  dark label on the
+ *   gradient 12.16 at its light stop, 5.22 at its dark stop.
+ *
+ * Layered after base.css.
+ */
+
+:root {
+  --d2p-page: #0b0b0d;
+  --d2p-surface: #141416;
+  --d2p-border: #26262a;
+  --d2p-text: #ede7db;
+  --d2p-muted: #a9a296;
+  --d2p-gold: #c9a45c;
+  --d2p-gold-hi: #e3c989;
+  --d2p-gold-lo: #a67c3d;
+  --d2p-gold-gradient: linear-gradient(135deg, #a67c3d 0%, #e3c989 48%, #c9a45c 100%);
+}
+
+/* --- Gold gradient buttons --------------------------------------------- */
+.button:not(.button-secondary):not(.button-unstyled):not(.button-custom):not([aria-disabled='true']):not(:disabled),
+button.shopify-payment-button__button--unbranded {
+  background-image: var(--d2p-gold-gradient);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  color: var(--d2p-page);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: background-position 0.45s ease;
+}
+
+.button:not(.button-secondary):not(.button-unstyled):not(.button-custom):hover,
+button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
+  background-position: 100% 50%;
+}
+
+/* =======================================================================
+ * Store-wide typography colors
+ *
+ * Headings gold, subheadings white. Both verified on the dark palette:
+ * gold on page 8.38:1, white on page 19.66:1 (WCAG AA needs 4.5:1).
+ *
+ * Headings inherit `var(--color)` in base.css, which sections set per
+ * context, so these rules name the elements directly. Buttons, cards and
+ * menus are excluded: their headings carry their own contextual color.
+ * ======================================================================= */
+
+h1,
+h2,
+h3,
+.h1,
+.h2,
+.h3 {
+  color: var(--d2p-gold);
+}
+
+h4,
+h5,
+h6,
+.h4,
+.h5,
+.h6 {
+  color: #ffffff;
+}
+
+/* Headings inside interactive or colored surfaces keep their own color. */
+.button h1, .button h2, .button h3, .button h4, .button h5, .button h6,
+.button-secondary :is(h1, h2, h3, h4, h5, h6),
+.d2p-header :is(h1, h2, h3, h4, h5, h6),
+.card__content :is(h4, h5, h6),
+[class*='badge'] :is(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}
+
+/* --- Gold borders on secondary buttons ---------------------------------
+ * Horizon draws button borders with an inset box-shadow driven by
+ * --button-border-color, so we set that variable rather than `border`.
+ */
+.button-secondary {
+  --button-border-color: var(--d2p-gold);
+  --button-color: var(--d2p-gold);
+  --button-border-width: 1px;
+}
+
+.button-secondary:hover {
+  --button-border-color: var(--d2p-gold-hi);
+  --button-color: var(--d2p-gold-hi);
+}
+
+/* =======================================================================
+ * Homepage components
+ * ======================================================================= */
+
+/* Category tiles: gold hairline on hover, image lift */
+.collection-card {
+  transition: transform 0.35s ease;
+}
+
+.collection-card:hover {
+  transform: translateY(-2px);
+}
+
+.collection-card img {
+  transition: transform 0.5s ease;
+}
+
+.collection-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Trust strip */
+.marquee {
+  border-block: 1px solid var(--d2p-border);
+}
+
+/* Product card imagery; the card surface itself is defined below. */
+.product-card img {
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.04);
+}
+
+/* =======================================================================
+ * Accordions (FAQ, product details, shipping/returns pages)
+ * ======================================================================= */
+
+.accordion summary,
+details summary {
+  transition: color 0.2s ease;
+}
+
+.accordion summary:hover,
+details summary:hover {
+  color: var(--d2p-gold);
+}
+
+/* =======================================================================
+ * Footer
+ * ======================================================================= */
+
+footer a {
+  transition: color 0.2s ease;
+}
+
+footer a:hover {
+  color: var(--d2p-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-card,
+  .collection-card img,
+  .product-card,
+  .product-card img,
+  .accordion summary,
+  details summary,
+  footer a {
+    transition: none;
+  }
+
+  .collection-card:hover,
+  .product-card:hover {
+    transform: none;
+  }
+
+  .collection-card:hover img,
+  .product-card:hover img {
+    transform: none;
+  }
+}
+
+/* =======================================================================
+ * Product row headings
+ *
+ * Horizon spreads heading / subtitle / button across the full width with
+ * space-between, which strands the subtitle mid-row. Group the text at the
+ * start and keep only the button pushed to the end.
+ * ======================================================================= */
+
+.section-resource-list__header {
+  align-items: baseline;
+}
+
+/* The subtitle follows the heading instead of floating to the centre; the
+   auto margin after it is what pushes the button to the far end. */
+.section-resource-list__header > *:nth-child(2) {
+  margin-inline-end: auto;
+}
+
+@media screen and (max-width: 749px) {
+  .section-resource-list__header > *:nth-child(2) {
+    margin-inline-end: 0;
+  }
+}

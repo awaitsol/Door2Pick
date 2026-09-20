@@ -1,0 +1,1242 @@
+{%- comment -%}
+  Door2Pick marketplace header.
+
+  Rows:
+    1. utility bar — benefit messages with icons
+    2. main bar    — logo, primary nav, pill search, account and cart
+    3. mega menu   — opened by "All Categories": a category rail on the left,
+                     one column of links per category, a promo panel and a
+                     trust row along the bottom
+
+  Horizon's built-in header cannot express per-category icons, the categories
+  rail or this mega menu, so this section replaces it rather than restyling it.
+
+  The cart button reuses Horizon's own drawer trigger contract
+  (`on:click="#cart-drawer/toggle"` plus matching ARIA), so the existing cart
+  drawer keeps working untouched.
+
+  Structure note: each `category` block owns its subcategory links as a single
+  newline-separated textarea (`Label | /url` per line) rather than as nested
+  blocks, because Shopify sections do not support two levels of nesting in the
+  theme editor.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign utilities = section.blocks | where: 'type', 'utility'
+  assign nav_links = section.blocks | where: 'type', 'nav_link'
+  assign categories = section.blocks | where: 'type', 'category'
+
+  comment
+    Category blocks name a collection rather than a URL, so a link can never
+    point at a handle that does not exist. `collection` is the picker; when it
+    is empty the block falls back to `collection_handle`, which is what a JSON
+    template can set. A block that resolves to neither is skipped entirely
+    rather than rendering a link to a 404.
+  endcomment
+-%}
+
+<div class="d2p-header" style="
+  --d2p-h-utility-bg: {{ s.utility_background }};
+  --d2p-h-utility-fg: {{ s.utility_text }};
+  --d2p-h-main-bg: {{ s.main_background }};
+  --d2p-h-main-fg: {{ s.main_text }};
+  --d2p-h-menu-bg: {{ s.menu_background }};
+  --d2p-h-menu-fg: {{ s.menu_text }};
+  --d2p-h-accent: {{ s.accent_color }};
+  --d2p-h-accent-fg: {{ s.accent_text }};
+  --d2p-h-border: {{ s.border_color }};
+">
+  {%- if utilities.size > 0 -%}
+    <div class="d2p-header__utility">
+      <div class="d2p-header__inner d2p-header__utility-inner">
+        {%- for block in utilities -%}
+          <div class="d2p-header__utility-item" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != 'none' -%}
+              <span class="d2p-header__utility-icon" aria-hidden="true">
+                {%- render 'd2p-icon', name: block.settings.icon -%}
+              </span>
+            {%- endif -%}
+            <span class="d2p-header__utility-text">
+              {%- if block.settings.strong_text != blank -%}
+                <strong>{{ block.settings.strong_text }}</strong>
+              {%- endif -%}
+              {{ block.settings.text }}
+            </span>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="d2p-header__main">
+    <div class="d2p-header__inner d2p-header__main-inner">
+      <button
+        class="d2p-header__burger"
+        type="button"
+        aria-label="{{ 'accessibility.menu' | t | default: 'Menu' }}"
+        aria-expanded="false"
+        aria-controls="d2p-megamenu"
+        data-d2p-toggle
+      >
+        {{- 'icon-menu.svg' | inline_asset_content -}}
+      </button>
+
+      <a class="d2p-header__logo" href="{{ routes.root_url }}">
+        {%- if s.logo != blank -%}
+          {{ s.logo | image_url: width: 600 | image_tag:
+             alt: shop.name, widths: '200, 300, 450, 600', loading: 'eager' }}
+        {%- elsif s.logo_asset != blank -%}
+          <img src="{{ s.logo_asset | asset_url }}" alt="{{ shop.name | escape }}" loading="eager" width="600" height="200">
+        {%- else -%}
+          <span class="d2p-header__logo-text">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+
+      {%- if nav_links.size > 0 -%}
+        <nav class="d2p-header__primary" aria-label="{{ s.primary_aria_label | escape }}">
+          <ul class="d2p-header__primary-list">
+            {%- for block in nav_links -%}
+              {%- liquid
+                assign is_active = false
+                if block.settings.link == routes.root_url and template.name == 'index'
+                  assign is_active = true
+                endif
+              -%}
+              <li {{ block.shopify_attributes }}>
+                <a
+                  class="d2p-header__primary-link{% if is_active %} is-active{% endif %}"
+                  href="{{ block.settings.link }}"
+                  {% if is_active %}aria-current="page"{% endif %}
+                >
+                  {{ block.settings.label }}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+
+      {%- if s.show_search -%}
+        <form class="d2p-header__search" action="{{ routes.search_url }}" method="get" role="search">
+          <input type="hidden" name="type" value="product">
+          <label class="visually-hidden" for="d2p-search-input">{{ 'content.search' | t }}</label>
+          <span class="d2p-header__search-icon" aria-hidden="true">
+            {{- 'icon-search.svg' | inline_asset_content -}}
+          </span>
+          <input
+            id="d2p-search-input"
+            class="d2p-header__search-input"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ s.search_placeholder | escape }}"
+            autocomplete="off"
+          >
+          <button class="d2p-header__search-submit" type="submit" aria-label="{{ 'content.search' | t }}">
+            {{- 'icon-search.svg' | inline_asset_content -}}
+          </button>
+        </form>
+      {%- endif -%}
+
+      <div class="d2p-header__actions">
+        {%- if shop.customer_accounts_enabled -%}
+          <a class="d2p-header__action" href="{{ routes.account_url }}">
+            <span class="d2p-header__action-icon" aria-hidden="true">
+              {{- 'icon-account.svg' | inline_asset_content -}}
+            </span>
+            <span class="d2p-header__action-label">{{ s.account_label | default: 'Account' }}</span>
+          </a>
+        {%- endif -%}
+
+        {%- capture cart_inner -%}
+          <span class="d2p-header__action-icon" aria-hidden="true">
+            {{- 'icon-cart.svg' | inline_asset_content -}}
+            <span class="d2p-header__cart-count">{{ cart.item_count }}</span>
+          </span>
+          <span class="d2p-header__action-label">{{ s.cart_label | default: 'Cart' }}</span>
+        {%- endcapture -%}
+
+        {%- if settings.cart_type == 'drawer' and template.name != 'cart' -%}
+          <button
+            class="d2p-header__action button-unstyled"
+            type="button"
+            on:click="#cart-drawer/toggle"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="cart-drawer"
+            aria-label="{{ 'accessibility.cart' | t }}"
+            data-testid="cart-drawer-trigger"
+          >
+            {{ cart_inner }}
+          </button>
+        {%- else -%}
+          <a class="d2p-header__action" href="{{ routes.cart_url }}" aria-label="{{ 'accessibility.cart' | t }}">
+            {{ cart_inner }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if categories.size > 0 -%}
+    <div class="d2p-header__menubar">
+      <div class="d2p-header__inner d2p-header__menubar-inner">
+        <button
+          class="d2p-header__pill"
+          type="button"
+          aria-expanded="false"
+          aria-controls="d2p-megamenu"
+          data-d2p-toggle
+        >
+          <span class="d2p-header__pill-icon" aria-hidden="true">
+            {%- render 'd2p-icon', name: 'grid' -%}
+          </span>
+          {{ s.all_categories_label | default: 'All Categories' }}
+          <span class="d2p-header__pill-caret" aria-hidden="true">
+            {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="d2p-megamenu" id="d2p-megamenu" hidden data-d2p-megamenu>
+      <div class="d2p-header__inner d2p-megamenu__inner">
+        <div class="d2p-megamenu__rail">
+          <ul class="d2p-megamenu__rail-list" role="tablist" aria-label="{{ s.nav_aria_label | escape }}">
+            {%- for block in categories -%}
+              {%- liquid
+                assign cat = block.settings.collection
+                if cat == blank and block.settings.collection_handle != blank
+                  assign cat = collections[block.settings.collection_handle]
+                endif
+                assign cat_url = cat.url | default: block.settings.link
+                assign cat_label = block.settings.label | default: cat.title
+              -%}
+              {%- if cat_url == blank -%}{%- continue -%}{%- endif -%}
+              <li {{ block.shopify_attributes }}>
+                <a
+                  class="d2p-megamenu__rail-link{% if forloop.first %} is-active{% endif %}"
+                  href="{{ cat_url }}"
+                  data-d2p-rail="{{ forloop.index0 }}"
+                >
+                  {%- if block.settings.icon != 'none' -%}
+                    <span class="d2p-megamenu__rail-icon" aria-hidden="true">
+                      {%- render 'd2p-icon', name: block.settings.icon -%}
+                    </span>
+                  {%- endif -%}
+                  <span class="d2p-megamenu__rail-label">{{ cat_label }}</span>
+                  <span class="d2p-megamenu__rail-caret" aria-hidden="true">
+                    {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+                  </span>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          {%- if s.promo_heading != blank -%}
+            <a class="d2p-megamenu__promo" href="{{ s.promo_link | default: routes.all_products_collection_url }}">
+              <span class="d2p-megamenu__promo-text">
+                <strong>{{ s.promo_heading }}</strong>
+                {%- if s.promo_body != blank -%}
+                  <span>{{ s.promo_body }}</span>
+                {%- endif -%}
+              </span>
+              <span class="d2p-megamenu__promo-arrow" aria-hidden="true">
+                {{- 'icon-arrow.svg' | inline_asset_content -}}
+              </span>
+            </a>
+          {%- endif -%}
+        </div>
+
+        <div class="d2p-megamenu__body">
+          <div class="d2p-megamenu__columns">
+            {%- for block in categories -%}
+              {%- liquid
+                assign cat = block.settings.collection
+                if cat == blank and block.settings.collection_handle != blank
+                  assign cat = collections[block.settings.collection_handle]
+                endif
+                assign cat_url = cat.url | default: block.settings.link
+                assign cat_label = block.settings.label | default: cat.title
+              -%}
+              {%- if cat_url == blank -%}{%- continue -%}{%- endif -%}
+              <div class="d2p-megamenu__column" data-d2p-panel="{{ forloop.index0 }}">
+                <a class="d2p-megamenu__column-title" href="{{ cat_url }}">
+                  {{ cat_label }}
+                </a>
+                {%- assign lines = block.settings.links | newline_to_br | split: '<br />' -%}
+                <ul class="d2p-megamenu__links">
+                  {%- for line in lines -%}
+                    {%- liquid
+                      assign parts = line | strip | split: '|'
+                      assign sub_label = parts.first | strip
+                      comment
+                        With no "| url" on the line the link falls back to the
+                        parent collection, so a sub-item never 404s before its
+                        own collection exists.
+                      endcomment
+                      if parts.size > 1
+                        assign sub_url = parts.last | strip
+                      else
+                        assign sub_url = cat_url
+                      endif
+                    -%}
+                    {%- if sub_label != blank -%}
+                      <li>
+                        <a href="{{ sub_url }}">{{ sub_label }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+                <a class="d2p-megamenu__viewall" href="{{ cat_url }}">
+                  {{ s.view_all_label | default: 'View All' }}
+                  <span aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+                </a>
+              </div>
+            {%- endfor -%}
+
+            {%- if s.feature_heading != blank -%}
+              <div class="d2p-megamenu__feature">
+                {%- if s.feature_eyebrow != blank -%}
+                  <span class="d2p-megamenu__feature-eyebrow">{{ s.feature_eyebrow }}</span>
+                {%- endif -%}
+                <h2 class="d2p-megamenu__feature-heading">{{ s.feature_heading }}</h2>
+                {%- if s.feature_body != blank -%}
+                  <p class="d2p-megamenu__feature-body">{{ s.feature_body }}</p>
+                {%- endif -%}
+                {%- if s.feature_button_label != blank -%}
+                  <a class="d2p-megamenu__feature-button" href="{{ s.feature_button_link | default: routes.all_products_collection_url }}">
+                    {{ s.feature_button_label }}
+                    <span aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+                  </a>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- if utilities.size > 0 -%}
+            <div class="d2p-megamenu__trust">
+              {%- for block in utilities -%}
+                <div class="d2p-megamenu__trust-item">
+                  {%- if block.settings.icon != 'none' -%}
+                    <span class="d2p-megamenu__trust-icon" aria-hidden="true">
+                      {%- render 'd2p-icon', name: block.settings.icon -%}
+                    </span>
+                  {%- endif -%}
+                  <span class="d2p-megamenu__trust-text">
+                    <strong>{{ block.settings.strong_text | default: block.settings.text }}</strong>
+                    {%- if block.settings.strong_text != blank -%}
+                      <span>{{ block.settings.text }}</span>
+                    {%- endif -%}
+                  </span>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .d2p-header {
+    position: relative;
+    z-index: 5;
+    background: var(--d2p-h-main-bg);
+  }
+
+  .d2p-header__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* ---------- utility bar ---------- */
+  .d2p-header__utility {
+    background: var(--d2p-h-utility-bg);
+    color: var(--d2p-h-utility-fg);
+    font-size: 0.8125rem;
+    border-block-end: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-header__utility-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(16px, 4vw, 64px);
+    min-block-size: 44px;
+  }
+
+  .d2p-header__utility-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  .d2p-header__utility-item + .d2p-header__utility-item {
+    border-inline-start: 1px solid var(--d2p-h-border);
+    padding-inline-start: clamp(16px, 4vw, 64px);
+  }
+
+  .d2p-header__utility-icon {
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-header__utility-icon svg {
+    inline-size: 20px;
+    block-size: 20px;
+    display: block;
+  }
+
+  .d2p-header__utility-text strong {
+    color: var(--d2p-h-accent);
+    font-weight: 700;
+    margin-inline-end: 4px;
+  }
+
+  /* ---------- main bar ---------- */
+  .d2p-header__main {
+    background: var(--d2p-h-main-bg);
+    color: var(--d2p-h-main-fg);
+  }
+
+  .d2p-header__main-inner {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2.4vw, 36px);
+    min-block-size: 88px;
+  }
+
+  .d2p-header__burger {
+    display: none;
+    padding: 8px;
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .d2p-header__burger svg {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+
+  .d2p-header__logo {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .d2p-header__logo img {
+    display: block;
+    block-size: 54px;
+    inline-size: auto;
+  }
+
+  .d2p-header__logo-text {
+    font-family: var(--font-heading--family);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  /* primary nav */
+  .d2p-header__primary-list {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 2vw, 34px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-header__primary-link {
+    position: relative;
+    display: block;
+    padding-block: 6px;
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .d2p-header__primary-link:hover,
+  .d2p-header__primary-link.is-active {
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-header__primary-link.is-active::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 2px;
+    background: var(--d2p-h-accent);
+  }
+
+  /* pill search */
+  .d2p-header__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    max-inline-size: 560px;
+    margin-inline-start: auto;
+    background: rgb(255 255 255 / 5%);
+    border: 1px solid var(--d2p-h-accent);
+    border-radius: 999px;
+    padding: 5px 5px 5px 18px;
+    gap: 10px;
+  }
+
+  .d2p-header__search-icon {
+    display: flex;
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-header__search-icon svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+
+  .d2p-header__search-input {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 0.9375rem;
+    color: var(--d2p-h-main-fg);
+  }
+
+  .d2p-header__search-input::placeholder {
+    color: rgb(255 255 255 / 45%);
+  }
+
+  .d2p-header__search-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    inline-size: 38px;
+    block-size: 38px;
+    border: none;
+    border-radius: 50%;
+    background: var(--d2p-h-accent);
+    color: var(--d2p-h-accent-fg);
+    cursor: pointer;
+    transition: filter 0.2s ease;
+  }
+
+  .d2p-header__search-submit:hover {
+    filter: brightness(1.1);
+  }
+
+  .d2p-header__search-submit svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+
+  /* account + cart */
+  .d2p-header__actions {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 2.4vw, 30px);
+    flex: 0 0 auto;
+    padding-inline-start: clamp(8px, 1.6vw, 24px);
+    border-inline-start: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-header__action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .d2p-header__action:hover {
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-header__action-icon {
+    position: relative;
+    display: flex;
+  }
+
+  .d2p-header__action-icon svg {
+    inline-size: 26px;
+    block-size: 26px;
+  }
+
+  .d2p-header__cart-count {
+    position: absolute;
+    inset-block-start: -6px;
+    inset-inline-end: -9px;
+    min-inline-size: 19px;
+    block-size: 19px;
+    padding-inline: 4px;
+    border-radius: 999px;
+    background: var(--d2p-h-accent);
+    color: var(--d2p-h-accent-fg);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 19px;
+    text-align: center;
+  }
+
+  /* ---------- categories pill ---------- */
+  .d2p-header__menubar {
+    background: var(--d2p-h-main-bg);
+    border-block-start: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-header__menubar-inner {
+    display: flex;
+    align-items: center;
+    min-block-size: 56px;
+  }
+
+  .d2p-header__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 22px;
+    border: 1px solid var(--d2p-h-accent);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 4%);
+    color: var(--d2p-h-accent);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+  }
+
+  .d2p-header__pill:hover,
+  .d2p-header__pill[aria-expanded='true'] {
+    background: var(--d2p-h-accent);
+    color: var(--d2p-h-accent-fg);
+  }
+
+  .d2p-header__pill-icon svg,
+  .d2p-header__pill-caret svg {
+    display: block;
+    inline-size: 16px;
+    block-size: 16px;
+  }
+
+  .d2p-header__pill-caret svg {
+    inline-size: 13px;
+    block-size: 13px;
+    transition: transform 0.2s ease;
+  }
+
+  .d2p-header__pill[aria-expanded='true'] .d2p-header__pill-caret svg {
+    transform: rotate(90deg);
+  }
+
+  /* ---------- mega menu ---------- */
+  .d2p-megamenu {
+    background: var(--d2p-h-menu-bg);
+    color: var(--d2p-h-menu-fg);
+    border-block: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-megamenu[hidden] {
+    display: none;
+  }
+
+  .d2p-megamenu__inner {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 0;
+    padding-block: 0;
+  }
+
+  .d2p-megamenu__rail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-block: 20px;
+    padding-inline-end: 24px;
+    border-inline-end: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-megamenu__rail-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .d2p-megamenu__rail-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.9375rem;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .d2p-megamenu__rail-link:hover,
+  .d2p-megamenu__rail-link.is-active {
+    background: rgb(255 255 255 / 4%);
+    border-color: var(--d2p-h-accent);
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__rail-icon {
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__rail-icon svg {
+    display: block;
+    inline-size: 22px;
+    block-size: 22px;
+  }
+
+  .d2p-megamenu__rail-label {
+    flex: 1 1 auto;
+  }
+
+  .d2p-megamenu__rail-caret svg {
+    display: block;
+    inline-size: 13px;
+    block-size: 13px;
+    opacity: 0.6;
+  }
+
+  .d2p-megamenu__promo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-block-start: auto;
+    padding: 16px;
+    border: 1px solid var(--d2p-h-border);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 3%);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .d2p-megamenu__promo:hover {
+    border-color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__promo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 auto;
+  }
+
+  .d2p-megamenu__promo-text strong {
+    font-size: 1rem;
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__promo-text span {
+    font-size: 0.8125rem;
+    opacity: 0.75;
+  }
+
+  .d2p-megamenu__promo-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 34px;
+    block-size: 34px;
+    flex: 0 0 auto;
+    border: 1px solid var(--d2p-h-accent);
+    border-radius: 50%;
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__promo-arrow svg {
+    inline-size: 15px;
+    block-size: 15px;
+  }
+
+  .d2p-megamenu__body {
+    display: flex;
+    flex-direction: column;
+    padding-block: 20px;
+    padding-inline-start: 32px;
+  }
+
+  .d2p-megamenu__columns {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) 1.25fr;
+    gap: 24px;
+    flex: 1 1 auto;
+  }
+
+  .d2p-megamenu__column-title {
+    display: block;
+    margin-block-end: 14px;
+    color: var(--d2p-h-accent);
+    font-family: var(--font-subheading--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .d2p-megamenu__links {
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .d2p-megamenu__links a {
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.875rem;
+    opacity: 0.85;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .d2p-megamenu__links a:hover {
+    color: var(--d2p-h-accent);
+    opacity: 1;
+  }
+
+  .d2p-megamenu__viewall {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--d2p-h-accent);
+    text-decoration: none;
+    font-size: 0.8125rem;
+  }
+
+  .d2p-megamenu__viewall svg {
+    inline-size: 14px;
+    block-size: 14px;
+  }
+
+  /* feature panel */
+  .d2p-megamenu__feature {
+    padding-inline-start: 28px;
+    border-inline-start: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-megamenu__feature-eyebrow {
+    display: block;
+    margin-block-end: 10px;
+    color: var(--d2p-h-accent);
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .d2p-megamenu__feature-heading {
+    margin: 0 0 10px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+    line-height: 1.1;
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__feature-body {
+    margin: 0 0 16px;
+    font-size: 0.875rem;
+    opacity: 0.85;
+  }
+
+  .d2p-megamenu__feature-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    border-radius: 999px;
+    background: var(--d2p-h-accent);
+    color: var(--d2p-h-accent-fg);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: filter 0.2s ease;
+  }
+
+  .d2p-megamenu__feature-button:hover {
+    filter: brightness(1.08);
+  }
+
+  .d2p-megamenu__feature-button svg {
+    inline-size: 15px;
+    block-size: 15px;
+  }
+
+  /* trust row */
+  .d2p-megamenu__trust {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 56px);
+    margin-block-start: 20px;
+    padding-block-start: 18px;
+    border-block-start: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-megamenu__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .d2p-megamenu__trust-icon {
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-megamenu__trust-icon svg {
+    display: block;
+    inline-size: 24px;
+    block-size: 24px;
+  }
+
+  .d2p-megamenu__trust-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .d2p-megamenu__trust-text strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .d2p-megamenu__trust-text span {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  /* ---------- responsive ---------- */
+  @media screen and (max-width: 1199px) {
+    .d2p-megamenu__columns {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .d2p-megamenu__feature {
+      grid-column: 1 / -1;
+      padding-inline-start: 0;
+      padding-block-start: 20px;
+      border-inline-start: none;
+      border-block-start: 1px solid var(--d2p-h-border);
+    }
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-header__primary,
+    .d2p-header__utility-item:nth-child(n + 2) {
+      display: none;
+    }
+
+    .d2p-header__action-label {
+      display: none;
+    }
+
+    .d2p-megamenu__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .d2p-megamenu__rail {
+      padding-inline-end: 0;
+      border-inline-end: none;
+      border-block-end: 1px solid var(--d2p-h-border);
+    }
+
+    .d2p-megamenu__body {
+      padding-inline-start: 0;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-header__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-header__burger {
+      display: flex;
+    }
+
+    .d2p-header__main-inner {
+      flex-wrap: wrap;
+      min-block-size: 0;
+      padding-block: 12px;
+      gap: 12px;
+    }
+
+    .d2p-header__logo img {
+      block-size: 38px;
+    }
+
+    .d2p-header__search {
+      order: 3;
+      flex-basis: 100%;
+      max-inline-size: none;
+      margin-inline-start: 0;
+    }
+
+    .d2p-header__actions {
+      margin-inline-start: auto;
+      border-inline-start: none;
+    }
+
+    .d2p-header__menubar {
+      display: none;
+    }
+
+    .d2p-megamenu__columns {
+      grid-template-columns: 1fr;
+    }
+
+    .d2p-megamenu__trust {
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-header__action,
+    .d2p-header__primary-link,
+    .d2p-header__search-submit,
+    .d2p-header__pill,
+    .d2p-header__pill-caret svg,
+    .d2p-megamenu__rail-link,
+    .d2p-megamenu__links a,
+    .d2p-megamenu__promo,
+    .d2p-megamenu__feature-button {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  // The mega menu is a disclosure: the pill (and the mobile burger) toggle it,
+  // and it closes on outside click or Escape. It stays in the DOM so its links
+  // remain crawlable; `hidden` handles visibility for assistive tech too.
+  (() => {
+    const menu = () => document.querySelector('[data-d2p-megamenu]');
+    const toggles = () => document.querySelectorAll('[data-d2p-toggle]');
+
+    const setOpen = (open) => {
+      const el = menu();
+      if (!el) return;
+      el.hidden = !open;
+      toggles().forEach((t) => t.setAttribute('aria-expanded', open ? 'true' : 'false'));
+    };
+
+    document.addEventListener('click', (event) => {
+      const toggle = event.target.closest('[data-d2p-toggle]');
+      if (toggle) {
+        event.preventDefault();
+        setOpen(menu()?.hidden ?? false);
+        return;
+      }
+
+      const el = menu();
+      if (!el || el.hidden) return;
+      if (!el.contains(event.target)) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+
+    // Hovering a category in the rail highlights it. Every column is shown at
+    // once in this layout, so this is emphasis only, not a filter.
+    document.addEventListener('mouseover', (event) => {
+      const link = event.target.closest('[data-d2p-rail]');
+      if (!link) return;
+      const rail = link.closest('.d2p-megamenu__rail-list');
+      if (!rail) return;
+      rail.querySelectorAll('[data-d2p-rail]').forEach((el) => {
+        el.classList.toggle('is-active', el === link);
+      });
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Custom header",
+  "tag": "header",
+  "class": "d2p-header-section",
+  "settings": [
+    { "type": "header", "content": "Logo" },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    {
+      "type": "text",
+      "id": "logo_asset",
+      "label": "Or theme asset filename",
+      "info": "A file in the theme's assets folder, for example logo-header.png",
+      "default": "logo-header.png"
+    },
+
+    { "type": "header", "content": "Search" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search for products, brands and more..."
+    },
+
+    { "type": "header", "content": "Actions" },
+    { "type": "text", "id": "account_label", "label": "Account label", "default": "Account" },
+    { "type": "text", "id": "cart_label", "label": "Cart label", "default": "Cart" },
+
+    { "type": "header", "content": "Mega menu" },
+    {
+      "type": "text",
+      "id": "all_categories_label",
+      "label": "Categories button label",
+      "default": "All Categories"
+    },
+    { "type": "text", "id": "view_all_label", "label": "View all label", "default": "View All" },
+    {
+      "type": "text",
+      "id": "primary_aria_label",
+      "label": "Primary nav description for screen readers",
+      "default": "Main navigation"
+    },
+    {
+      "type": "text",
+      "id": "nav_aria_label",
+      "label": "Category nav description for screen readers",
+      "default": "Product categories"
+    },
+
+    { "type": "header", "content": "Mega menu promo card" },
+    { "type": "text", "id": "promo_heading", "label": "Heading", "default": "Special Picks for Everyday" },
+    { "type": "text", "id": "promo_body", "label": "Body", "default": "Quality products. Happier everyday." },
+    { "type": "url", "id": "promo_link", "label": "Link" },
+
+    { "type": "header", "content": "Mega menu feature panel" },
+    { "type": "text", "id": "feature_eyebrow", "label": "Eyebrow", "default": "Elevate your everyday" },
+    { "type": "text", "id": "feature_heading", "label": "Heading", "default": "Better Picks Brighter Days" },
+    {
+      "type": "textarea",
+      "id": "feature_body",
+      "label": "Body",
+      "default": "Discover jewellery, home decor, kitchen essentials, tech and more — all in one place."
+    },
+    { "type": "text", "id": "feature_button_label", "label": "Button label", "default": "Shop Now" },
+    { "type": "url", "id": "feature_button_link", "label": "Button link" },
+
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "utility_background", "label": "Utility bar background", "default": "#0B0B0D" },
+    { "type": "color", "id": "utility_text", "label": "Utility bar text", "default": "#EDE7DB" },
+    { "type": "color", "id": "main_background", "label": "Main bar background", "default": "#0B0B0D" },
+    { "type": "color", "id": "main_text", "label": "Main bar text", "default": "#FFFFFF" },
+    { "type": "color", "id": "menu_background", "label": "Mega menu background", "default": "#111113" },
+    { "type": "color", "id": "menu_text", "label": "Mega menu text", "default": "#EDE7DB" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#E8C27A" },
+    { "type": "color", "id": "accent_text", "label": "Accent text", "default": "#1A1A1A" },
+    { "type": "color", "id": "border_color", "label": "Border", "default": "#2A2A2E" }
+  ],
+  "blocks": [
+    {
+      "type": "utility",
+      "name": "Utility message",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "sparkle", "label": "Quality" },
+            { "value": "shield", "label": "Secure" },
+            { "value": "return", "label": "Returns" },
+            { "value": "headset", "label": "Support" }
+          ],
+          "default": "truck"
+        },
+        { "type": "text", "id": "strong_text", "label": "Emphasised text" },
+        { "type": "text", "id": "text", "label": "Text", "default": "on orders over Rs. 2,999" }
+      ]
+    },
+    {
+      "type": "nav_link",
+      "name": "Nav link",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Home" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "diamond", "label": "Jewellery" },
+            { "value": "house", "label": "Home decor" },
+            { "value": "phone", "label": "Tech" },
+            { "value": "pot", "label": "Kitchen" },
+            { "value": "flame", "label": "Trending" },
+            { "value": "sparkle", "label": "New" },
+            { "value": "tag", "label": "Deals" },
+            { "value": "gift", "label": "Gifts" }
+          ],
+          "default": "diamond"
+        },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        {
+          "type": "text",
+          "id": "collection_handle",
+          "label": "Or collection handle",
+          "info": "Used when no collection is picked above, for example kitchen."
+        },
+        { "type": "text", "id": "label", "label": "Label", "info": "Defaults to the collection title.", "default": "Category" },
+        { "type": "url", "id": "link", "label": "Link override" },
+        {
+          "type": "textarea",
+          "id": "links",
+          "label": "Subcategory links",
+          "info": "One per line. Just a label links to the parent collection; add \" | /collections/handle\" to link elsewhere."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom header",
+      "blocks": [
+        { "type": "utility" },
+        { "type": "nav_link" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

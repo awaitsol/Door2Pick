@@ -1,0 +1,473 @@
+{%- comment -%}
+  Door2Pick hero banner slideshow.
+
+  The artwork is pre-designed: headline, subtitle, call-to-action and category
+  icons are part of each image. So this section renders images only and adds no
+  text overlay — a live overlay would duplicate what the picture already says.
+
+  Horizon's stock `slideshow` cannot be used here because its image setting is an
+  `image_picker`, which reads from Shopify Files in admin and cannot point at a
+  theme asset. Each slide here takes an asset filename instead, so the bundled
+  images work with no admin upload. A merchant who later uploads through the
+  theme editor can use `image` on a slide, which takes precedence.
+
+  Accessibility: each slide needs alt text describing the artwork, including the
+  words rendered inside it, because screen readers cannot read text in a bitmap.
+{%- endcomment -%}
+
+{%- liquid
+  assign slides = section.blocks | where: 'type', 'slide'
+  assign slide_count = slides.size
+-%}
+
+{%- if slide_count > 0 -%}
+  <div
+    class="hero-banner section-background{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
+    style="--hero-radius: {{ section.settings.corner_radius }}px;"
+  >
+    <hero-banner-carousel
+      class="hero-banner__viewport{% if section.settings.section_width == 'page-width' %} page-width{% endif %}"
+      {% if section.settings.autoplay and slide_count > 1 %}
+        data-autoplay="{{ section.settings.autoplay_speed | times: 1000 }}"
+      {% endif %}
+      data-slide-count="{{ slide_count }}"
+    >
+      <div class="hero-banner__track" role="region" aria-roledescription="carousel" aria-label="{{ section.settings.aria_label | escape }}">
+        {%- for block in slides -%}
+          {%- liquid
+            assign img = block.settings.image
+            assign asset_name = block.settings.image_asset | strip
+          -%}
+          <div
+            class="hero-banner__slide"
+            data-index="{{ forloop.index0 }}"
+            {% if forloop.first == false %}aria-hidden="true"{% endif %}
+            role="group"
+            aria-roledescription="slide"
+            aria-label="{{ forloop.index }} of {{ slide_count }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- capture slide_media -%}
+              {%- if img != blank -%}
+                {%- if forloop.first -%}
+                  {{
+                    img
+                    | image_url: width: 2000
+                    | image_tag:
+                      class: 'hero-banner__image',
+                      alt: block.settings.alt_text,
+                      widths: '600, 900, 1200, 1600, 2000',
+                      sizes: '100vw',
+                      loading: 'eager',
+                      fetchpriority: 'high'
+                  }}
+                {%- else -%}
+                  {{
+                    img
+                    | image_url: width: 2000
+                    | image_tag:
+                      class: 'hero-banner__image',
+                      alt: block.settings.alt_text,
+                      widths: '600, 900, 1200, 1600, 2000',
+                      sizes: '100vw',
+                      loading: 'lazy'
+                  }}
+                {%- endif -%}
+              {%- elsif asset_name != blank -%}
+                <img
+                  class="hero-banner__image"
+                  src="{{ asset_name | asset_url }}"
+                  alt="{{ block.settings.alt_text | escape }}"
+                  {% if forloop.first %}
+                    loading="eager"
+                    fetchpriority="high"
+                  {% else %}
+                    loading="lazy"
+                  {% endif %}
+                  width="1800"
+                  height="918"
+                >
+              {%- else -%}
+                {{ 'hero-banner__image placeholder' | placeholder_svg_tag }}
+              {%- endif -%}
+            {%- endcapture -%}
+
+            {%- if block.settings.link != blank -%}
+              <a
+                class="hero-banner__link"
+                href="{{ block.settings.link }}"
+                aria-label="{{ block.settings.link_label | default: block.settings.alt_text | escape }}"
+              >
+                {{ slide_media }}
+              </a>
+            {%- else -%}
+              {{ slide_media }}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if slide_count > 1 -%}
+        <button
+          class="hero-banner__arrow hero-banner__arrow--prev"
+          type="button"
+          data-direction="prev"
+          aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+        >
+          {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+        </button>
+        <button
+          class="hero-banner__arrow hero-banner__arrow--next"
+          type="button"
+          data-direction="next"
+          aria-label="{{ 'accessibility.slideshow_next' | t }}"
+        >
+          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+        </button>
+
+        <div class="hero-banner__dots" role="tablist" aria-label="{{ section.settings.aria_label | escape }}">
+          {%- for block in slides -%}
+            <button
+              class="hero-banner__dot{% if forloop.first %} is-active{% endif %}"
+              type="button"
+              role="tab"
+              data-index="{{ forloop.index0 }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-label="{{ forloop.index }} of {{ slide_count }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </hero-banner-carousel>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .hero-banner {
+    display: block;
+  }
+
+  .hero-banner__viewport {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--hero-radius, 0);
+  }
+
+  .hero-banner__track {
+    display: grid;
+  }
+
+  /* Slides stack; only the active one is visible. Grid keeps the section's
+     height equal to the tallest slide, so nothing jumps between transitions. */
+  /* The first slide is visible from CSS alone, so the hero still renders if
+     JavaScript is slow, blocked or errors. Once the carousel upgrades it sets
+     data-active and takes over. */
+  .hero-banner__slide {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+
+  .hero-banner__slide:first-child,
+  .hero-banner__slide[data-active] {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Once JS is driving, the first child defers to whichever slide is active. */
+  hero-banner-carousel[data-ready] .hero-banner__slide:not([data-active]) {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .hero-banner__link {
+    display: block;
+  }
+
+  .hero-banner__image {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+
+  .hero-banner__arrow {
+    position: absolute;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 35%);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .hero-banner__arrow:hover {
+    background: rgb(0 0 0 / 60%);
+  }
+
+  .hero-banner__arrow--prev {
+    inset-inline-start: 16px;
+  }
+
+  .hero-banner__arrow--next {
+    inset-inline-end: 16px;
+  }
+
+  .hero-banner__arrow svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+
+  .hero-banner__dots {
+    position: absolute;
+    inset-block-end: 16px;
+    inset-inline: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .hero-banner__dot {
+    inline-size: 8px;
+    block-size: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 55%);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .hero-banner__dot.is-active {
+    background: #fff;
+    transform: scale(1.3);
+  }
+
+  @media screen and (max-width: 749px) {
+    .hero-banner__arrow {
+      inline-size: 32px;
+      block-size: 32px;
+    }
+
+    .hero-banner__arrow--prev {
+      inset-inline-start: 8px;
+    }
+
+    .hero-banner__arrow--next {
+      inset-inline-end: 8px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-banner__slide,
+    .hero-banner__arrow,
+    .hero-banner__dot {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class HeroBannerCarousel extends HTMLElement {
+    connectedCallback() {
+      this.slides = Array.from(this.querySelectorAll('.hero-banner__slide'));
+      this.dots = Array.from(this.querySelectorAll('.hero-banner__dot'));
+      if (this.slides.length === 0) return;
+
+      this.index = 0;
+      this.timer = null;
+      this.show(0);
+      this.setAttribute('data-ready', '');
+
+      this.addEventListener('click', this.onClick);
+
+      const delay = parseInt(this.dataset.autoplay || '0', 10);
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (delay > 0 && this.slides.length > 1 && !reduced) {
+        this.delay = delay;
+        this.start();
+        this.addEventListener('mouseenter', this.stop);
+        this.addEventListener('mouseleave', this.start);
+        this.addEventListener('focusin', this.stop);
+        this.addEventListener('focusout', this.start);
+        document.addEventListener('visibilitychange', this.onVisibility);
+      }
+    }
+
+    disconnectedCallback() {
+      this.stop();
+      document.removeEventListener('visibilitychange', this.onVisibility);
+    }
+
+    onVisibility = () => {
+      if (document.hidden) this.stop();
+      else this.start();
+    };
+
+    onClick = (event) => {
+      const arrow = event.target.closest('[data-direction]');
+      if (arrow) {
+        const step = arrow.dataset.direction === 'next' ? 1 : -1;
+        this.show(this.index + step);
+        this.restart();
+        return;
+      }
+
+      const dot = event.target.closest('.hero-banner__dot');
+      if (dot) {
+        this.show(parseInt(dot.dataset.index, 10));
+        this.restart();
+      }
+    };
+
+    show(next) {
+      const count = this.slides.length;
+      this.index = ((next % count) + count) % count;
+
+      this.slides.forEach((slide, i) => {
+        const active = i === this.index;
+        slide.toggleAttribute('data-active', active);
+        if (active) slide.removeAttribute('aria-hidden');
+        else slide.setAttribute('aria-hidden', 'true');
+      });
+
+      this.dots.forEach((dot, i) => {
+        const active = i === this.index;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    start = () => {
+      if (!this.delay || this.timer) return;
+      this.timer = setInterval(() => this.show(this.index + 1), this.delay);
+    };
+
+    stop = () => {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    };
+
+    restart() {
+      this.stop();
+      this.start();
+    }
+  }
+
+  if (!customElements.get('hero-banner-carousel')) {
+    customElements.define('hero-banner-carousel', HeroBannerCarousel);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Hero banner",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page width" },
+        { "value": "full-width", "label": "Full width" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Seconds per slide",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 6
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Carousel description for screen readers",
+      "default": "Featured promotions"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Takes precedence over the asset filename below."
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Or theme asset filename",
+          "info": "A file in the theme's assets folder, for example hero-1.jpg"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text",
+          "info": "Describe the image, including any words shown inside it."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link description for screen readers"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero banner",
+      "blocks": [{ "type": "slide" }]
+    }
+  ]
+}
+{% endschema %}

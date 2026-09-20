@@ -1,0 +1,14 @@
+{{ 'overflow-list.css' | asset_url | preload_tag: as: 'style' }}
+{{ 'base.css' | asset_url | stylesheet_tag: preload: true }}
+{{ 'theme-custom.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  theme-custom.css paints the bundled logo asset when no logo has been
+  chosen in the theme editor. CSS files cannot call asset_url, so the URL
+  is handed over as a custom property here.
+{%- endcomment -%}
+<style>
+  :root {
+    --d2p-logo: url({{ 'logo-header.png' | asset_url }});
+  }
+</style>

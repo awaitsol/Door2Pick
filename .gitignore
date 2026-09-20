@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Local Claude Code settings
+.claude/
+
+# Source artwork kept outside the theme.
+# Shopify rejects subfolders in assets/, so the full-resolution originals live
+# here and the optimised copies in assets/ are what ship.
+source-images/
+
+# Shopify CLI
+.shopify/

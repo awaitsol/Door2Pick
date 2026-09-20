@@ -1,0 +1,176 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "t:names.header",
+  "sections": {
+    "custom_header": {
+      "type": "custom-header",
+      "blocks": {
+        "u1": {
+          "type": "utility",
+          "settings": {
+            "icon": "truck",
+            "strong_text": "FREE DELIVERY",
+            "text": "on orders over Rs. 2,999"
+          }
+        },
+        "u2": {
+          "type": "utility",
+          "settings": {
+            "icon": "sparkle",
+            "strong_text": "",
+            "text": "Quality Products. Happier Everyday."
+          }
+        },
+        "u3": {
+          "type": "utility",
+          "settings": {
+            "icon": "shield",
+            "strong_text": "",
+            "text": "Secure Payments & Easy Returns"
+          }
+        },
+        "u4": {
+          "type": "utility",
+          "settings": {
+            "icon": "headset",
+            "strong_text": "24/7 Support",
+            "text": "We're always here"
+          }
+        },
+        "n1": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Home",
+            "link": "/"
+          }
+        },
+        "n2": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Shop",
+            "link": "/collections/all"
+          }
+        },
+        "n3": {
+          "type": "nav_link",
+          "settings": {
+            "label": "New Arrivals",
+            "link": "/collections/all"
+          }
+        },
+        "n4": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Track Order",
+            "link": "/pages/shipping"
+          }
+        },
+        "c1": {
+          "type": "category",
+          "settings": {
+            "icon": "diamond",
+            "label": "Jewellery",
+            "link": "",
+            "links": "Rings\nNecklaces\nEarrings\nBracelets\nWatches\nAccessories",
+            "collection_handle": "jewelary"
+          }
+        },
+        "c2": {
+          "type": "category",
+          "settings": {
+            "icon": "house",
+            "label": "Home Decor",
+            "link": "",
+            "links": "Wall Decor\nLighting\nCushions & Textiles\nVases & Planters\nStorage & Organizers\nDecor Accents",
+            "collection_handle": "home-decor"
+          }
+        },
+        "c3": {
+          "type": "category",
+          "settings": {
+            "icon": "phone",
+            "label": "Tech & Gadgets",
+            "link": "",
+            "links": "Headphones\nSmart Watches\nMobile Accessories\nSpeakers\nSmart Home\nGaming Accessories",
+            "collection_handle": "tech-gadgets"
+          }
+        },
+        "c4": {
+          "type": "category",
+          "settings": {
+            "icon": "pot",
+            "label": "Kitchen",
+            "link": "",
+            "links": "Cookware\nKitchen Storage\nDining & Serveware\nSmall Appliances\nKitchen Tools\nBakeware",
+            "collection_handle": "kitchen"
+          }
+        },
+        "c5": {
+          "type": "category",
+          "settings": {
+            "icon": "sparkle",
+            "label": "Health & Wellness",
+            "link": "",
+            "links": "Personal Care\nWellness\nMassagers\nFitness\nSelf Care\nDaily Essentials",
+            "collection_handle": "health-wellness"
+          }
+        }
+      },
+      "block_order": [
+        "u1",
+        "u2",
+        "u3",
+        "u4",
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5"
+      ],
+      "settings": {
+        "logo_asset": "logo-header.png",
+        "show_search": true,
+        "search_placeholder": "Search for products, brands and more...",
+        "account_label": "Account",
+        "cart_label": "Cart",
+        "all_categories_label": "All Categories",
+        "view_all_label": "View All",
+        "primary_aria_label": "Main navigation",
+        "nav_aria_label": "Product categories",
+        "promo_heading": "Special Picks for Everyday",
+        "promo_body": "Quality products. Happier everyday.",
+        "promo_link": "/collections/all",
+        "feature_eyebrow": "Elevate your everyday",
+        "feature_heading": "Better Picks Brighter Days",
+        "feature_body": "Discover jewellery, home decor, kitchen essentials, tech and more — all in one place.",
+        "feature_button_label": "Shop Now",
+        "feature_button_link": "/collections/all",
+        "utility_background": "#0B0B0D",
+        "utility_text": "#EDE7DB",
+        "main_background": "#0B0B0D",
+        "main_text": "#FFFFFF",
+        "menu_background": "#111113",
+        "menu_text": "#EDE7DB",
+        "accent_color": "#E8C27A",
+        "accent_text": "#1A1A1A",
+        "border_color": "#2A2A2E"
+      }
+    }
+  },
+  "order": [
+    "custom_header"
+  ]
+}

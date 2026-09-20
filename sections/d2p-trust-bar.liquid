@@ -1,0 +1,172 @@
+{%- comment -%}
+  A bordered strip of icon + heading + subtext items. Used twice on the home
+  page: as the delivery/payment/returns/support bar under the categories, and
+  as the guarantee strip above the footer.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign items = section.blocks | where: 'type', 'item'
+-%}
+
+{%- if items.size > 0 -%}
+  <div class="d2p-trust" style="
+    --d2p-trust-bg: {{ s.background_color }};
+    padding-block-start: {{ s.padding_top }}px;
+    padding-block-end: {{ s.padding_bottom }}px;
+  ">
+    <div class="d2p-trust__inner">
+      <ul class="d2p-trust__list{% if s.boxed %} d2p-trust__list--boxed{% endif %}">
+        {%- for block in items -%}
+          <li class="d2p-trust__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != 'none' -%}
+              <span class="d2p-trust__icon" aria-hidden="true">
+                {%- render 'd2p-icon', name: block.settings.icon -%}
+              </span>
+            {%- endif -%}
+            <span class="d2p-trust__text">
+              <strong>{{ block.settings.heading }}</strong>
+              {%- if block.settings.subtext != blank -%}
+                <span>{{ block.settings.subtext }}</span>
+              {%- endif -%}
+            </span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-trust {
+    background: var(--d2p-trust-bg);
+  }
+
+  .d2p-trust__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .d2p-trust__list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-trust__list--boxed {
+    border: 1px solid var(--d2p-border, #2a2a2e);
+    border-radius: 10px;
+    padding: 18px 8px;
+  }
+
+  .d2p-trust__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding-inline: 16px;
+  }
+
+  .d2p-trust__item + .d2p-trust__item {
+    border-inline-start: 1px solid var(--d2p-border, #2a2a2e);
+  }
+
+  .d2p-trust__icon {
+    color: var(--d2p-gold, #e8c27a);
+    flex: 0 0 auto;
+  }
+
+  .d2p-trust__icon svg {
+    inline-size: 30px;
+    block-size: 30px;
+    display: block;
+  }
+
+  .d2p-trust__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .d2p-trust__text strong {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .d2p-trust__text span {
+    font-size: 0.8125rem;
+    opacity: 0.65;
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-trust__list {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .d2p-trust__item {
+      justify-content: flex-start;
+    }
+
+    .d2p-trust__item + .d2p-trust__item {
+      border-inline-start: none;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-trust__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-trust__list {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Trust bar",
+  "tag": "section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "checkbox", "id": "boxed", "label": "Show border box", "default": true },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "shield", "label": "Secure" },
+            { "value": "return", "label": "Returns" },
+            { "value": "headset", "label": "Support" },
+            { "value": "sparkle", "label": "Quality" },
+            { "value": "tag", "label": "Price" },
+            { "value": "gift", "label": "Gift" }
+          ],
+          "default": "truck"
+        },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Free Delivery" },
+        { "type": "text", "id": "subtext", "label": "Subtext", "default": "on orders over Rs. 2,999" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Trust bar", "blocks": [{ "type": "item" }] }]
+}
+{% endschema %}
