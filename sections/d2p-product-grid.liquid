@@ -555,11 +555,12 @@
   }
 
   /* ---------- compact card style ----------
-   * Drawn from a light marketplace reference, so every colour here comes from
-   * a mode variable rather than the reference's own values — otherwise the
-   * cards stay white in dark mode. */
-   * A marketplace grid: flat cards, denser columns, price-led. Set per
-   * section with the "Card style" setting. */
+   * A dense marketplace grid: flat cards, tighter columns, price-led. Chosen
+   * per section with the "Card style" setting.
+   *
+   * The layout came from a light reference design, so every colour here reads
+   * from a mode variable rather than that reference's own values — otherwise
+   * the cards would stay white in dark mode. */
   .d2p-grid--compact .d2p-grid__list {
     gap: 10px;
   }
@@ -595,7 +596,7 @@
   }
 
   .d2p-grid--compact .d2p-card__price {
-    color: var(--d2p-price, #f57224);
+    color: var(--d2p-gold-text, #c9a45c);
     font-size: 1.0625rem;
     font-weight: 500;
   }

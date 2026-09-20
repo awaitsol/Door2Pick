@@ -35,7 +35,6 @@
   --d2p-gold-lo: #a67c3d;
   --d2p-on-gold: #0b0b0d;
   --d2p-heading: #ffffff;
-  --d2p-price: #f57224;
   --d2p-success: #4c9a6a;
   --d2p-error: #d46a6a;
   --d2p-gold-gradient: linear-gradient(135deg, #a67c3d 0%, #e3c989 48%, #c9a45c 100%);
@@ -55,7 +54,6 @@
   --d2p-gold-lo: #a87518;
   --d2p-on-gold: #111111;
   --d2p-heading: #171717;
-  --d2p-price: #c04a16;
   --d2p-success: #3f7d58;
   --d2p-error: #b84a4a;
   --d2p-gold-gradient: linear-gradient(135deg, #a87518 0%, #dcae4d 48%, #c9952e 100%);
@@ -446,4 +444,42 @@ dialog {
 :root[data-theme='light'] [class*='sorting'] button,
 :root[data-theme='light'] [class*='results-count'] {
   color: var(--d2p-text);
+}
+
+/* =======================================================================
+ * Blocks that previously pinned a colour
+ *
+ * Icon, divider and accordion blocks stored their colour as a palette
+ * reference, which resolves server-side against the dark palette and pins the
+ * element to one mode. Those settings are now blank, so the colours come from
+ * here and follow the active mode.
+ * ======================================================================= */
+
+/* Icons in trust badges, accordion rows and product details. The icon block
+ * renders a bare SVG inside .text-inherit, so it takes the colour it is given
+ * rather than carrying one of its own. */
+.text-inherit {
+  color: var(--d2p-gold-text);
+}
+
+/* Dividers. */
+.divider__line {
+  border-color: var(--d2p-border);
+  background-color: var(--d2p-border);
+}
+
+/* Accordion rows: heading, caret and body. */
+.details__header {
+  color: var(--d2p-text);
+}
+
+.details-content,
+.details-content p {
+  color: var(--d2p-text);
+}
+
+/* Inventory status reads as an accent, so it keeps the gold. */
+.product-inventory__text,
+.product-inventory__status {
+  color: var(--d2p-gold-text);
 }
