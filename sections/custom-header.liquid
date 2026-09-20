@@ -210,10 +210,27 @@
                 if cat == blank and block.settings.collection_handle != blank
                   assign cat = collections[block.settings.collection_handle]
                 endif
+                comment
+                  Handles are easy to get wrong (Jewelary vs jewellery, an
+                  ampersand in Tech & Gadgets). If the handle misses, match on
+                  title instead so a category never silently disappears.
+                endcomment
+                if cat == blank and block.settings.label != blank
+                  assign wanted = block.settings.label | downcase | strip
+                  for c in collections
+                    assign c_title = c.title | downcase | strip
+                    if c_title == wanted
+                      assign cat = c
+                      break
+                    endif
+                  endfor
+                endif
                 assign cat_url = cat.url | default: block.settings.link
                 assign cat_label = block.settings.label | default: cat.title
               -%}
-              {%- if cat_url == blank -%}{%- continue -%}{%- endif -%}
+              {%- if cat_url == blank -%}
+                {%- assign cat_url = routes.search_url | append: '?q=' | append: block.settings.label | url_encode -%}
+              {%- endif -%}
               <li {{ block.shopify_attributes }}>
                 <a
                   class="d2p-megamenu__rail-link{% if forloop.first %} is-active{% endif %}"
@@ -257,10 +274,27 @@
                 if cat == blank and block.settings.collection_handle != blank
                   assign cat = collections[block.settings.collection_handle]
                 endif
+                comment
+                  Handles are easy to get wrong (Jewelary vs jewellery, an
+                  ampersand in Tech & Gadgets). If the handle misses, match on
+                  title instead so a category never silently disappears.
+                endcomment
+                if cat == blank and block.settings.label != blank
+                  assign wanted = block.settings.label | downcase | strip
+                  for c in collections
+                    assign c_title = c.title | downcase | strip
+                    if c_title == wanted
+                      assign cat = c
+                      break
+                    endif
+                  endfor
+                endif
                 assign cat_url = cat.url | default: block.settings.link
                 assign cat_label = block.settings.label | default: cat.title
               -%}
-              {%- if cat_url == blank -%}{%- continue -%}{%- endif -%}
+              {%- if cat_url == blank -%}
+                {%- assign cat_url = routes.search_url | append: '?q=' | append: block.settings.label | url_encode -%}
+              {%- endif -%}
               <div class="d2p-megamenu__column" data-d2p-panel="{{ forloop.index0 }}">
                 <a class="d2p-megamenu__column-title" href="{{ cat_url }}">
                   {{ cat_label }}

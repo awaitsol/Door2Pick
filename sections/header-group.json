@@ -118,10 +118,10 @@
           "type": "category",
           "settings": {
             "icon": "sparkle",
-            "label": "Health & Wellness",
+            "label": "New Arrivals",
             "link": "",
-            "links": "Personal Care\nWellness\nMassagers\nFitness\nSelf Care\nDaily Essentials",
-            "collection_handle": "health-wellness"
+            "links": "Just In\nViral Finds\nTop Rated\nSeasonal Picks\nEditor's Choice\nMust Have",
+            "collection_handle": "new-arrivals"
           }
         }
       },

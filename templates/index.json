@@ -54,63 +54,6 @@
         "background_color": "#0B0B0D"
       }
     },
-    "category_icons": {
-      "type": "d2p-category-icons",
-      "blocks": {
-        "c0": {
-          "type": "category",
-          "settings": {
-            "icon": "diamond",
-            "label": "Jewellery",
-            "link": "/collections/jewelary"
-          }
-        },
-        "c1": {
-          "type": "category",
-          "settings": {
-            "icon": "house",
-            "label": "Home Decor",
-            "link": "/collections/home-decor"
-          }
-        },
-        "c2": {
-          "type": "category",
-          "settings": {
-            "icon": "phone",
-            "label": "Tech & Gadgets",
-            "link": "/collections/tech-gadgets"
-          }
-        },
-        "c3": {
-          "type": "category",
-          "settings": {
-            "icon": "pot",
-            "label": "Kitchen",
-            "link": "/collections/kitchen"
-          }
-        },
-        "c4": {
-          "type": "category",
-          "settings": {
-            "icon": "sparkle",
-            "label": "New Arrivals",
-            "link": "/collections/all"
-          }
-        }
-      },
-      "block_order": [
-        "c0",
-        "c1",
-        "c2",
-        "c3",
-        "c4"
-      ],
-      "settings": {
-        "background_color": "#0B0B0D",
-        "padding_top": 44,
-        "padding_bottom": 28
-      }
-    },
     "trust_bar": {
       "type": "d2p-trust-bar",
       "blocks": {
@@ -328,7 +271,6 @@
   },
   "order": [
     "hero_banner",
-    "category_icons",
     "trust_bar",
     "row_trending",
     "promos_1",
