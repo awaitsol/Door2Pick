@@ -26,14 +26,11 @@
   assign utilities = section.blocks | where: 'type', 'utility'
   assign nav_links = section.blocks | where: 'type', 'nav_link'
   assign categories = section.blocks | where: 'type', 'category'
-
-  comment
-    Category blocks name a collection rather than a URL, so a link can never
-    point at a handle that does not exist. `collection` is the picker; when it
-    is empty the block falls back to `collection_handle`, which is what a JSON
-    template can set. A block that resolves to neither is skipped entirely
-    rather than rendering a link to a 404.
-  endcomment
+    # Category blocks name a collection rather than a URL, so a link can never
+    # point at a handle that does not exist. `collection` is the picker; when it
+    # is empty the block falls back to `collection_handle`, which is what a JSON
+    # template can set. A block that resolves to neither is skipped entirely
+    # rather than rendering a link to a 404.
 -%}
 
 <script type="module" src="{{ 'cart-icon.js' | asset_url }}" fetchpriority="low"></script>
@@ -99,12 +96,30 @@
         <nav class="d2p-header__primary" aria-label="{{ s.primary_aria_label | escape }}">
           <ul class="d2p-header__primary-list">
             {%- for block in nav_links -%}
-              {%- liquid
-                assign is_active = false
-                if block.settings.link == routes.root_url and template.name == 'index'
-                  assign is_active = true
-                endif
-              -%}
+              {%- comment -%}
+                A link is active when its path matches the page being viewed.
+                Home matches only the root, since every path starts with "/".
+                Other links also match their sub-pages, so a product inside a
+                collection still highlights the section it belongs to.
+              {%- endcomment -%}
+              {%- assign link_path = block.settings.link | split: '?' | first -%}
+              {%- assign here = request.path -%}
+              {%- assign is_active = false -%}
+
+              {%- if link_path == '/' or link_path == routes.root_url -%}
+                {%- if here == '/' or template.name == 'index' -%}
+                  {%- assign is_active = true -%}
+                {%- endif -%}
+              {%- elsif link_path != blank -%}
+                {%- if here == link_path -%}
+                  {%- assign is_active = true -%}
+                {%- else -%}
+                  {%- assign prefix = link_path | append: '/' -%}
+                  {%- if here contains prefix -%}
+                    {%- assign is_active = true -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endif -%}
               <li {{ block.shopify_attributes }}>
                 <a
                   class="d2p-header__primary-link{% if is_active %} is-active{% endif %}"
@@ -220,11 +235,9 @@
                 if cat == blank and block.settings.collection_handle != blank
                   assign cat = collections[block.settings.collection_handle]
                 endif
-                comment
-                  Handles are easy to get wrong (Jewelary vs jewellery, an
-                  ampersand in Tech & Gadgets). If the handle misses, match on
-                  title instead so a category never silently disappears.
-                endcomment
+    # Handles are easy to get wrong (Jewelary vs jewellery, an
+    # ampersand in Tech & Gadgets). If the handle misses, match on
+    # title instead so a category never silently disappears.
                 if cat == blank and block.settings.label != blank
                   assign wanted = block.settings.label | downcase | strip
                   for c in collections
@@ -284,11 +297,9 @@
                 if cat == blank and block.settings.collection_handle != blank
                   assign cat = collections[block.settings.collection_handle]
                 endif
-                comment
-                  Handles are easy to get wrong (Jewelary vs jewellery, an
-                  ampersand in Tech & Gadgets). If the handle misses, match on
-                  title instead so a category never silently disappears.
-                endcomment
+    # Handles are easy to get wrong (Jewelary vs jewellery, an
+    # ampersand in Tech & Gadgets). If the handle misses, match on
+    # title instead so a category never silently disappears.
                 if cat == blank and block.settings.label != blank
                   assign wanted = block.settings.label | downcase | strip
                   for c in collections
@@ -315,11 +326,9 @@
                     {%- liquid
                       assign parts = line | strip | split: '|'
                       assign sub_label = parts.first | strip
-                      comment
-                        With no "| url" on the line the link falls back to the
-                        parent collection, so a sub-item never 404s before its
-                        own collection exists.
-                      endcomment
+    # With no "| url" on the line the link falls back to the
+    # parent collection, so a sub-item never 404s before its
+    # own collection exists.
                       if parts.size > 1
                         assign sub_url = parts.last | strip
                       else
@@ -514,13 +523,31 @@
     color: var(--d2p-h-accent);
   }
 
-  .d2p-header__primary-link.is-active::after {
+  /* The active tab carries weight as well as colour, so it reads as selected
+     even for someone who cannot distinguish the gold from the white. */
+  .d2p-header__primary-link.is-active {
+    font-weight: 600;
+  }
+
+  /* One underline, revealed faintly on hover and fully when active. */
+  .d2p-header__primary-link::after {
     content: '';
     position: absolute;
     inset-inline: 0;
-    inset-block-end: 0;
-    block-size: 2px;
+    inset-block-end: -2px;
+    block-size: 3px;
+    border-radius: 2px;
     background: var(--d2p-h-accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .d2p-header__primary-link:hover::after {
+    opacity: 0.45;
+  }
+
+  .d2p-header__primary-link.is-active::after {
+    opacity: 1;
   }
 
   /* pill search */

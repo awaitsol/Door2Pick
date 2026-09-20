@@ -21,9 +21,22 @@
 -%}
 
 {%- if slide_count > 0 -%}
+  {%- comment -%}
+    .section-background is a background LAYER — position: absolute, inset: 0 —
+    so it goes on its own empty div, as every built-in section does. On the
+    content wrapper it takes the section out of flow and collapses it.
+  {%- endcomment -%}
+  <div class="section-background"></div>
+
   <div
-    class="hero-banner section-background{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
-    style="--hero-radius: {{ section.settings.corner_radius }}px;"
+    class="hero-banner"
+    style="
+      --hero-radius: {{ section.settings.corner_radius }}px;
+      --hero-height: {{ section.settings.height }}svh;
+      --hero-max-height: {{ section.settings.max_height }}px;
+      --hero-height-mobile: {{ section.settings.height_mobile }}svh;
+      --hero-focus: {{ section.settings.focal_point }};
+    "
   >
     <hero-banner-carousel
       class="hero-banner__viewport{% if section.settings.section_width == 'page-width' %} page-width{% endif %}"
@@ -188,7 +201,22 @@
   .hero-banner__image {
     display: block;
     inline-size: 100%;
-    block-size: auto;
+    /* The artwork is ~2:1, so at full width the hero grows very tall on wide
+       monitors. Capping the height and cropping keeps it to a usable band
+       while the setting below still controls how tall that band is. */
+    block-size: var(--hero-height, 62svh);
+    max-block-size: var(--hero-max-height, 620px);
+    object-fit: cover;
+    /* The headline sits on the left of this artwork, so the crop favours that
+       side — centring would cut the words off on a wide screen. */
+    object-position: var(--hero-focus, left center);
+  }
+
+  @media screen and (max-width: 749px) {
+    .hero-banner__image {
+      block-size: var(--hero-height-mobile, 48svh);
+      max-block-size: none;
+    }
   }
 
   .hero-banner__arrow {
@@ -388,6 +416,49 @@
         { "value": "full-width", "label": "Full width" }
       ],
       "default": "full-width"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Height",
+      "min": 30,
+      "max": 90,
+      "step": 2,
+      "unit": "%",
+      "info": "Share of the screen height the banner fills on desktop.",
+      "default": 62
+    },
+    {
+      "type": "range",
+      "id": "max_height",
+      "label": "Maximum height",
+      "min": 320,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "default": 620
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Height on mobile",
+      "min": 30,
+      "max": 80,
+      "step": 2,
+      "unit": "%",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "focal_point",
+      "label": "Crop from",
+      "info": "Which part of the image to keep when it is cropped to height.",
+      "options": [
+        { "value": "left center", "label": "Left" },
+        { "value": "center center", "label": "Centre" },
+        { "value": "right center", "label": "Right" }
+      ],
+      "default": "left center"
     },
     {
       "type": "range",

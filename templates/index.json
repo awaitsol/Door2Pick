@@ -51,7 +51,11 @@
         "autoplay": true,
         "autoplay_speed": 6,
         "aria_label": "Featured promotions",
-        "background_color": "#0B0B0D"
+        "background_color": "#0B0B0D",
+        "height": 58,
+        "max_height": 560,
+        "height_mobile": 46,
+        "focal_point": "left center"
       }
     },
     "trust_bar": {
@@ -103,105 +107,6 @@
         "padding_bottom": 32
       }
     },
-    "row_trending": {
-      "type": "d2p-product-grid",
-      "blocks": {},
-      "block_order": [],
-      "settings": {
-        "heading": "New Arrivals",
-        "subheading": "Popular picks everyone's loving right now.",
-        "max_products": 5,
-        "columns": 5,
-        "show_discount_badge": true,
-        "show_rating": true,
-        "show_wishlist": true,
-        "show_add_to_cart": true,
-        "add_to_cart_label": "Add to Cart",
-        "wishlist_label": "Save for later",
-        "show_view_all": true,
-        "view_all_label": "View All",
-        "empty_text": "Products from this collection will appear here.",
-        "background_color": "#0B0B0D",
-        "padding_top": 40,
-        "padding_bottom": 40,
-        "use_all_products": false,
-        "collection_handle": "new-arrivals",
-        "fallback_to_all": false
-      }
-    },
-    "promos_1": {
-      "type": "d2p-promo-banners",
-      "blocks": {
-        "p1": {
-          "type": "panel",
-          "settings": {
-            "overlay_color": "#0B0B0DE0",
-            "heading": "Kitchen Essentials",
-            "subheading": "For a Better You",
-            "offer": "Up to 40% OFF",
-            "button_label": "Shop Kitchen",
-            "button_link": "/collections/kitchen"
-          }
-        },
-        "p2": {
-          "type": "panel",
-          "settings": {
-            "overlay_color": "#0B0B0DE0",
-            "heading": "Stylish Home Decor",
-            "subheading": "Make Every Space Special",
-            "offer": "Up to 35% OFF",
-            "button_label": "Shop Home Decor",
-            "button_link": "/collections/home-decor"
-          }
-        }
-      },
-      "block_order": [
-        "p1",
-        "p2"
-      ],
-      "settings": {
-        "columns": 2,
-        "background_color": "#0B0B0D",
-        "padding_top": 16,
-        "padding_bottom": 32
-      }
-    },
-    "promos_2": {
-      "type": "d2p-promo-banners",
-      "blocks": {
-        "p1": {
-          "type": "panel",
-          "settings": {
-            "overlay_color": "#0B0B0DE0",
-            "heading": "Trending Now",
-            "subheading": "Best Picks This Season",
-            "offer": "",
-            "button_label": "Shop Trending",
-            "button_link": "/collections/all"
-          }
-        },
-        "p2": {
-          "type": "signup",
-          "settings": {
-            "heading": "Get Exclusive Offers",
-            "body": "Subscribe to our newsletter and be the first to know about new arrivals and special deals.",
-            "placeholder": "Enter your email address",
-            "button_label": "Subscribe",
-            "success_text": "Thanks for subscribing."
-          }
-        }
-      },
-      "block_order": [
-        "p1",
-        "p2"
-      ],
-      "settings": {
-        "columns": 2,
-        "background_color": "#0B0B0D",
-        "padding_top": 16,
-        "padding_bottom": 32
-      }
-    },
     "guarantee": {
       "type": "d2p-trust-bar",
       "blocks": {
@@ -242,40 +147,40 @@
         "padding_bottom": 48
       }
     },
-    "row_all": {
+    "just_for_you_v2": {
       "type": "d2p-product-grid",
       "blocks": {},
       "block_order": [],
       "settings": {
-        "heading": "All Products",
-        "subheading": "Everything in our store, all in one place.",
+        "heading": "Just For You",
+        "subheading": "",
         "max_products": 12,
-        "columns": 5,
+        "columns": 6,
         "show_discount_badge": true,
         "show_rating": true,
-        "show_wishlist": true,
-        "show_add_to_cart": true,
+        "show_wishlist": false,
+        "show_add_to_cart": false,
         "add_to_cart_label": "Add to Cart",
         "wishlist_label": "Save for later",
         "show_view_all": true,
         "view_all_label": "View All",
         "empty_text": "Products from this collection will appear here.",
         "background_color": "#0B0B0D",
-        "padding_top": 40,
-        "padding_bottom": 40,
-        "use_all_products": true,
-        "collection_handle": "",
-        "fallback_to_all": true
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "use_all_products": false,
+        "collection_handle": "just-for-you",
+        "fallback_to_all": false,
+        "hide_sold_out": false,
+        "card_style": "compact",
+        "show_discount_percent": true
       }
     }
   },
   "order": [
     "hero_banner",
     "trust_bar",
-    "row_trending",
-    "promos_1",
-    "row_all",
-    "promos_2",
+    "just_for_you_v2",
     "guarantee"
   ]
 }

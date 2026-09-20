@@ -17,59 +17,64 @@
   markup, so the existing cart drawer picks it up with no extra wiring.
 {%- endcomment -%}
 
-{%- liquid
-  comment
-    A `collection` setting returns a collection OBJECT, not a handle, so it is
-    used directly. `collections.all` is the catch-all pseudo-collection and is
-    offered as a separate toggle because it cannot be picked in the picker.
+{%- assign s = section.settings -%}
 
-    `collection_handle` is a plain-text escape hatch: a template can name a
-    collection that has not been picked in the editor, which is how these rows
-    are wired up from templates/index.json.
+{%- comment -%}
+  Resolve the collection: the picker first, then a handle a template can set,
+  then a match on the section heading against collection titles, since handles
+  are easy to get wrong. Written as separate tags rather than one combined
+  logic block, because a stray tag inside such a block silently discards every
+  assignment that follows it.
+{%- endcomment -%}
 
-    When the chosen collection turns up empty — a handle that does not exist,
-    or a collection with nothing in it — the section falls back to the whole
-    catalogue rather than rendering an empty band, so the page never silently
-    loses a row. `fallback_used` records that, for the editor notice below.
-  endcomment
-  assign s = section.settings
+{%- if s.use_all_products -%}
+  {%- assign coll = collections.all -%}
+{%- elsif s.collection != blank -%}
+  {%- assign coll = s.collection -%}
+{%- elsif s.collection_handle != blank -%}
+  {%- assign coll = collections[s.collection_handle] -%}
+{%- endif -%}
 
-  if s.use_all_products
-    assign coll = collections.all
-  elsif s.collection != blank
-    assign coll = s.collection
-  elsif s.collection_handle != blank
-    assign coll = collections[s.collection_handle]
+{%- if coll == blank and s.heading != blank -%}
+  {%- assign wanted = s.heading | downcase | strip -%}
+  {%- for c in collections -%}
+    {%- assign c_title = c.title | downcase | strip -%}
+    {%- if c_title == wanted -%}
+      {%- assign coll = c -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
 
-    comment
-      Handles are easy to get wrong, so if the handle misses, match the
-      section heading against collection titles before giving up.
-    endcomment
-    if coll == blank and s.heading != blank
-      assign wanted = s.heading | downcase | strip
-      for c in collections
-        assign c_title = c.title | downcase | strip
-        if c_title == wanted
-          assign coll = c
-          break
-        endif
-      endfor
-    endif
-  endif
+{%- assign products = coll.products -%}
+{%- assign fallback_used = false -%}
 
-  assign products = coll.products
-  assign fallback_used = false
+{%- if products.size == 0 and s.fallback_to_all -%}
+  {%- assign coll = collections.all -%}
+  {%- assign products = coll.products -%}
+  {%- assign fallback_used = true -%}
+{%- endif -%}
 
-  if products.size == 0 and s.fallback_to_all
-    assign coll = collections.all
-    assign products = coll.products
-    assign fallback_used = true
-  endif
+{%- comment -%}
+  Hiding unavailable products filters the collection, so a row can come up
+  short of max_products when much of it is out of stock. That is intended: the
+  homepage should not advertise things that cannot be bought.
+{%- endcomment -%}
+{%- if s.hide_sold_out -%}
+  {%- assign products = products | where: 'available' -%}
+{%- endif -%}
 
-  assign limit = s.max_products
--%}
+{%- assign limit = s.max_products -%}
 
-<div class="d2p-grid section-background" style="
+{%- comment -%}
+  .section-background is a background LAYER in this theme — position: absolute
+  with inset: 0 — so it belongs on its own empty div, the way every built-in
+  section uses it. Putting it on the content wrapper takes the whole section
+  out of flow and collapses it to zero height, rendering nothing.
+{%- endcomment -%}
+<div class="section-background"></div>
+
+<div class="d2p-grid d2p-grid--{{ s.card_style | default: 'panel' }}" style="
   --d2p-grid-bg: {{ s.background_color }};
   --d2p-grid-columns: {{ s.columns }};
   padding-block-start: {{ s.padding_top }}px;
@@ -119,22 +124,19 @@
 
     <ul class="d2p-grid__list" data-d2p-track{% if s.max_products > s.columns %} data-wrapped{% endif %}>
       {%- for product in products limit: limit -%}
-        {%- liquid
-          comment
-            selected_or_first_available_variant is nil when every variant is
-            sold out, which would leave the card with no price and no button.
-            Fall back to the first variant so out-of-stock products still show
-            their price and a Sold out state.
-          endcomment
-          assign variant = product.selected_or_first_available_variant | default: product.variants.first
-          assign has_sale = false
-          if variant.compare_at_price > variant.price
-            assign has_sale = true
-            assign saving = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round
-          endif
-          assign rating = product.metafields.reviews.rating.value.rating
-          assign rating_count = product.metafields.reviews.rating_count.value
-        -%}
+        {%- comment -%}
+          selected_or_first_available_variant is nil when every variant is sold
+          out, which would leave the card with no price and no button. Falling
+          back to the first variant keeps the price and a Sold out state.
+        {%- endcomment -%}
+        {%- assign variant = product.selected_or_first_available_variant | default: product.variants.first -%}
+        {%- assign has_sale = false -%}
+        {%- if variant.compare_at_price > variant.price -%}
+          {%- assign has_sale = true -%}
+          {%- assign saving = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round -%}
+        {%- endif -%}
+        {%- assign rating = product.metafields.reviews.rating.value.rating -%}
+        {%- assign rating_count = product.metafields.reviews.rating_count.value -%}
         <li class="d2p-card">
           <div class="d2p-card__media">
             <a class="d2p-card__link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
@@ -181,7 +183,11 @@
             <div class="d2p-card__prices">
               <span class="d2p-card__price">{{ variant.price | money }}</span>
               {%- if has_sale -%}
-                <s class="d2p-card__compare">{{ variant.compare_at_price | money }}</s>
+                {%- if s.show_discount_percent -%}
+                  <span class="d2p-card__discount">-{{ saving }}%</span>
+                {%- else -%}
+                  <s class="d2p-card__compare">{{ variant.compare_at_price | money }}</s>
+                {%- endif -%}
               {%- endif -%}
             </div>
 
@@ -233,8 +239,13 @@
           {{ s.empty_text | default: 'Products from this collection will appear here.' }}
           {%- if request.design_mode -%}
             <br><small>
-              No products found for this section. Check the Collection setting —
-              the collection may be empty or not selected.
+              {%- if s.hide_sold_out -%}
+                No products to show. "Hide sold-out products" is on, so this row
+                is empty when everything in the collection is out of stock.
+              {%- else -%}
+                No products found for this section. Check the Collection setting —
+                the collection may be empty or not selected.
+              {%- endif -%}
             </small>
           {%- endif -%}
         </li>
@@ -373,17 +384,22 @@
   .d2p-card__media {
     position: relative;
     background: #fff;
+    /* The square is reserved on the container, so a card keeps its height
+       while an image loads or if one is missing — otherwise the row collapses
+       to just titles and prices. */
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
   }
 
   .d2p-card__link {
     display: block;
+    block-size: 100%;
   }
 
   .d2p-card__image {
     display: block;
     inline-size: 100%;
-    block-size: auto;
-    aspect-ratio: 1 / 1;
+    block-size: 100%;
     object-fit: cover;
     transition: transform 0.4s ease;
   }
@@ -536,6 +552,71 @@
     cursor: not-allowed;
   }
 
+  /* ---------- compact card style ----------
+   * A marketplace grid: flat cards, denser columns, price-led. Set per
+   * section with the "Card style" setting. */
+  .d2p-grid--compact .d2p-grid__list {
+    gap: 10px;
+  }
+
+  .d2p-grid--compact .d2p-card {
+    background: #fff;
+    border: none;
+    border-radius: 2px;
+  }
+
+  .d2p-grid--compact .d2p-card:hover {
+    transform: none;
+    box-shadow: 0 6px 18px -8px rgb(0 0 0 / 45%);
+  }
+
+  .d2p-grid--compact .d2p-card__body {
+    gap: 4px;
+    padding: 10px;
+  }
+
+  .d2p-grid--compact .d2p-card__title {
+    color: #1a1a1a;
+    font-size: 0.8125rem;
+  }
+
+  .d2p-grid--compact .d2p-card__title:hover {
+    color: #c9852e;
+  }
+
+  .d2p-grid--compact .d2p-card__prices {
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .d2p-grid--compact .d2p-card__price {
+    color: #f57224;
+    font-size: 1.0625rem;
+    font-weight: 500;
+  }
+
+  .d2p-grid--compact .d2p-card__discount {
+    color: #757575;
+    font-size: 0.8125rem;
+  }
+
+  .d2p-grid--compact .d2p-card__compare {
+    color: #9e9e9e;
+  }
+
+  .d2p-grid--compact .d2p-card__rating-count {
+    color: #757575;
+    opacity: 1;
+  }
+
+  .d2p-grid--compact .d2p-card__star {
+    color: #faa500;
+  }
+
+  .d2p-grid--compact .d2p-grid__heading {
+    color: var(--d2p-text, #ede7db);
+  }
+
   /* ---------- responsive ---------- */
   @media screen and (max-width: 1199px) {
     .d2p-grid__list {
@@ -660,14 +741,37 @@
     },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Trending Products" },
     { "type": "text", "id": "subheading", "label": "Subheading", "default": "Popular picks everyone's loving right now." },
-    { "type": "range", "id": "max_products", "label": "Products", "min": 2, "max": 12, "step": 1, "default": 5 },
+    { "type": "range", "id": "max_products", "label": "Products", "min": 2, "max": 24, "step": 1, "default": 5 },
     { "type": "range", "id": "columns", "label": "Columns", "min": 2, "max": 6, "step": 1, "default": 5 },
 
     { "type": "header", "content": "Card" },
     { "type": "checkbox", "id": "show_discount_badge", "label": "Show discount badge", "default": true },
     { "type": "checkbox", "id": "show_rating", "label": "Show rating", "info": "Needs a reviews app that writes the reviews.rating metafield.", "default": true },
     { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist heart", "info": "Visual only — nothing is saved.", "default": true },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        { "value": "panel", "label": "Panel — bordered card" },
+        { "value": "compact", "label": "Compact — marketplace grid" }
+      ],
+      "default": "panel"
+    },
     { "type": "checkbox", "id": "show_add_to_cart", "label": "Show Add to Cart", "default": true },
+    {
+      "type": "checkbox",
+      "id": "show_discount_percent",
+      "label": "Show discount percent beside price",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_sold_out",
+      "label": "Hide sold-out products",
+      "info": "Shows only products that can be bought. The row may show fewer items than the limit above.",
+      "default": false
+    },
     { "type": "text", "id": "add_to_cart_label", "label": "Add to Cart label", "default": "Add to Cart" },
     { "type": "text", "id": "wishlist_label", "label": "Wishlist button description", "default": "Save for later" },
 
