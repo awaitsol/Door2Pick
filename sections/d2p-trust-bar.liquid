@@ -11,7 +11,7 @@
 
 {%- if items.size > 0 -%}
   <div class="d2p-trust" style="
-    --d2p-trust-bg: {{ s.background_color }};
+    {% if s.background_color != blank %}--d2p-trust-bg: {{ s.background_color }};{% endif %}
     padding-block-start: {{ s.padding_top }}px;
     padding-block-end: {{ s.padding_bottom }}px;
   ">
@@ -39,7 +39,7 @@
 
 {% stylesheet %}
   .d2p-trust {
-    background: var(--d2p-trust-bg);
+    background: var(--d2p-trust-bg, var(--d2p-page));
   }
 
   .d2p-trust__inner {
@@ -59,6 +59,7 @@
   }
 
   .d2p-trust__list--boxed {
+    background: var(--d2p-surface, #141416);
     border: 1px solid var(--d2p-border, #2a2a2e);
     border-radius: 10px;
     padding: 18px 8px;
@@ -77,7 +78,7 @@
   }
 
   .d2p-trust__icon {
-    color: var(--d2p-gold, #e8c27a);
+    color: var(--d2p-gold-text, #c9a45c);
     flex: 0 0 auto;
   }
 
@@ -94,6 +95,7 @@
   }
 
   .d2p-trust__text strong {
+    color: var(--d2p-text, #ede7db);
     font-size: 0.9375rem;
     font-weight: 600;
   }
@@ -103,6 +105,7 @@
     opacity: 0.65;
   }
 
+  /* Light mode, in-section so it wins over theme-custom.css. */
   @media screen and (max-width: 989px) {
     .d2p-trust__list {
       grid-auto-flow: row;

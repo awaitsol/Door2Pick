@@ -51,7 +51,7 @@
         "autoplay": true,
         "autoplay_speed": 6,
         "aria_label": "Featured promotions",
-        "background_color": "#0B0B0D",
+        "background_color": "",
         "height": 58,
         "max_height": 560,
         "height_mobile": 46,
@@ -102,7 +102,7 @@
       ],
       "settings": {
         "boxed": true,
-        "background_color": "#0B0B0D",
+        "background_color": "",
         "padding_top": 8,
         "padding_bottom": 32
       }
@@ -142,7 +142,7 @@
       ],
       "settings": {
         "boxed": true,
-        "background_color": "#0B0B0D",
+        "background_color": "",
         "padding_top": 16,
         "padding_bottom": 48
       }
@@ -165,7 +165,7 @@
         "show_view_all": true,
         "view_all_label": "View All",
         "empty_text": "Products from this collection will appear here.",
-        "background_color": "#0B0B0D",
+        "background_color": "",
         "padding_top": 48,
         "padding_bottom": 48,
         "use_all_products": false,

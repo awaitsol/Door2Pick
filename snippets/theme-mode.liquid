@@ -1,0 +1,43 @@
+{%- doc -%}
+  Sets the colour mode on <html> before first paint.
+
+  This must run synchronously in <head>, before any stylesheet, or the page
+  paints in the wrong mode and visibly flashes when corrected. That is why it
+  is inline rather than a module.
+
+  Precedence: the visitor's stored choice, then their OS setting. While they
+  have expressed no choice of their own, the site keeps following the OS.
+
+  @example
+  {% render 'theme-mode' %}
+{%- enddoc -%}
+
+<script>
+  (() => {
+    const KEY = 'd2p-theme';
+    const query = window.matchMedia('(prefers-color-scheme: light)');
+
+    const read = () => {
+      try {
+        return localStorage.getItem(KEY);
+      } catch (error) {
+        // Private windows and blocked storage throw on access. The OS setting
+        // still applies, so there is nothing to recover from.
+        return null;
+      }
+    };
+
+    const stored = read();
+    const mode = stored === 'light' || stored === 'dark'
+      ? stored
+      : (query.matches ? 'light' : 'dark');
+
+    document.documentElement.setAttribute('data-theme', mode);
+
+    query.addEventListener('change', (event) => {
+      const choice = read();
+      if (choice === 'light' || choice === 'dark') return;
+      document.documentElement.setAttribute('data-theme', event.matches ? 'light' : 'dark');
+    });
+  })();
+</script>

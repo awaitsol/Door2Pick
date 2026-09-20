@@ -14,7 +14,7 @@
 
 {%- if panels.size > 0 -%}
   <div class="d2p-promos" style="
-    --d2p-promos-bg: {{ s.background_color }};
+    {% if s.background_color != blank %}--d2p-promos-bg: {{ s.background_color }};{% endif %}
     --d2p-promos-columns: {{ s.columns }};
     padding-block-start: {{ s.padding_top }}px;
     padding-block-end: {{ s.padding_bottom }}px;
@@ -91,7 +91,7 @@
 
 {% stylesheet %}
   .d2p-promos {
-    background: var(--d2p-promos-bg);
+    background: var(--d2p-promos-bg, var(--d2p-page));
   }
 
   .d2p-promos__inner {
@@ -151,6 +151,7 @@
   }
 
   .d2p-promo__heading {
+    color: var(--d2p-text, #ede7db);
     margin: 0;
     font-family: var(--font-heading--family);
     font-size: clamp(1.25rem, 2.2vw, 1.75rem);
@@ -158,6 +159,7 @@
   }
 
   .d2p-promo__sub {
+    color: var(--d2p-gold-text, #c9a45c);
     margin: 0;
     font-family: var(--font-heading--family);
     font-size: clamp(1.05rem, 1.8vw, 1.375rem);
@@ -165,13 +167,14 @@
   }
 
   .d2p-promo__body {
+    color: var(--d2p-muted, #a9a296);
     margin: 0;
     font-size: 0.875rem;
-    opacity: 0.75;
     max-inline-size: 46ch;
   }
 
   .d2p-promo__offer {
+    color: var(--d2p-gold-text, #c9a45c);
     margin: 6px 0 10px;
     font-size: 1.125rem;
     font-weight: 700;
@@ -186,7 +189,7 @@
     padding: 11px 22px;
     border-radius: 999px;
     background: var(--d2p-gold, #e8c27a);
-    color: #1a1a1a;
+    color: var(--d2p-on-gold, #0b0b0d);
     font-weight: 600;
     font-size: 0.875rem;
     text-decoration: none;
@@ -212,7 +215,7 @@
     padding: 5px;
     border: 1px solid var(--d2p-border, #2a2a2e);
     border-radius: 8px;
-    background: rgb(255 255 255 / 4%);
+    background: var(--d2p-input, #141416);
   }
 
   .d2p-promo__input {
@@ -240,7 +243,7 @@
     border: none;
     border-radius: 6px;
     background: var(--d2p-gold, #e8c27a);
-    color: #1a1a1a;
+    color: var(--d2p-on-gold, #0b0b0d);
     cursor: pointer;
     transition: filter 0.2s ease;
   }

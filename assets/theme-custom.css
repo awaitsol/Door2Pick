@@ -1,28 +1,117 @@
 /*
- * Door2Pick — dark luxury identity (store-wide)
+ * Door2Pick — theme colours (store-wide)
  *
- * Palette:
- *   page      #0B0B0D    surface   #141416    border  #26262A
- *   text      #EDE7DB    muted     #A9A296
- *   gold      #C9A45C    gradient  #E3C989 -> #A67C3D
+ * Two modes share one set of variable names, so every rule below is written
+ * once. The mode is set by data-theme on <html> by snippets/theme-mode.liquid,
+ * before first paint; with no stored choice it follows the visitor's OS.
  *
- * Contrast (WCAG AA, 4.5:1 for text):
- *   ivory on page 15.97  ·  gold on page 8.38  ·  dark label on the
- *   gradient 12.16 at its light stop, 5.22 at its dark stop.
+ * DARK (default):  page #0B0B0D  surface #141416  text #EDE7DB  gold #C9A45C
+ * LIGHT:           page #FAF8F3  surface #FFFFFF  text #171717  gold #C9952E
+ *
+ * Contrast (WCAG AA: 4.5:1 text, 3:1 UI):
+ *   dark  — text 15.97, gold 8.38, dark-on-gradient 5.22 at its darkest stop
+ *   light — text 16.89, secondary 5.71, ink-on-gold 7.03
+ *
+ * One deliberate difference: #C9952E reaches only 2.53:1 as text on ivory, so
+ * light mode uses --d2p-gold-text (#8A5F12, 5.31:1) for gold lettering and
+ * keeps #C9952E for fills, where dark labels sit on it at 7.03:1. In dark mode
+ * both variables are the same gold.
  *
  * Layered after base.css.
  */
 
-:root {
+:root,
+:root[data-theme='dark'] {
   --d2p-page: #0b0b0d;
   --d2p-surface: #141416;
+  --d2p-surface-alt: #17171a;
   --d2p-border: #26262a;
+  --d2p-input: #141416;
   --d2p-text: #ede7db;
   --d2p-muted: #a9a296;
   --d2p-gold: #c9a45c;
+  --d2p-gold-text: #c9a45c;
   --d2p-gold-hi: #e3c989;
   --d2p-gold-lo: #a67c3d;
+  --d2p-on-gold: #0b0b0d;
+  --d2p-heading: #ffffff;
+  --d2p-price: #f57224;
+  --d2p-success: #4c9a6a;
+  --d2p-error: #d46a6a;
   --d2p-gold-gradient: linear-gradient(135deg, #a67c3d 0%, #e3c989 48%, #c9a45c 100%);
+}
+
+:root[data-theme='light'] {
+  --d2p-page: #faf8f3;
+  --d2p-surface: #ffffff;
+  --d2p-surface-alt: #f3efe7;
+  --d2p-border: #e5e0d7;
+  --d2p-input: #f7f5f0;
+  --d2p-text: #171717;
+  --d2p-muted: #66625c;
+  --d2p-gold: #c9952e;
+  --d2p-gold-text: #8a5f12;
+  --d2p-gold-hi: #dcae4d;
+  --d2p-gold-lo: #a87518;
+  --d2p-on-gold: #111111;
+  --d2p-heading: #171717;
+  --d2p-price: #c04a16;
+  --d2p-success: #3f7d58;
+  --d2p-error: #b84a4a;
+  --d2p-gold-gradient: linear-gradient(135deg, #a87518 0%, #dcae4d 48%, #c9952e 100%);
+}
+
+/* Horizon paints every surface from the palette in settings_data.json, which
+ * holds one set of values, declared at :root. Light mode replaces them there.
+ *
+ * The -rgb triplets matter as much as the colours: muted text, borders, input
+ * states and overlays are computed from them with rgb(... / opacity), so
+ * overriding only the colour leaves those derived values on the dark palette. */
+:root[data-theme='light'] {
+  --color-background: #faf8f3;
+  --color-background-rgb: 250 248 243;
+  --color-foreground: #171717;
+  --color-foreground-rgb: 23 23 23;
+  --color-border: #e5e0d7;
+  --color-border-rgb: 229 224 215;
+
+  --color-primary-button-background: #c9952e;
+  --color-primary-button-text: #111111;
+  --color-primary-button-border: #c9952e;
+  --color-primary-button-hover-background: #a87518;
+  --color-primary-button-hover-text: #111111;
+  --color-primary-button-hover-border: #a87518;
+
+  --color-secondary-button-background: rgb(0 0 0 / 0%);
+  --color-secondary-button-text: #171717;
+  --color-secondary-button-border: #171717;
+
+  --color-input-background: #f7f5f0;
+  --color-input-text: #171717;
+  --color-input-border: #e5e0d7;
+}
+
+:root[data-theme='light'] body {
+  background-color: var(--d2p-page);
+  color: var(--d2p-text);
+}
+
+/* A section with a background_color setting emits .color-custom-{id}, which
+ * re-declares these tokens on the section itself from the dark palette. That
+ * beats the :root override, so light mode resets them here. */
+:root[data-theme='light'] [class*='color-custom-'],
+:root[data-theme='light'] [class*='color-custom-'] .text-block {
+  --color-background: #faf8f3;
+  --color-background-rgb: 250 248 243;
+  --color-foreground: #171717;
+  --color-foreground-rgb: 23 23 23;
+  --color: #171717;
+  --color-rgb: 23 23 23;
+  --color-border: #e5e0d7;
+  --color-border-rgb: 229 224 215;
+
+  background-color: #faf8f3;
+  color: #171717;
 }
 
 /* --- Gold gradient buttons --------------------------------------------- */
@@ -53,13 +142,17 @@ button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
  * menus are excluded: their headings carry their own contextual color.
  * ======================================================================= */
 
+/* Headings use variables rather than fixed colours, so each mode supplies its
+ * own without needing an override. --d2p-gold-text is the gold that stays
+ * legible on the mode's background; --d2p-heading is the plain heading colour.
+ */
 h1,
 h2,
 h3,
 .h1,
 .h2,
 .h3 {
-  color: var(--d2p-gold);
+  color: var(--d2p-gold-text);
 }
 
 h4,
@@ -68,7 +161,7 @@ h6,
 .h4,
 .h5,
 .h6 {
-  color: #ffffff;
+  color: var(--d2p-heading);
 }
 
 /* Headings inside interactive or colored surfaces keep their own color. */
@@ -229,4 +322,128 @@ footer a:hover {
 /* Accelerated buttons (Shop Pay, PayPal, Google Pay) sit under Checkout. */
 .additional-checkout-buttons {
   margin-block-start: 10px;
+}
+
+/* =======================================================================
+ * Light mode: store-wide surfaces
+ * ======================================================================= */
+
+/* The footer's link columns are rich text whose colour is stored in the
+ * section settings, so they carry it inline and need naming explicitly. Both
+ * modes use variables, so this is written once rather than per mode. */
+footer a,
+footer p,
+footer span {
+  color: var(--d2p-text);
+}
+
+footer a:hover {
+  color: var(--d2p-gold-text);
+}
+
+/* Horizon's own cards, used on collection, search and product pages. */
+.product-card,
+.collection-card,
+.card-gallery {
+  background-color: var(--d2p-surface);
+}
+
+/* The payment icons are drawn for white, so the plate is dark-mode only. */
+:root[data-theme='light'] .payment-icons__item svg {
+  background: transparent;
+  padding: 0;
+}
+
+/* =======================================================================
+ * Body copy and common surfaces
+ *
+ * Horizon colours these from --color-foreground, which both modes set at
+ * :root, so most text follows automatically. These name the cases that carry
+ * their own colour or sit on a surface that changes between modes.
+ * ======================================================================= */
+
+/* Secondary copy: descriptions, meta lines, counts. */
+.d2p-grid__subheading,
+.d2p-card__compare,
+.d2p-card__rating-count,
+.d2p-trust__text span,
+.d2p-promo__body {
+  color: var(--d2p-muted);
+  opacity: 1;
+}
+
+/* Inputs and form fields. */
+input,
+textarea,
+select {
+  color: var(--d2p-text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--d2p-muted);
+}
+
+/* Feedback states. Named explicitly rather than by substring, so an unrelated
+ * class that happens to contain "error" is not recoloured. */
+.form__message--success {
+  color: var(--d2p-success);
+}
+
+.form__message--error,
+.form__message--error-list {
+  color: var(--d2p-error);
+}
+
+/* Drawers sit above the page and need the card surface. Class names taken
+ * from the theme's own markup rather than assumed. */
+.cart-drawer__content,
+.menu-drawer-container,
+dialog {
+  background-color: var(--d2p-surface);
+  color: var(--d2p-text);
+}
+
+/* =======================================================================
+ * Light mode: text that carries a colour from theme settings
+ *
+ * Block settings like text_color resolve server-side against the palette in
+ * settings_data.json — the dark one — and are emitted as inline --color
+ * values on the element. Inline values cannot be overridden by setting the
+ * same variable, so these rules set `color` directly, which does win.
+ *
+ * Scoped to light mode only: in dark mode the inline values are already right.
+ * ======================================================================= */
+
+:root[data-theme='light'] .product-card .product-title,
+:root[data-theme='light'] .product-card [class*='product-title'],
+:root[data-theme='light'] .card__heading,
+:root[data-theme='light'] .card__content a {
+  color: var(--d2p-text);
+}
+
+:root[data-theme='light'] .product-card .price,
+:root[data-theme='light'] .product-card [class*='price'],
+:root[data-theme='light'] .card__content .price {
+  color: var(--d2p-text);
+}
+
+:root[data-theme='light'] .price--on-sale,
+:root[data-theme='light'] [class*='price--sale'] {
+  color: var(--d2p-gold-text);
+}
+
+/* Filters, sort controls and result counts sit directly on the page. Only the
+ * text-bearing elements are named, so icons keep their own colour. */
+:root[data-theme='light'] .facets,
+:root[data-theme='light'] .facets label,
+:root[data-theme='light'] .facets summary,
+:root[data-theme='light'] .facets legend,
+:root[data-theme='light'] .facets button,
+:root[data-theme='light'] [class*='sorting'],
+:root[data-theme='light'] [class*='sorting'] label,
+:root[data-theme='light'] [class*='sorting'] summary,
+:root[data-theme='light'] [class*='sorting'] button,
+:root[data-theme='light'] [class*='results-count'] {
+  color: var(--d2p-text);
 }

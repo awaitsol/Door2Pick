@@ -166,7 +166,8 @@
         "menu_text": "#EDE7DB",
         "accent_color": "#E8C27A",
         "accent_text": "#1A1A1A",
-        "border_color": "#2A2A2E"
+        "border_color": "#2A2A2E",
+        "show_theme_toggle": true
       }
     }
   },

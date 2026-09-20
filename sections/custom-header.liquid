@@ -35,16 +35,22 @@
 
 <script type="module" src="{{ 'cart-icon.js' | asset_url }}" fetchpriority="low"></script>
 
+{%- comment -%}
+  The colour settings are written as *-setting variables and mapped to the ones
+  the styles use further down, per mode. Setting the used names directly here
+  would make them inline styles, which no stylesheet rule can override — so
+  light mode could never recolour the header.
+{%- endcomment -%}
 <div class="d2p-header" style="
-  --d2p-h-utility-bg: {{ s.utility_background }};
-  --d2p-h-utility-fg: {{ s.utility_text }};
-  --d2p-h-main-bg: {{ s.main_background }};
-  --d2p-h-main-fg: {{ s.main_text }};
-  --d2p-h-menu-bg: {{ s.menu_background }};
-  --d2p-h-menu-fg: {{ s.menu_text }};
-  --d2p-h-accent: {{ s.accent_color }};
-  --d2p-h-accent-fg: {{ s.accent_text }};
-  --d2p-h-border: {{ s.border_color }};
+  --d2p-h-utility-bg-setting: {{ s.utility_background }};
+  --d2p-h-utility-fg-setting: {{ s.utility_text }};
+  --d2p-h-main-bg-setting: {{ s.main_background }};
+  --d2p-h-main-fg-setting: {{ s.main_text }};
+  --d2p-h-menu-bg-setting: {{ s.menu_background }};
+  --d2p-h-menu-fg-setting: {{ s.menu_text }};
+  --d2p-h-accent-setting: {{ s.accent_color }};
+  --d2p-h-accent-fg-setting: {{ s.accent_text }};
+  --d2p-h-border-setting: {{ s.border_color }};
 ">
   {%- if utilities.size > 0 -%}
     <div class="d2p-header__utility">
@@ -157,6 +163,30 @@
       {%- endif -%}
 
       <div class="d2p-header__actions">
+        {%- if s.show_theme_toggle -%}
+          {%- comment -%}
+            The label and icon name the mode this switches TO, and aria-pressed
+            reports whether light mode is on. Both are kept current by the
+            script below, since the initial mode is decided before paint.
+          {%- endcomment -%}
+          <button
+            class="d2p-header__action d2p-header__theme-toggle"
+            type="button"
+            data-d2p-theme-toggle
+            aria-pressed="false"
+          >
+            <span class="d2p-header__action-icon" aria-hidden="true">
+              <span class="d2p-header__theme-icon d2p-header__theme-icon--sun">
+                {%- render 'd2p-icon', name: 'sun' -%}
+              </span>
+              <span class="d2p-header__theme-icon d2p-header__theme-icon--moon">
+                {%- render 'd2p-icon', name: 'moon' -%}
+              </span>
+            </span>
+            <span class="d2p-header__action-label" data-d2p-theme-label>Light</span>
+          </button>
+        {%- endif -%}
+
         {%- if shop.customer_accounts_enabled -%}
           <a class="d2p-header__action" href="{{ routes.account_url }}">
             <span class="d2p-header__action-icon" aria-hidden="true">
@@ -394,7 +424,90 @@
 </div>
 
 {% stylesheet %}
+  /* Light mode draws the header from the page palette instead of the colour
+     settings, which hold the dark values — otherwise a dark band sits above a
+     light page. Declared here because section stylesheets load after
+     theme-custom.css and would otherwise override it. */
+  :root[data-theme='light'] .d2p-header {
+    --d2p-h-utility-bg: #f3efe7;
+    --d2p-h-utility-fg: #171717;
+    --d2p-h-main-bg: #ffffff;
+    --d2p-h-main-fg: #171717;
+    --d2p-h-menu-bg: #ffffff;
+    --d2p-h-menu-fg: #171717;
+    --d2p-h-accent: #c9952e;
+    --d2p-h-accent-fg: #111111;
+    --d2p-h-border: #e5e0d7;
+  }
+
+  :root[data-theme='light'] .d2p-header__search {
+    background: #f7f5f0;
+  }
+
+  :root[data-theme='light'] .d2p-header__search-input {
+    color: #171717;
+  }
+
+  :root[data-theme='light'] .d2p-header__search-input::placeholder {
+    color: #66625c;
+  }
+
+  /* The logo artwork is light-on-transparent, made for the dark header, so on
+     a light header it needs a dark plate behind it. */
+  :root[data-theme='light'] .d2p-header__logo img {
+    background: #111111;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+
+  :root[data-theme='light'] .d2p-header__utility-text strong,
+  :root[data-theme='light'] .d2p-header__utility-icon,
+  :root[data-theme='light'] .d2p-header__search-icon,
+  :root[data-theme='light'] .d2p-megamenu__rail-icon,
+  :root[data-theme='light'] .d2p-megamenu__trust-icon,
+  :root[data-theme='light'] .d2p-megamenu__column-title,
+  :root[data-theme='light'] .d2p-megamenu__viewall,
+  :root[data-theme='light'] .d2p-megamenu__feature-heading,
+  :root[data-theme='light'] .d2p-megamenu__feature-eyebrow,
+  :root[data-theme='light'] .d2p-megamenu__promo-text strong,
+  :root[data-theme='light'] .d2p-header__primary-link:hover,
+  :root[data-theme='light'] .d2p-header__primary-link.is-active,
+  :root[data-theme='light'] .d2p-header__action:hover {
+    color: #8a5f12;
+  }
+
+  :root[data-theme='light'] .d2p-header__pill {
+    background: transparent;
+    border-color: #c9952e;
+    color: #8a5f12;
+  }
+
+  :root[data-theme='light'] .d2p-header__pill:hover,
+  :root[data-theme='light'] .d2p-header__pill[aria-expanded='true'],
+  :root[data-theme='light'] .d2p-header__search-submit,
+  :root[data-theme='light'] .d2p-megamenu__feature-button {
+    background: #c9952e;
+    color: #111111;
+  }
+
+  :root[data-theme='light'] .d2p-megamenu__rail-link:hover,
+  :root[data-theme='light'] .d2p-megamenu__rail-link.is-active,
+  :root[data-theme='light'] .d2p-megamenu__promo {
+    background: #f3efe7;
+  }
+
+  /* Dark mode takes the merchant's colour settings as-is. */
   .d2p-header {
+    --d2p-h-utility-bg: var(--d2p-h-utility-bg-setting);
+    --d2p-h-utility-fg: var(--d2p-h-utility-fg-setting);
+    --d2p-h-main-bg: var(--d2p-h-main-bg-setting);
+    --d2p-h-main-fg: var(--d2p-h-main-fg-setting);
+    --d2p-h-menu-bg: var(--d2p-h-menu-bg-setting);
+    --d2p-h-menu-fg: var(--d2p-h-menu-fg-setting);
+    --d2p-h-accent: var(--d2p-h-accent-setting);
+    --d2p-h-accent-fg: var(--d2p-h-accent-fg-setting);
+    --d2p-h-border: var(--d2p-h-border-setting);
+
     position: relative;
     z-index: 5;
     background: var(--d2p-h-main-bg);
@@ -640,6 +753,21 @@
 
   .d2p-header__action:hover {
     color: var(--d2p-h-accent);
+  }
+
+  .d2p-header__theme-icon {
+    display: none;
+  }
+
+  /* Dark mode offers the sun (switch to light); light mode offers the moon. */
+  :root[data-theme='dark'] .d2p-header__theme-icon--sun,
+  :root[data-theme='light'] .d2p-header__theme-icon--moon {
+    display: flex;
+  }
+
+  .d2p-header__theme-icon svg {
+    inline-size: 24px;
+    block-size: 24px;
   }
 
   .d2p-header__action-icon {
@@ -1135,6 +1263,38 @@
 {% endstylesheet %}
 
 {% javascript %}
+  // Colour-mode toggle. The initial mode is set before first paint by
+  // snippets/theme-mode.liquid; this switches it and keeps the control's
+  // label and pressed state honest.
+  (() => {
+    const KEY = 'd2p-theme';
+
+    const sync = () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      document.querySelectorAll('[data-d2p-theme-toggle]').forEach((button) => {
+        button.setAttribute('aria-pressed', isLight ? 'true' : 'false');
+        button.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+        const label = button.querySelector('[data-d2p-theme-label]');
+        if (label) label.textContent = isLight ? 'Dark' : 'Light';
+      });
+    };
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('[data-d2p-theme-toggle]')) return;
+      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem(KEY, next);
+      } catch (error) {
+        // Storage can be blocked; the mode still applies for this page view.
+      }
+      sync();
+    });
+
+    sync();
+    document.addEventListener('DOMContentLoaded', sync);
+  })();
+
   // The mega menu is a disclosure: the pill (and the mobile burger) toggle it,
   // and it closes on outside click or Escape. It stays in the DOM so its links
   // remain crawlable; `hidden` handles visibility for assistive tech too.
@@ -1206,6 +1366,7 @@
     },
 
     { "type": "header", "content": "Actions" },
+    { "type": "checkbox", "id": "show_theme_toggle", "label": "Show light/dark toggle", "default": true },
     { "type": "text", "id": "account_label", "label": "Account label", "default": "Account" },
     { "type": "text", "id": "cart_label", "label": "Cart label", "default": "Cart" },
 

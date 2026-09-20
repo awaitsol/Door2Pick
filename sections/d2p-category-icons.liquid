@@ -141,6 +141,20 @@
     color: var(--d2p-gold, #e8c27a);
   }
 
+  /* Light mode, in-section so it wins over theme-custom.css. */
+  :root[data-theme='light'] .d2p-cats__ring {
+    background: #ffffff;
+    border-color: #c9952e;
+  }
+
+  :root[data-theme='light'] .d2p-cats__icon {
+    color: #8a5f12;
+  }
+
+  :root[data-theme='light'] .d2p-cats__link:hover .d2p-cats__label {
+    color: #8a5f12;
+  }
+
   @media screen and (max-width: 749px) {
     .d2p-cats__inner {
       padding-inline: 16px;
