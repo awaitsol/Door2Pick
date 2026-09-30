@@ -7,7 +7,8 @@
   colour from their container.
 
   @param {string} name - Icon name: truck, sparkle, shield, return, headset,
-    diamond, house, phone, pot, flame, tag, gift, grid, heart, star, sun, moon.
+    diamond, house, phone, pot, flame, tag, gift, grid, heart, star, sun, moon,
+    share, copy, check.
 
   @example
   {% render 'd2p-icon', name: 'diamond' %}
@@ -102,6 +103,23 @@
   {%- when 'moon' -%}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">
       <path d="M20 13.4A8.2 8.2 0 0 1 10.6 4a8.4 8.4 0 1 0 9.4 9.4z"/>
+    </svg>
+
+  {%- when 'share' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>
+    </svg>
+
+  {%- when 'copy' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <rect x="9" y="9" width="11" height="11" rx="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </svg>
+
+  {%- when 'check' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+      <path d="M20 6L9 17l-5-5"/>
     </svg>
 
   {%- when 'gift' -%}

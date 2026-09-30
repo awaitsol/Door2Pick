@@ -19,7 +19,7 @@
           "settings": {
             "icon": "truck",
             "strong_text": "FREE DELIVERY",
-            "text": "on orders over Rs. 2,999"
+            "text": "on orders over Rs. 1,999"
           }
         },
         "u2": {
@@ -71,7 +71,7 @@
           "type": "nav_link",
           "settings": {
             "label": "Track Order",
-            "link": "/pages/shipping"
+            "link": "/pages/track-order"
           }
         },
         "c1": {
@@ -133,6 +133,7 @@
         "n1",
         "n2",
         "n3",
+        "n4",
         "c1",
         "c2",
         "c3",
@@ -140,7 +141,7 @@
         "c5"
       ],
       "settings": {
-        "logo_asset": "logo-header.png",
+        "logo_asset": "logo-dark.png",
         "show_search": true,
         "search_placeholder": "Search for products, brands and more...",
         "account_label": "Account",
@@ -166,7 +167,11 @@
         "accent_color": "#E8C27A",
         "accent_text": "#1A1A1A",
         "border_color": "#2A2A2E",
-        "show_theme_toggle": true
+        "show_theme_toggle": true,
+        "logo_asset_light": "logo-light.png",
+        "utility_scroll": true,
+        "utility_scroll_speed": 40,
+        "show_category_rail": true
       }
     }
   },

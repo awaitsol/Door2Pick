@@ -323,7 +323,7 @@
     inline-size: 34px;
     block-size: 34px;
     padding: 0;
-    border: 1px solid var(--d2p-border, #2a2a2e);
+    border: 1px solid var(--d2p-border, #26262a);
     border-radius: 50%;
     background: none;
     color: inherit;
@@ -332,8 +332,8 @@
   }
 
   .d2p-grid__arrow:hover {
-    border-color: var(--d2p-gold, #e8c27a);
-    color: var(--d2p-gold, #e8c27a);
+    border-color: var(--d2p-gold, #c9a45c);
+    color: var(--d2p-gold, #c9a45c);
   }
 
   .d2p-grid__arrow svg {
@@ -353,7 +353,7 @@
   .d2p-grid__notice {
     margin: 0 0 14px;
     padding: 10px 14px;
-    border: 1px dashed var(--d2p-border, #2a2a2e);
+    border: 1px dashed var(--d2p-border, #26262a);
     border-radius: 6px;
     font-size: 0.8125rem;
     opacity: 0.75;
@@ -372,14 +372,14 @@
     display: flex;
     flex-direction: column;
     background: var(--d2p-surface, #141416);
-    border: 1px solid var(--d2p-border, #2a2a2e);
+    border: 1px solid var(--d2p-border, #26262a);
     border-radius: 10px;
     overflow: hidden;
     transition: border-color 0.25s ease, transform 0.25s ease;
   }
 
   .d2p-card:hover {
-    border-color: var(--d2p-gold, #e8c27a);
+    border-color: var(--d2p-gold, #c9a45c);
     transform: translateY(-3px);
   }
 
@@ -462,7 +462,7 @@
   }
 
   .d2p-card__title {
-    color: var(--d2p-text, #ede7db);
+    color: var(--d2p-text, #ffffff);
     text-decoration: none;
     font-size: 0.8125rem;
     line-height: 1.35;
@@ -486,7 +486,7 @@
 
   .d2p-card__star {
     display: flex;
-    color: var(--d2p-gold, #e8c27a);
+    color: var(--d2p-gold, #c9a45c);
   }
 
   .d2p-card__star svg {
@@ -517,6 +517,13 @@
     font-size: 0.8125rem;
   }
 
+  /* product-form-component is a custom element and so defaults to
+     display: inline, which would collapse the full-width Add to Cart button
+     inside it. */
+  .d2p-card__form-component {
+    display: block;
+  }
+
   .d2p-card__form {
     margin: 0;
   }
@@ -531,7 +538,7 @@
     padding-block: 9px;
     border: none;
     border-radius: 6px;
-    background: var(--d2p-gold, #e8c27a);
+    background: var(--d2p-gold, #c9a45c);
     color: #1a1a1a;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -549,7 +556,7 @@
   }
 
   .d2p-card__add--disabled {
-    background: var(--d2p-border, #2a2a2e);
+    background: var(--d2p-border, #26262a);
     color: var(--d2p-muted, #a9a296);
     cursor: not-allowed;
   }
@@ -582,7 +589,7 @@
   }
 
   .d2p-grid--compact .d2p-card__title {
-    color: var(--d2p-text, #ede7db);
+    color: var(--d2p-text, #ffffff);
     font-size: 0.8125rem;
   }
 
@@ -620,7 +627,7 @@
   }
 
   .d2p-grid--compact .d2p-grid__heading {
-    color: var(--d2p-text, #ede7db);
+    color: var(--d2p-text, #ffffff);
   }
 
   /* Light mode: the section background is set from an inline style, so the

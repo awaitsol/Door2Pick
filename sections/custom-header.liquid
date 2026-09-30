@@ -53,23 +53,45 @@
   --d2p-h-border-setting: {{ s.border_color }};
 ">
   {%- if utilities.size > 0 -%}
-    <div class="d2p-header__utility">
-      <div class="d2p-header__inner d2p-header__utility-inner">
-        {%- for block in utilities -%}
-          <div class="d2p-header__utility-item" {{ block.shopify_attributes }}>
-            {%- if block.settings.icon != 'none' -%}
-              <span class="d2p-header__utility-icon" aria-hidden="true">
-                {%- render 'd2p-icon', name: block.settings.icon -%}
-              </span>
-            {%- endif -%}
-            <span class="d2p-header__utility-text">
-              {%- if block.settings.strong_text != blank -%}
-                <strong>{{ block.settings.strong_text }}</strong>
-              {%- endif -%}
-              {{ block.settings.text }}
-            </span>
-          </div>
-        {%- endfor -%}
+    {%- comment -%}
+      The messages scroll as a continuous marquee.
+
+      The run is rendered FOUR times, not twice. The loop translates by one
+      run's width and resets, so the seam is invisible only while the copies
+      that remain still cover the screen. Two copies of four short messages
+      do not span a wide monitor, so a gap opened at the end of every cycle —
+      the bar looked empty from the middle onward. Four copies keep the track
+      wider than any viewport, so the row is always full.
+
+      Only the first run is exposed to assistive technology; the rest are
+      aria-hidden so each message is announced once.
+    {%- endcomment -%}
+    <div class="d2p-header__utility{% if s.utility_scroll %} d2p-header__utility--scrolling{% endif %}">
+      <div class="d2p-header__utility-inner">
+        <div class="d2p-header__utility-track" style="--d2p-utility-duration: {{ s.utility_scroll_speed }}s;">
+          {%- for copy in (1..4) -%}
+            <div
+              class="d2p-header__utility-run"
+              {% if copy > 1 %}aria-hidden="true"{% endif %}
+            >
+              {%- for block in utilities -%}
+                <div class="d2p-header__utility-item" {% if copy == 1 %}{{ block.shopify_attributes }}{% endif %}>
+                  {%- if block.settings.icon != 'none' -%}
+                    <span class="d2p-header__utility-icon" aria-hidden="true">
+                      {%- render 'd2p-icon', name: block.settings.icon -%}
+                    </span>
+                  {%- endif -%}
+                  <span class="d2p-header__utility-text">
+                    {%- if block.settings.strong_text != blank -%}
+                      <strong>{{ block.settings.strong_text }}</strong>
+                    {%- endif -%}
+                    {{ block.settings.text }}
+                  </span>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
       </div>
     </div>
   {%- endif -%}
@@ -92,7 +114,29 @@
           {{ s.logo | image_url: width: 600 | image_tag:
              alt: shop.name, widths: '200, 300, 450, 600', loading: 'eager' }}
         {%- elsif s.logo_asset != blank -%}
-          <img src="{{ s.logo_asset | asset_url }}" alt="{{ shop.name | escape }}" loading="eager" width="600" height="200">
+          {%- comment -%}
+            The wordmark is white, so it needs a dark-text twin for the light
+            header. Both are rendered and CSS picks one — swapping the src in
+            JS would flash the wrong logo first.
+          {%- endcomment -%}
+          <img
+            class="d2p-header__logo-img d2p-header__logo-img--dark"
+            src="{{ s.logo_asset | asset_url }}"
+            alt="{{ shop.name | escape }}"
+            loading="eager"
+            width="300"
+            height="200"
+          >
+          {%- if s.logo_asset_light != blank -%}
+            <img
+              class="d2p-header__logo-img d2p-header__logo-img--light"
+              src="{{ s.logo_asset_light | asset_url }}"
+              alt=""
+              loading="eager"
+              width="300"
+              height="200"
+            >
+          {%- endif -%}
         {%- else -%}
           <span class="d2p-header__logo-text">{{ shop.name }}</span>
         {%- endif -%}
@@ -144,9 +188,6 @@
         <form class="d2p-header__search" action="{{ routes.search_url }}" method="get" role="search">
           <input type="hidden" name="type" value="product">
           <label class="visually-hidden" for="d2p-search-input">{{ 'content.search' | t }}</label>
-          <span class="d2p-header__search-icon" aria-hidden="true">
-            {{- 'icon-search.svg' | inline_asset_content -}}
-          </span>
           <input
             id="d2p-search-input"
             class="d2p-header__search-input"
@@ -252,11 +293,91 @@
             {{- 'icon-chevron-right.svg' | inline_asset_content -}}
           </span>
         </button>
+
+        {%- comment -%}
+          Circular category shortcuts beside the pill. Each resolves the same
+          way the mega menu rail does — picker, then handle, then title — so a
+          category never silently disappears when a handle is mistyped.
+          The thumbnail prefers a block image, then the collection's own
+          featured image, then the line icon, so the row is usable before any
+          artwork is uploaded.
+        {%- endcomment -%}
+        {%- if s.show_category_rail -%}
+          <ul class="d2p-header__rail">
+            {%- for block in categories -%}
+              {%- liquid
+                assign cat = block.settings.collection
+                if cat == blank and block.settings.collection_handle != blank
+                  assign cat = collections[block.settings.collection_handle]
+                endif
+                if cat == blank and block.settings.label != blank
+                  assign wanted = block.settings.label | downcase | strip
+                  for c in collections
+                    assign c_title = c.title | downcase | strip
+                    if c_title == wanted
+                      assign cat = c
+                      break
+                    endif
+                  endfor
+                endif
+                assign cat_url = cat.url | default: block.settings.link
+                assign cat_label = block.settings.label | default: cat.title
+                if cat_url == blank
+                  assign cat_url = routes.search_url | append: '?q=' | append: block.settings.label | url_encode
+                endif
+              -%}
+              <li>
+                <a class="d2p-header__rail-link" href="{{ cat_url }}">
+                  <span class="d2p-header__rail-thumb">
+                    {%- if block.settings.image != blank -%}
+                      {{
+                        block.settings.image
+                        | image_url: width: 160
+                        | image_tag: class: 'd2p-header__rail-img', alt: '', widths: '56, 84, 112, 160', loading: 'lazy'
+                      }}
+                    {%- elsif cat.featured_image != blank -%}
+                      {{
+                        cat.featured_image
+                        | image_url: width: 160
+                        | image_tag: class: 'd2p-header__rail-img', alt: '', widths: '56, 84, 112, 160', loading: 'lazy'
+                      }}
+                    {%- elsif block.settings.icon != 'none' -%}
+                      <span class="d2p-header__rail-icon" aria-hidden="true">
+                        {%- render 'd2p-icon', name: block.settings.icon -%}
+                      </span>
+                    {%- endif -%}
+                  </span>
+                  <span class="d2p-header__rail-label">{{ cat_label }}</span>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
       </div>
     </div>
 
     <div class="d2p-megamenu" id="d2p-megamenu" hidden data-d2p-megamenu>
       <div class="d2p-header__inner d2p-megamenu__inner">
+        {%- comment -%}
+          The primary nav is hidden on narrow screens, where there is no room
+          for it beside the logo. This repeats it inside the panel the burger
+          opens, so those destinations are still reachable on a phone. It is
+          hidden on desktop, where the real nav is visible.
+        {%- endcomment -%}
+        {%- if nav_links.size > 0 -%}
+          <nav class="d2p-megamenu__quick" aria-label="{{ s.primary_aria_label | escape }}">
+            <ul class="d2p-megamenu__quick-list">
+              {%- for block in nav_links -%}
+                <li>
+                  <a class="d2p-megamenu__quick-link" href="{{ block.settings.link }}">
+                    {{ block.settings.label }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+
         <div class="d2p-megamenu__rail">
           <ul class="d2p-megamenu__rail-list" role="tablist" aria-label="{{ s.nav_aria_label | escape }}">
             {%- for block in categories -%}
@@ -428,6 +549,9 @@
      settings, which hold the dark values — otherwise a dark band sits above a
      light page. Declared here because section stylesheets load after
      theme-custom.css and would otherwise override it. */
+  /* Light mode header. The accent is #8a5f12 for LETTERING (5.02:1 on white)
+     while fills keep #c9a45c, because the brand orange as text on white is
+     only 2.16:1. */
   :root[data-theme='light'] .d2p-header {
     --d2p-h-utility-bg: #f3efe7;
     --d2p-h-utility-fg: #171717;
@@ -435,34 +559,26 @@
     --d2p-h-main-fg: #171717;
     --d2p-h-menu-bg: #ffffff;
     --d2p-h-menu-fg: #171717;
-    --d2p-h-accent: #c9952e;
-    --d2p-h-accent-fg: #111111;
+    --d2p-h-accent: #8a5f12;
+    --d2p-h-accent-fg: #171717;
     --d2p-h-border: #e5e0d7;
   }
 
   :root[data-theme='light'] .d2p-header__search {
-    background: #f7f5f0;
+    background: #f3efe7;
   }
 
-  :root[data-theme='light'] .d2p-header__search-input {
+  :root[data-theme='light'] input.d2p-header__search-input {
     color: #171717;
+    background-color: transparent;
   }
 
   :root[data-theme='light'] .d2p-header__search-input::placeholder {
     color: #66625c;
   }
 
-  /* The logo artwork is light-on-transparent, made for the dark header, so on
-     a light header it needs a dark plate behind it. */
-  :root[data-theme='light'] .d2p-header__logo img {
-    background: #111111;
-    border-radius: 6px;
-    padding: 6px 10px;
-  }
-
   :root[data-theme='light'] .d2p-header__utility-text strong,
   :root[data-theme='light'] .d2p-header__utility-icon,
-  :root[data-theme='light'] .d2p-header__search-icon,
   :root[data-theme='light'] .d2p-megamenu__rail-icon,
   :root[data-theme='light'] .d2p-megamenu__trust-icon,
   :root[data-theme='light'] .d2p-megamenu__column-title,
@@ -531,8 +647,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(16px, 4vw, 64px);
     min-block-size: 44px;
+    /* The marquee runs edge to edge, so this one is not width-limited like
+       the other header rows; the track is clipped here instead. */
+    overflow: hidden;
+  }
+
+  .d2p-header__utility-track {
+    display: flex;
+    align-items: center;
+  }
+
+  .d2p-header__utility-run {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 4vw, 64px);
+    padding-inline: clamp(8px, 2vw, 32px);
+  }
+
+  /* The divider is drawn by the adjacent-sibling rule below, which skips the
+     first item of each run. While scrolling that leaves a gap where the two
+     runs meet, so the run itself carries a leading divider instead. */
+  .d2p-header__utility--scrolling .d2p-header__utility-run {
+    border-inline-start: 1px solid var(--d2p-h-border);
   }
 
   .d2p-header__utility-item {
@@ -545,6 +682,50 @@
   .d2p-header__utility-item + .d2p-header__utility-item {
     border-inline-start: 1px solid var(--d2p-h-border);
     padding-inline-start: clamp(16px, 4vw, 64px);
+  }
+
+  /* When the bar is not scrolling the duplicate run is redundant: hide it and
+     centre the single run, which reproduces the original static layout. */
+  .d2p-header__utility:not(.d2p-header__utility--scrolling) .d2p-header__utility-track {
+    inline-size: 100%;
+    justify-content: center;
+  }
+
+  .d2p-header__utility:not(.d2p-header__utility--scrolling) .d2p-header__utility-run[aria-hidden] {
+    display: none;
+  }
+
+  /* The track holds four identical runs, so translating it by 25% lands the
+     second exactly where the first began — the reset is invisible, and the
+     three copies still on screen keep the row full at any width. */
+  .d2p-header__utility--scrolling .d2p-header__utility-track {
+    inline-size: max-content;
+    animation: d2p-utility-scroll var(--d2p-utility-duration, 30s) linear infinite;
+  }
+
+  /* Pausing on hover lets someone read a message that is scrolling away. */
+  .d2p-header__utility--scrolling:hover .d2p-header__utility-track,
+  .d2p-header__utility--scrolling:focus-within .d2p-header__utility-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes d2p-utility-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-25%); }
+  }
+
+  /* Motion that loops indefinitely is exactly what this setting is for: the
+     messages stay, laid out statically, but nothing moves. */
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-header__utility--scrolling .d2p-header__utility-track {
+      inline-size: 100%;
+      justify-content: center;
+      animation: none;
+    }
+
+    .d2p-header__utility--scrolling .d2p-header__utility-run[aria-hidden] {
+      display: none;
+    }
   }
 
   .d2p-header__utility-icon {
@@ -602,6 +783,22 @@
     display: block;
     block-size: 54px;
     inline-size: auto;
+  }
+
+  /* The wordmark is white, so a dark-text twin is rendered for the light
+     header and CSS shows whichever matches the mode.
+     These carry the parent class so they outrank `.d2p-header__logo img`
+     above — without it, that rule's `display: block` revealed both logos. */
+  .d2p-header__logo img.d2p-header__logo-img--light {
+    display: none;
+  }
+
+  :root[data-theme='light'] .d2p-header__logo img.d2p-header__logo-img--dark {
+    display: none;
+  }
+
+  :root[data-theme='light'] .d2p-header__logo img.d2p-header__logo-img--light {
+    display: block;
   }
 
   .d2p-header__logo-text {
@@ -674,28 +871,45 @@
     background: rgb(255 255 255 / 5%);
     border: 1px solid var(--d2p-h-accent);
     border-radius: 999px;
-    padding: 5px 5px 5px 18px;
-    gap: 10px;
+    padding: 5px;
+    gap: 8px;
   }
 
-  .d2p-header__search-icon {
-    display: flex;
-    color: var(--d2p-h-accent);
-  }
-
-  .d2p-header__search-icon svg {
-    inline-size: 18px;
-    block-size: 18px;
-  }
-
-  .d2p-header__search-input {
+  /* base.css styles inputs with `input:not([type='checkbox'], [type='radio'])`,
+     which outranks a single class — so its border-color and background showed
+     through as a second outline inside the pill. Matching that specificity with
+     the attribute selector is what actually removes it. */
+  input.d2p-header__search-input:not([type='checkbox'], [type='radio']) {
     flex: 1 1 auto;
     min-inline-size: 0;
-    border: none;
+    border: 0;
+    box-shadow: none;
     outline: none;
-    background: none;
+    background: transparent;
+    background-color: transparent;
+    padding-inline: 18px 0;
+    block-size: 38px;
     font-size: 0.9375rem;
     color: var(--d2p-h-main-fg);
+  }
+
+  /* Keyboard focus lands on the pill rather than the bare field, so the ring
+     follows the shape the user sees. */
+  .d2p-header__search:focus-within {
+    outline: 2px solid var(--d2p-h-accent);
+    outline-offset: 2px;
+  }
+
+  .d2p-header__search-input:focus,
+  .d2p-header__search-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* Safari renders a clear button and inner spin area on type="search". */
+  .d2p-header__search-input::-webkit-search-decoration,
+  .d2p-header__search-input::-webkit-search-cancel-button {
+    appearance: none;
   }
 
   .d2p-header__search-input::placeholder {
@@ -834,10 +1048,197 @@
   .d2p-header__menubar-inner {
     display: flex;
     align-items: center;
+    gap: 20px;
     min-block-size: 56px;
   }
 
+  /* ---------- category rail ---------- */
+  /* Scrolls sideways rather than wrapping, so the bar stays one row deep at
+     every width and the pill keeps its place. */
+  .d2p-header__rail {
+    /* Takes the width left over by the pill and centres inside it, so the
+       circles read as centred in the bar while the pill stays pinned left.
+       min-inline-size: 0 lets it shrink and scroll instead of pushing the
+       pill off the row. */
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(16px, 2.4vw, 36px);
+    margin: 0;
+    padding: 10px 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .d2p-header__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .d2p-header__rail li {
+    flex: 0 0 auto;
+  }
+
+  .d2p-header__rail-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    inline-size: 86px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .d2p-header__rail-thumb {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 54px;
+    block-size: 54px;
+    border: 1px solid var(--d2p-h-border);
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--d2p-h-surface, rgb(255 255 255 / 4%));
+    transition:
+      border-color 0.25s ease,
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.25s ease;
+  }
+
+  .d2p-header__rail-img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s ease;
+  }
+
+  /* The circles fade up in sequence on load, left to right. The delay is set
+     per item below rather than with a selector loop. */
+  .d2p-header__rail li {
+    animation: d2p-rail-in 0.5s ease both;
+  }
+
+  .d2p-header__rail li:nth-child(1) { animation-delay: 0.04s; }
+  .d2p-header__rail li:nth-child(2) { animation-delay: 0.10s; }
+  .d2p-header__rail li:nth-child(3) { animation-delay: 0.16s; }
+  .d2p-header__rail li:nth-child(4) { animation-delay: 0.22s; }
+  .d2p-header__rail li:nth-child(5) { animation-delay: 0.28s; }
+  .d2p-header__rail li:nth-child(6) { animation-delay: 0.34s; }
+
+  /* One idle loop shared by every category. The loop lives on the thumb
+     while the entrance above lives on the li, so the two never fight over
+     transform, and hover can still override this one. */
+  .d2p-header__rail-thumb {
+    animation: d2p-rail-pop 3.2s ease-in-out infinite;
+  }
+
+  /* Most of the cycle is still, so the row reads as an occasional pulse
+     rather than constant motion next to the navigation: the circle swells,
+     overshoots slightly on the way back, then settles. */
+  @keyframes d2p-rail-pop {
+    0%, 55%, 100% { transform: translateY(0) scale(1); }
+    62% { transform: translateY(-5px) scale(1.09); }
+    70% { transform: translateY(0) scale(0.98); }
+    77% { transform: translateY(-2px) scale(1.03); }
+    85% { transform: translateY(0) scale(1); }
+  }
+
+  /* Pointing at a circle CANCELS the loop rather than pausing it. A running
+     or paused animation still wins over a plain transform declaration, so
+     pausing would freeze the circle mid-pop and the hover lift below would
+     never apply. Removing the animation hands transform back to hover. */
+  .d2p-header__rail-link:hover .d2p-header__rail-thumb,
+  .d2p-header__rail-link:focus-visible .d2p-header__rail-thumb {
+    animation: none;
+  }
+
+  @keyframes d2p-rail-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .d2p-header__rail-icon {
+    display: flex;
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-header__rail-icon svg {
+    inline-size: 24px;
+    block-size: 24px;
+    display: block;
+  }
+
+  .d2p-header__rail-label {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    text-align: center;
+    /* Two lines maximum, and the height is reserved whether the name wraps or
+       not — otherwise a single wrapping label makes its column taller than
+       the rest and the row looks ragged. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    block-size: calc(0.75rem * 1.3 * 2);
+  }
+
+  .d2p-header__rail-link:hover .d2p-header__rail-thumb,
+  .d2p-header__rail-link:focus-visible .d2p-header__rail-thumb {
+    border-color: var(--d2p-h-accent);
+    transform: translateY(-4px) scale(1.06);
+    /* A soft gold ring, drawn with a spread shadow so it needs no extra
+       element and does not affect layout. */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--d2p-h-accent) 22%, transparent), 0 10px 18px -10px rgb(0 0 0 / 55%);
+  }
+
+  .d2p-header__rail-link:hover .d2p-header__rail-img {
+    transform: scale(1.12);
+  }
+
+  .d2p-header__rail-link:hover .d2p-header__rail-label,
+  .d2p-header__rail-link:focus-visible .d2p-header__rail-label {
+    color: var(--d2p-h-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-header__rail li,
+    .d2p-header__rail-thumb {
+      animation: none;
+    }
+
+    .d2p-header__rail-thumb,
+    .d2p-header__rail-img,
+    .d2p-header__rail-label {
+      transition: none;
+    }
+
+    .d2p-header__rail-link:hover .d2p-header__rail-thumb,
+    .d2p-header__rail-link:focus-visible .d2p-header__rail-thumb {
+      transform: none;
+    }
+
+    .d2p-header__rail-link:hover .d2p-header__rail-img {
+      transform: none;
+    }
+  }
+
+  .d2p-header__rail-label {
+    transition: color 0.2s ease;
+  }
+
   .d2p-header__pill {
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -1012,6 +1413,43 @@
     padding-inline-start: 32px;
   }
 
+  /* The quick nav repeats the primary links for narrow screens; on desktop
+     the real nav is visible, so this would be a duplicate. */
+  .d2p-megamenu__quick {
+    display: none;
+  }
+
+  /* Centred, because this row only renders on narrow screens where it sits
+     alone above the categories — left-aligned it reads as a ragged fragment
+     rather than a deliberate row. */
+  .d2p-megamenu__quick-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    padding: 0 0 18px;
+    list-style: none;
+    border-block-end: 1px solid var(--d2p-h-border);
+  }
+
+  .d2p-megamenu__quick-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 18px;
+    border: 1px solid var(--d2p-h-border);
+    border-radius: 999px;
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .d2p-megamenu__quick-link:hover {
+    border-color: var(--d2p-h-accent);
+    color: var(--d2p-h-accent);
+  }
+
   .d2p-megamenu__columns {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr)) 1.25fr;
@@ -1177,8 +1615,13 @@
   }
 
   @media screen and (max-width: 989px) {
-    .d2p-header__primary,
-    .d2p-header__utility-item:nth-child(n + 2) {
+    .d2p-header__primary {
+      display: none;
+    }
+
+    /* Narrow screens have no room for four static messages, so only the first
+       is kept — but a scrolling bar shows them all in turn and needs them. */
+    .d2p-header__utility:not(.d2p-header__utility--scrolling) .d2p-header__utility-item:nth-child(n + 2) {
       display: none;
     }
 
@@ -1237,8 +1680,20 @@
       display: none;
     }
 
+    .d2p-megamenu__quick {
+      display: block;
+      /* The quick nav appears from 989px down, but the page gutter on
+         .d2p-header__inner only kicks in at 749px. Without this the pills
+         run to the panel edge on tablet widths. */
+      padding-inline: 16px;
+    }
+
+    /* The subcategory columns are collapsed on a phone: five categories each
+       listing six links makes the panel a very long scroll before the first
+       category is even reached. The rail above is the navigation here, and
+       tapping a category goes straight to its collection. */
     .d2p-megamenu__columns {
-      grid-template-columns: 1fr;
+      display: none;
     }
 
     .d2p-megamenu__trust {
@@ -1350,10 +1805,16 @@
     { "type": "image_picker", "id": "logo", "label": "Logo" },
     {
       "type": "text",
+      "id": "logo_asset_light",
+      "label": "Light mode logo filename",
+      "info": "A version with dark text, for the light header. Leave empty to use the same logo in both modes."
+    },
+    {
+      "type": "text",
       "id": "logo_asset",
       "label": "Or theme asset filename",
-      "info": "A file in the theme's assets folder, for example logo-header.png",
-      "default": "logo-header.png"
+      "info": "A file in the theme's assets folder, for example logo-dark.png",
+      "default": "logo-dark.png"
     },
 
     { "type": "header", "content": "Search" },
@@ -1376,6 +1837,13 @@
       "id": "all_categories_label",
       "label": "Categories button label",
       "default": "All Categories"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_category_rail",
+      "label": "Show category shortcuts",
+      "info": "Circular category links beside the All Categories button.",
+      "default": true
     },
     { "type": "text", "id": "view_all_label", "label": "View all label", "default": "View All" },
     {
@@ -1409,15 +1877,17 @@
     { "type": "url", "id": "feature_button_link", "label": "Button link" },
 
     { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "utility_background", "label": "Utility bar background", "default": "#0B0B0D" },
-    { "type": "color", "id": "utility_text", "label": "Utility bar text", "default": "#EDE7DB" },
-    { "type": "color", "id": "main_background", "label": "Main bar background", "default": "#0B0B0D" },
+    { "type": "checkbox", "id": "utility_scroll", "label": "Scroll the utility bar", "info": "Loops the messages continuously. Pauses on hover, and stays still for visitors who prefer reduced motion.", "default": true },
+    { "type": "range", "id": "utility_scroll_speed", "label": "Scroll duration", "min": 10, "max": 90, "step": 5, "unit": "s", "info": "Seconds for one full loop. Higher is slower.", "default": 40 },
+    { "type": "color", "id": "utility_background", "label": "Utility bar background", "default": "#0b0b0d" },
+    { "type": "color", "id": "utility_text", "label": "Utility bar text", "default": "#ffffff" },
+    { "type": "color", "id": "main_background", "label": "Main bar background", "default": "#0b0b0d" },
     { "type": "color", "id": "main_text", "label": "Main bar text", "default": "#FFFFFF" },
     { "type": "color", "id": "menu_background", "label": "Mega menu background", "default": "#111113" },
-    { "type": "color", "id": "menu_text", "label": "Mega menu text", "default": "#EDE7DB" },
-    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#E8C27A" },
+    { "type": "color", "id": "menu_text", "label": "Mega menu text", "default": "#ffffff" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#c9a45c" },
     { "type": "color", "id": "accent_text", "label": "Accent text", "default": "#1A1A1A" },
-    { "type": "color", "id": "border_color", "label": "Border", "default": "#2A2A2E" }
+    { "type": "color", "id": "border_color", "label": "Border", "default": "#26262a" }
   ],
   "blocks": [
     {
@@ -1439,7 +1909,7 @@
           "default": "truck"
         },
         { "type": "text", "id": "strong_text", "label": "Emphasised text" },
-        { "type": "text", "id": "text", "label": "Text", "default": "on orders over Rs. 2,999" }
+        { "type": "text", "id": "text", "label": "Text", "default": "on orders over Rs. 1,999" }
       ]
     },
     {
@@ -1454,6 +1924,12 @@
       "type": "category",
       "name": "Category",
       "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail",
+          "info": "Shown in the category row beside All Categories. Falls back to the collection image, then the icon."
+        },
         {
           "type": "select",
           "id": "icon",

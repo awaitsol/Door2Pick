@@ -1,0 +1,206 @@
+{%- doc -%}
+  Floating WhatsApp contact button, fixed to the bottom corner of every page.
+
+  The link uses wa.me, which opens the WhatsApp app on a phone and WhatsApp Web
+  on a desktop, so no script or embed is needed.
+
+  @example
+  {% render 'd2p-whatsapp' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign raw_number = settings.whatsapp_number | default: '' | strip
+  comment
+    wa.me wants digits only: no +, spaces, dashes or brackets.
+  endcomment
+  assign digits = raw_number | remove: '+' | remove: ' ' | remove: '-' | remove: '(' | remove: ')'
+-%}
+
+{%- if settings.whatsapp_enabled and digits != blank -%}
+  {%- liquid
+    assign prefill = settings.whatsapp_message | default: '' | strip
+    assign href = 'https://wa.me/' | append: digits
+    comment
+      Only the message is encoded: url_encode on the whole string would
+      escape the :// and / in the URL itself.
+    endcomment
+    if prefill != blank
+      assign encoded = prefill | url_encode
+      assign href = href | append: '?text=' | append: encoded
+    endif
+    assign label = settings.whatsapp_label | default: 'Chat with us on WhatsApp'
+  -%}
+
+  <a
+    class="d2p-whatsapp"
+    href="{{ href }}"
+    target="_blank"
+    rel="noopener"
+    aria-label="{{ label | escape }}"
+  >
+    <span class="d2p-whatsapp__icon" aria-hidden="true">
+      <svg viewBox="0 0 20 20" fill="none" focusable="false">
+        {%- render 'icon', icon: 'whatsapp' -%}
+      </svg>
+    </span>
+  </a>
+
+  {%- comment -%}
+    Styles are inline rather than in theme-custom.css because the button is
+    rendered from the layout, outside any section — there is no section
+    stylesheet for it to belong to.
+  {%- endcomment -%}
+  <style>
+    .d2p-whatsapp {
+      position: fixed;
+      /* Lifted clear of the footer so the button does not sit level with the
+         last row of links. */
+      inset-block-end: clamp(28px, 6vw, 72px);
+      inset-inline-end: clamp(16px, 3vw, 28px);
+      z-index: 50;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      border-radius: 50%;
+      /* WhatsApp's own green, with the white glyph on it at 3.2:1 — above the
+         3:1 WCAG asks of a graphical control. */
+      background: #25d366;
+      color: #ffffff;
+      text-decoration: none;
+      box-shadow: 0 10px 30px -10px rgb(0 0 0 / 45%);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, inset-block-end 0.25s ease;
+      /* The ring below is drawn outside the button's box. */
+      isolation: isolate;
+    }
+
+    /* A ring that expands and fades out of the button, repeating on a pause.
+       It is a pseudo-element behind the button rather than an animated
+       box-shadow, so only opacity and transform animate — both compositor
+       properties, so the loop costs no layout work while it runs. */
+    .d2p-whatsapp::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: 50%;
+      background: #25d366;
+      animation: d2p-whatsapp-ring 2.4s ease-out infinite;
+    }
+
+    @keyframes d2p-whatsapp-ring {
+      0% {
+        transform: scale(1);
+        opacity: 0.55;
+      }
+
+      70% {
+        transform: scale(1.9);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1.9);
+        opacity: 0;
+      }
+    }
+
+    /* A slow tilt of the handset itself, on a long cycle so it reads as an
+       occasional nudge rather than constant movement. */
+    .d2p-whatsapp__icon {
+      animation: d2p-whatsapp-nudge 3.2s ease-in-out infinite;
+    }
+
+    @keyframes d2p-whatsapp-nudge {
+      0%, 65%, 100% {
+        transform: rotate(0deg) scale(1);
+      }
+
+      70% {
+        transform: rotate(-12deg) scale(1.06);
+      }
+
+      78% {
+        transform: rotate(10deg) scale(1.06);
+      }
+
+      86% {
+        transform: rotate(-6deg) scale(1.03);
+      }
+
+      93% {
+        transform: rotate(3deg) scale(1);
+      }
+    }
+
+    /* Once someone is pointing at it the animation has done its job, and a
+       moving target is harder to click. */
+    .d2p-whatsapp:hover::before,
+    .d2p-whatsapp:focus-visible::before,
+    .d2p-whatsapp:hover .d2p-whatsapp__icon,
+    .d2p-whatsapp:focus-visible .d2p-whatsapp__icon {
+      animation-play-state: paused;
+    }
+
+    .d2p-whatsapp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px -12px rgb(0 0 0 / 55%);
+      color: #ffffff;
+    }
+
+    .d2p-whatsapp:focus-visible {
+      outline: 2px solid currentcolor;
+      outline-offset: 3px;
+    }
+
+    .d2p-whatsapp__icon {
+      display: block;
+      inline-size: 30px;
+      block-size: 30px;
+    }
+
+    .d2p-whatsapp__icon svg {
+      inline-size: 100%;
+      block-size: 100%;
+      display: block;
+    }
+
+    /* The cart drawer and search modal sit above this; keeping the button
+       below them stops it floating over an open overlay. */
+    body:has(dialog[open]) .d2p-whatsapp,
+    body:has(.drawer[open]) .d2p-whatsapp {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* The product page's sticky add-to-cart bar docks to the bottom of the
+       screen once the buy button scrolls away, and the button would sit on
+       top of it — covering the cart action, which matters more. The bar sets
+       data-stuck when it docks, so the button lifts only while it is there
+       and drops back afterwards. */
+    body:has(.sticky-add-to-cart__bar[data-stuck='true']) .d2p-whatsapp {
+      inset-block-end: calc(clamp(28px, 6vw, 72px) + 76px);
+    }
+
+    /* Both loops run indefinitely, which is what this setting is meant to
+       stop. The button stays fully visible and clickable, just still. */
+    @media (prefers-reduced-motion: reduce) {
+      .d2p-whatsapp {
+        transition: none;
+      }
+
+      .d2p-whatsapp:hover {
+        transform: none;
+      }
+
+      .d2p-whatsapp::before,
+      .d2p-whatsapp__icon {
+        animation: none;
+      }
+
+      .d2p-whatsapp::before {
+        display: none;
+      }
+    }
+  </style>
+{%- endif -%}

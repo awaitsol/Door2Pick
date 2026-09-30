@@ -339,11 +339,15 @@ footer a:hover {
   color: var(--d2p-gold-text);
 }
 
-/* Horizon's own cards, used on collection, search and product pages. */
+/* Horizon's own cards, used on collection, search and product pages.
+   The card itself stays transparent: --d2p-surface is white in light mode,
+   and the card's content sits in separate rows with gaps between them, so a
+   filled background shows as white strips between the title and the price
+   against the ivory page. The media inside carries its own surface. */
 .product-card,
 .collection-card,
 .card-gallery {
-  background-color: var(--d2p-surface);
+  background-color: transparent;
 }
 
 /* The payment icons are drawn for white, so the plate is dark-mode only. */
@@ -446,6 +450,18 @@ dialog {
   color: var(--d2p-text);
 }
 
+/* The item count above a collection grid. Its class is products-count-wrapper,
+   not results-count, and it lives in blocks/filters.liquid — a {% stylesheet %}
+   block, which Shopify bundles after this file, so :root is doubled to outrank
+   it rather than relying on source order. The span inside carries role=status
+   and is named too, because the colour is set on whichever the theme reaches
+   first. */
+:root:root[data-theme='light'] .products-count-wrapper,
+:root:root[data-theme='light'] .products-count-wrapper span {
+  color: var(--d2p-text);
+  opacity: 1;
+}
+
 /* =======================================================================
  * Blocks that previously pinned a colour
  *
@@ -482,4 +498,651 @@ dialog {
 .product-inventory__text,
 .product-inventory__status {
   color: var(--d2p-gold-text);
+}
+
+/* =======================================================================
+ * Filter checkboxes (collection and search facets)
+ * ======================================================================= */
+
+/* The dropdown's own heading. The option rows below are rendered by
+   snippets/checkbox.liquid and use .checkbox__label instead. */
+:root[data-theme='light'] .facets__label {
+  color: var(--d2p-text);
+}
+
+/* A filter with no matching products is disabled, and its label is drawn at
+   --input-disabled-text-color: the palette foreground at 50% opacity. That is
+   the dark palette's ivory, which on white is close to invisible — the state
+   was right but unreadable. These give the disabled state a colour derived
+   from the mode's own text instead. */
+:root[data-theme='light'] .checkbox {
+  --input-disabled-text-color: var(--d2p-text);
+  --input-disabled-border-color: var(--d2p-border);
+  --input-disabled-background-color: var(--d2p-surface-alt);
+  --checkbox-border: 1px solid var(--d2p-border);
+}
+
+/* snippets/checkbox-styles.liquid sets the disabled label colour in a
+   {% stylesheet %} block. Shopify bundles those AFTER theme-custom.css, so an
+   equal-specificity selector here loses on source order no matter how it is
+   written. :root:root matches the same element twice, which raises specificity
+   above the bundled rule without resorting to !important. */
+:root:root[data-theme='light'] .checkbox__label,
+:root:root[data-theme='light'] .checkbox__label .checkbox__label-text,
+:root:root[data-theme='light'] .checkbox__input:disabled + .checkbox__label,
+:root:root[data-theme='light'] .checkbox__input:disabled + .checkbox__label .checkbox__label-text {
+  color: var(--d2p-text);
+}
+
+/* =======================================================================
+ * Product buy area
+ *
+ * Horizon's own blocks render the title, price, inventory, quantity and
+ * buttons. These rules dress them to match the d2p-* sections further down
+ * the page: gradient gold on the price, a pill quantity control, and panels
+ * with the same radius and depth. Everything is scoped to the product
+ * template so no other page inherits it. The attribute is on <main>, not
+ * <body>, which is where the theme actually puts it.
+ * ======================================================================= */
+
+/* --- price ------------------------------------------------------------- */
+/* The active price takes the gold gradient, so it is the first thing read in
+   the column. The compare-at price stays muted and struck through beside it. */
+main[data-template='product'] .product-details .price-item__group.price {
+  font-size: clamp(1.75rem, 3.4vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.1;
+  background: var(--d2p-gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+main[data-template='product'] .product-details .compare-at-price {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--d2p-muted);
+  text-decoration: line-through;
+  background: none;
+  -webkit-text-fill-color: currentcolor;
+}
+
+/* --- inventory --------------------------------------------------------- */
+/* "2 left" reads as urgency, so it gets a tinted pill rather than plain text. */
+main[data-template='product'] .product-inventory__text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--d2p-gold) 14%, transparent);
+  color: var(--d2p-gold-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* --- quantity ---------------------------------------------------------- */
+main[data-template='product'] .quantity-selector {
+  border: 1px solid var(--d2p-border);
+  background: var(--d2p-surface);
+  overflow: hidden;
+}
+
+main[data-template='product'] .quantity-selector .button.quantity-minus,
+main[data-template='product'] .quantity-selector .button.quantity-plus {
+  color: var(--d2p-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+main[data-template='product'] .quantity-selector .button.quantity-minus:hover,
+main[data-template='product'] .quantity-selector .button.quantity-plus:hover {
+  background: color-mix(in srgb, var(--d2p-gold) 18%, transparent);
+  color: var(--d2p-gold-text);
+}
+
+/* --- buttons ----------------------------------------------------------- */
+/* A softer radius and a shorter button read as more considered than the full
+   pill, which at this width looked chunky. The shadow is gold rather than
+   neutral so it reads as a lift off the page, not a drop behind it. */
+main[data-template='product'] .add-to-cart-button,
+main[data-template='product'] .shopify-payment-button__button {
+  min-block-size: 0;
+  padding-block: 13px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+}
+
+main[data-template='product'] .add-to-cart-button {
+  box-shadow: 0 10px 22px -14px color-mix(in srgb, var(--d2p-gold) 80%, transparent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.45s ease;
+}
+
+main[data-template='product'] .add-to-cart-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -16px color-mix(in srgb, var(--d2p-gold) 85%, transparent);
+}
+
+/* Buy it now is the secondary action of the two, so it is outlined rather
+   than a second gold slab competing with Add to cart. */
+main[data-template='product'] .shopify-payment-button__button--unbranded {
+  background: transparent;
+  background-image: none;
+  border: 1px solid var(--d2p-gold);
+  color: var(--d2p-gold-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+main[data-template='product'] .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+  background: color-mix(in srgb, var(--d2p-gold) 14%, transparent);
+  color: var(--d2p-gold-text);
+}
+
+/* The quantity control should match the buttons' new height and radius. */
+main[data-template='product'] .quantity-selector {
+  border-radius: 12px;
+}
+
+/* --- the trust panel in the buy column --------------------------------- */
+/* Horizon renders it as a bordered group; this gives it the same radius and
+   surface as the panels below, so the column does not look like two themes. */
+main[data-template='product'] .product-details .group-block[style*='border'],
+main[data-template='product'] .product-details .border-style {
+  border-radius: 16px;
+}
+
+/* --- description ------------------------------------------------------- */
+/* The description arrives as one long bulleted list from the supplier. Gold
+   markers and looser spacing make it scannable rather than a wall. */
+main[data-template='product'] .product-details .rte ul {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+main[data-template='product'] .product-details .rte ul li {
+  position: relative;
+  padding-inline-start: 24px;
+  margin-block-end: 10px;
+  line-height: 1.7;
+}
+
+main[data-template='product'] .product-details .rte ul li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0.62em;
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 50%;
+  background: var(--d2p-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main[data-template='product'] .add-to-cart-button,
+  main[data-template='product'] .quantity-selector .button.quantity-minus,
+  main[data-template='product'] .quantity-selector .button.quantity-plus {
+    transition: none;
+  }
+
+  main[data-template='product'] .add-to-cart-button:hover {
+    transform: none;
+  }
+}
+
+/* --- buy area motion ---------------------------------------------------
+ * A sheen sweeps across Add to cart on hover, the cart icon nudges, and the
+ * price settles in on load. All of it is transform and opacity only, so it
+ * runs on the compositor and costs no layout work.
+ */
+
+/* The sheen is a pseudo-element clipped by the button, swept with transform
+   rather than animating background-position, which would repaint each frame. */
+main[data-template='product'] .add-to-cart-button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+main[data-template='product'] .add-to-cart-button::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -60%;
+  inline-size: 40%;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(255 255 255 / 34%) 50%,
+    transparent 100%
+  );
+  transform: translateX(0) skewX(-18deg);
+  opacity: 0;
+  transition: transform 0.7s ease, opacity 0.2s ease;
+}
+
+main[data-template='product'] .add-to-cart-button:hover::after {
+  transform: translateX(420%) skewX(-18deg);
+  opacity: 1;
+}
+
+main[data-template='product'] .add-to-cart-button:active {
+  transform: translateY(1px);
+}
+
+/* The icon leans toward the cart on hover, which points at what the button
+   does without moving the label. */
+main[data-template='product'] .add-to-cart-button svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+
+main[data-template='product'] .add-to-cart-button:hover svg {
+  transform: translateX(3px) scale(1.08);
+}
+
+main[data-template='product'] .shopify-payment-button__button--unbranded:active {
+  transform: translateY(1px);
+}
+
+/* The price is the first thing the eye should land on, so it rises in once
+   on load rather than appearing with everything else.
+   Only opacity is animated here: the price is painted with background-clip:
+   text and a transparent colour, and animating transform on such an element
+   can drop the gradient mid-animation in some engines. */
+main[data-template='product'] .product-details .price-item__group.price {
+  animation: d2p-price-in 0.5s ease both;
+}
+
+@keyframes d2p-price-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* The stock pill pulses gently: scarcity that is felt, not shouted. The cycle
+   is mostly still so it does not distract while reading. */
+main[data-template='product'] .product-inventory__text {
+  animation: d2p-stock-pulse 3.4s ease-in-out infinite;
+}
+
+@keyframes d2p-stock-pulse {
+  0%, 62%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--d2p-gold) 42%, transparent);
+  }
+
+  72% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--d2p-gold) 0%, transparent);
+  }
+
+  82% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main[data-template='product'] .add-to-cart-button::after,
+  main[data-template='product'] .add-to-cart-button svg {
+    transition: none;
+  }
+
+  main[data-template='product'] .add-to-cart-button:hover::after {
+    transform: translateX(0) skewX(-18deg);
+    opacity: 0;
+  }
+
+  main[data-template='product'] .add-to-cart-button:hover svg {
+    transform: none;
+  }
+
+  main[data-template='product'] .product-details .price-item__group.price,
+  main[data-template='product'] .product-inventory__text {
+    animation: none;
+  }
+}
+
+/* =======================================================================
+ * Scroll reveals
+ *
+ * Sections rise into view as they are scrolled to, using scroll-driven
+ * animations — no JavaScript, no IntersectionObserver, and nothing to run
+ * on the main thread. Browsers without support simply show the content,
+ * because the fallback state is the finished state.
+ * ======================================================================= */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .d2p-feats__panel,
+    .d2p-tabs__panel,
+    .d2p-reviews__head,
+    .d2p-extras__inner {
+      animation: d2p-rise-in linear both;
+      animation-timeline: view();
+      /* Runs across the band where the element enters the viewport, and is
+         finished well before it reaches the middle of the screen. */
+      animation-range: entry 0% cover 34%;
+    }
+
+    /* Review and feature cards stagger within their own grid as it arrives. */
+    .d2p-reviews__item,
+    .d2p-feats__card,
+    .d2p-tabs__mark {
+      animation: d2p-rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+  }
+}
+
+@keyframes d2p-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- product gallery ---------------------------------------------------- */
+/* A slow zoom on hover, clipped by the container, so the image feels alive
+   without the layout moving. */
+main[data-template='product'] .product-media-container {
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+main[data-template='product'] .product-media-container img {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+main[data-template='product'] .product-media-container:hover img {
+  transform: scale(1.06);
+}
+
+/* Thumbnails lift and take a gold edge as they are pointed at. */
+main[data-template='product'] .dialog-thumbnails-list__thumbnail {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+main[data-template='product'] .dialog-thumbnails-list__thumbnail:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 2px var(--d2p-gold);
+}
+
+/* --- section headings --------------------------------------------------- */
+/* A gold rule draws itself under each section heading as it arrives. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* .d2p-feats__heading is deliberately excluded: it is painted with
+       background-clip: text, and a pseudo-element on it inherits that clip,
+       so the rule would be invisible. Its panel already carries a gradient
+       border, so it loses nothing. */
+    .d2p-reviews__heading {
+      position: relative;
+    }
+
+    .d2p-reviews__heading::after {
+      content: '';
+      position: absolute;
+      inset-block-end: -8px;
+      inset-inline-start: 0;
+      block-size: 3px;
+      border-radius: 2px;
+      background: var(--d2p-gold-gradient);
+      inline-size: 56px;
+      transform-origin: inline-start;
+      animation: d2p-rule-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@keyframes d2p-rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main[data-template='product'] .product-media-container img,
+  main[data-template='product'] .dialog-thumbnails-list__thumbnail {
+    transition: none;
+  }
+
+  main[data-template='product'] .product-media-container:hover img {
+    transform: none;
+  }
+
+  main[data-template='product'] .dialog-thumbnails-list__thumbnail:hover {
+    transform: none;
+  }
+}
+
+/* =======================================================================
+ * Catchier product page
+ * ======================================================================= */
+
+/* --- discount badge on the price --------------------------------------
+ * Horizon marks a discounted price with .compare-at-price. A ::after on it
+ * cannot show a computed percentage (CSS cannot do arithmetic on content),
+ * so this gives the struck price a tinted "SALE" chip instead — legible at a
+ * glance, and honest because it only exists when a compare-at price does.
+ */
+main[data-template='product'] .product-details .compare-at-price::after {
+  content: 'SALE';
+  display: inline-block;
+  margin-inline-start: 10px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--d2p-error);
+  color: #ffffff;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+  /* The parent is line-through; a child cannot switch that off with
+     text-decoration, because the parent's line is drawn across descendants.
+     Changing the display type to inline-block is what excludes it. */
+  text-decoration: none;
+  text-decoration-line: none;
+}
+
+/* --- title ------------------------------------------------------------- */
+/* Tighter tracking and a heavier weight give the name more presence without
+   making it larger. */
+main[data-template='product'] .product-details h1,
+main[data-template='product'] .view-product-title {
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+}
+
+/* --- trust rows in the buy column -------------------------------------- */
+/* Each line slides a little on hover, so the panel feels responsive rather
+   than static. */
+main[data-template='product'] .product-details .icon-with-text,
+main[data-template='product'] .product-details .group-block-content > .text-block {
+  transition: transform 0.2s ease;
+}
+
+main[data-template='product'] .product-details .icon-with-text:hover {
+  transform: translateX(3px);
+}
+
+/* --- feature cards: numbered ------------------------------------------- */
+/* A faint index in the corner of each card reads as a curated set rather than
+   four loose tiles. counter-reset sits on the list, so the numbering follows
+   however many cards are configured. */
+.d2p-feats__list {
+  counter-reset: d2p-feat;
+}
+
+.d2p-feats__card {
+  counter-increment: d2p-feat;
+}
+
+.d2p-feats__card::before {
+  content: counter(d2p-feat, decimal-leading-zero);
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 12px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--d2p-gold);
+  opacity: 0.4;
+  transition: opacity 0.25s ease;
+}
+
+.d2p-feats__card:hover::before {
+  opacity: 1;
+}
+
+/* --- highlight tiles: gradient edge on hover --------------------------- */
+.d2p-tabs__mark {
+  position: relative;
+  overflow: hidden;
+}
+
+.d2p-tabs__mark::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 3px;
+  background: var(--d2p-gold-gradient);
+  transform: scaleX(0);
+  transform-origin: inline-start;
+  transition: transform 0.3s ease;
+}
+
+.d2p-tabs__mark:hover::before {
+  transform: scaleX(1);
+}
+
+/* --- reviews: gradient rail ------------------------------------------- */
+/* A gold edge appears down the side of a review as it is pointed at. */
+.d2p-reviews__item::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 3px;
+  border-radius: 16px 0 0 16px;
+  background: var(--d2p-gold-gradient);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
+}
+
+.d2p-reviews__item:hover::before {
+  transform: scaleY(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main[data-template='product'] .product-details .icon-with-text,
+  .d2p-feats__card::before,
+  .d2p-tabs__mark::before,
+  .d2p-reviews__item::before {
+    transition: none;
+  }
+
+  main[data-template='product'] .product-details .icon-with-text:hover {
+    transform: none;
+  }
+}
+
+/* =======================================================================
+ * Buy column: quieter
+ *
+ * More air and a clearer order of reading, rather than more decoration.
+ * The price and the two buttons are the only things given weight; the trust
+ * panel stays plain on purpose, because it is reassurance, not a feature.
+ * ======================================================================= */
+
+/* Space between the title, the price and the actions, so each is read in
+   turn instead of as one dense block. */
+main[data-template='product'] .product-details h1,
+main[data-template='product'] .view-product-title {
+  margin-block-end: 18px;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+
+main[data-template='product'] .product-details .price {
+  margin-block-end: 6px;
+}
+
+/* The struck price sits quietly beside the current one rather than competing
+   with it. */
+main[data-template='product'] .product-details .compare-at-price {
+  font-size: 0.9375rem;
+  opacity: 0.75;
+}
+
+/* A plain, roomy trust panel: no border treatment, no tint. It reads as a
+   footnote to the purchase, which is what it is. */
+main[data-template='product'] .product-details .group-block.border-style {
+  border-radius: 12px;
+  padding-block: 4px;
+}
+
+main[data-template='product'] .product-details .group-block.border-style svg {
+  opacity: 0.8;
+}
+
+/* The description is the longest thing in the column, so it gets a measure
+   and more line spacing rather than more styling. */
+main[data-template='product'] .product-details .rte {
+  max-inline-size: 60ch;
+}
+
+main[data-template='product'] .product-details .rte ul li {
+  line-height: 1.75;
+  margin-block-end: 12px;
+}
+
+/* A smaller, lighter marker: present enough to separate items, quiet enough
+   to stay out of the way of the text. */
+main[data-template='product'] .product-details .rte ul li::before {
+  inline-size: 5px;
+  block-size: 5px;
+  inset-block-start: 0.72em;
+  opacity: 0.7;
+}
+
+/* --- price filter -------------------------------------------------------
+ * snippets/price-filter.liquid draws the "highest price" hint from
+ * --color-foreground-muted, which resolves against the dark palette's ivory
+ * and is close to invisible on the light panel. That rule lives in a
+ * {% stylesheet %} block, which Shopify bundles AFTER this file, so the
+ * override doubles :root to outrank it rather than relying on source order.
+ */
+:root:root[data-theme='light'] .price-facet__highest-price {
+  color: var(--d2p-text);
+}
+
+/* The two amount fields and their currency labels come from the same
+   palette, so they need the same treatment to stay readable. */
+:root:root[data-theme='light'] .price-facet__input,
+:root:root[data-theme='light'] .price-facet__label {
+  color: var(--d2p-text);
+}
+
+:root:root[data-theme='light'] .price-facet__input::placeholder {
+  color: var(--d2p-muted);
 }

@@ -1,0 +1,66 @@
+{
+  "sections": {
+    "main": {
+      "type": "d2p-track-order",
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "heading": "Order confirmed",
+            "text": "We email you as soon as your order is placed."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "heading": "Dispatched",
+            "text": "Orders leave us within 1–2 business days, and we send tracking details by email."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "heading": "On its way",
+            "text": "Delivery usually takes 2–5 business days, or 5–10 days for remote areas."
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "heading": "Delivered",
+            "text": "Cash on Delivery orders are paid to the courier on arrival."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {
+        "heading": "Track your order",
+        "intro": "Your order status and tracking details live in your account, alongside every order you have placed with us.",
+        "panel_heading": "View your orders",
+        "panel_body": "Sign in with the email address you used at checkout. We will send you a code — there is no password to remember.",
+        "button_label": "Sign in to view your orders",
+        "button_note": "Use the same email address you entered when placing the order.",
+        "contact_label": "Contact us for an update",
+        "contact_link": "/pages/contact",
+        "help_text": "<p>Cannot find your order? <a href=\"/pages/contact\">Contact us</a> with your order number and the email address you used, and we will look it up for you.</p>",
+        "padding_top": 56,
+        "padding_bottom": 72,
+        "order_limit": 5,
+        "track_label": "Track this order",
+        "details_label": "Order details",
+        "all_orders_label": "See all orders",
+        "empty_heading": "No orders yet",
+        "empty_body": "When you place an order it will appear here with its status and tracking.",
+        "empty_button": "Start shopping"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

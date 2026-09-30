@@ -11,8 +11,6 @@
   "current": {
     "logo_height": 36,
     "logo_height_mobile": 28,
-    "page_background_color": "{{ settings.color_palette.background }}",
-    "page_width": "narrow",
     "page_text_color": "{{ settings.color_palette.foreground }}",
     "type_body_font": "jost_n4",
     "type_subheading_font": "jost_n5",
@@ -44,13 +42,15 @@
     "type_font_h6": "subheading",
     "type_size_h6": "12",
     "type_line_height_h6": "display-loose",
+    "page_background_color": "{{ settings.color_palette.background }}",
+    "page_width": "narrow",
     "page_transition_enabled": false,
     "transition_to_main_product": false,
     "card_hover_effect": "none",
     "badge_position": "top-right",
     "badge_corner_radius": 100,
-    "badge_sale_background_color": "{{ settings.color_palette.color1 }}",
-    "badge_sale_text_color": "{{ settings.color_palette.background }}",
+    "badge_sale_background_color": "#02BC87",
+    "badge_sale_text_color": "#06251D",
     "badge_sold_out_background_color": "#26262A",
     "badge_sold_out_text_color": "{{ settings.color_palette.foreground }}",
     "badge_text_transform": "none",
@@ -68,6 +68,7 @@
     "cart_price_font": "subheading",
     "show_cart_note": true,
     "show_add_discount_code": true,
+    "show_accelerated_checkout_buttons": true,
     "drawer_background_color": "{{ settings.color_palette.background }}",
     "drawer_text_color": "{{ settings.color_palette.foreground }}",
     "drawer_border_color": "{{ settings.color_palette.color2 }}",
@@ -102,13 +103,25 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
+    "whatsapp_enabled": true,
+    "whatsapp_number": "+923174970123",
+    "whatsapp_message": "Hi Door2Pick, I'd like to ask about a product.",
+    "whatsapp_label": "Chat with us on WhatsApp",
+    "google_site_verification": "tbDzI3mJEUV6MD3qqHvC769USkO8fBiAG0XLfRppIL0",
+    "content_for_index": [],
+    "blocks": {
+      "14060646107696862457": {
+        "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "disabled": false,
+        "settings": {}
+      }
+    },
     "color_palette": {
       "background": "#0B0B0D",
       "foreground": "#EDE7DB",
       "color1": "#C9A45C",
       "color2": "#26262A"
-    },
-    "show_accelerated_checkout_buttons": true
+    }
   },
   "presets": {
     "Horizon": {

@@ -18,7 +18,8 @@
             "image_asset": "hero-1.jpg",
             "alt_text": "Curated for every corner — jewellery, home, tech and trending products, chosen with care. Shop all.",
             "link": "shopify://collections/all",
-            "link_label": "Shop all products"
+            "link_label": "Shop all products",
+            "focal_point": "center"
           }
         },
         "slide_2": {
@@ -27,7 +28,8 @@
             "image_asset": "hero-2.jpg",
             "alt_text": "Discover a better way to shop. Curated for every corner. Shop all.",
             "link": "shopify://collections/all",
-            "link_label": "Shop all products"
+            "link_label": "Shop all products",
+            "focal_point": "center"
           }
         },
         "slide_3": {
@@ -36,7 +38,8 @@
             "image_asset": "hero-3.jpg",
             "alt_text": "New arrivals in jewellery, home decor and tech. Built for the everyday. Shop now.",
             "link": "shopify://collections/all",
-            "link_label": "Shop new arrivals"
+            "link_label": "Shop new arrivals",
+            "focal_point": "center"
           }
         }
       },
@@ -52,59 +55,10 @@
         "autoplay_speed": 6,
         "aria_label": "Featured promotions",
         "background_color": "",
-        "height": 58,
-        "max_height": 560,
-        "height_mobile": 46,
-        "focal_point": "left center"
-      }
-    },
-    "trust_bar": {
-      "type": "d2p-trust-bar",
-      "blocks": {
-        "t0": {
-          "type": "item",
-          "settings": {
-            "icon": "truck",
-            "heading": "Free Delivery",
-            "subtext": "on orders over Rs. 2,999"
-          }
-        },
-        "t1": {
-          "type": "item",
-          "settings": {
-            "icon": "shield",
-            "heading": "Secure Payments",
-            "subtext": "100% safe & secure"
-          }
-        },
-        "t2": {
-          "type": "item",
-          "settings": {
-            "icon": "return",
-            "heading": "Easy Returns",
-            "subtext": "Hassle-free returns"
-          }
-        },
-        "t3": {
-          "type": "item",
-          "settings": {
-            "icon": "headset",
-            "heading": "24/7 Support",
-            "subtext": "We're always here"
-          }
-        }
-      },
-      "block_order": [
-        "t0",
-        "t1",
-        "t2",
-        "t3"
-      ],
-      "settings": {
-        "boxed": true,
-        "background_color": "",
-        "padding_top": 8,
-        "padding_bottom": 32
+        "max_width": 1100,
+        "aspect_ratio_x100": 196,
+        "viewport_height": 62,
+        "band_ratio_x100": 196
       }
     },
     "guarantee": {
@@ -179,7 +133,6 @@
   },
   "order": [
     "hero_banner",
-    "trust_bar",
     "just_for_you_v2",
     "guarantee"
   ]

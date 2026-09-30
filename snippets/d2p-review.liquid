@@ -1,0 +1,46 @@
+{%- doc -%}
+  Renders one customer review: author, date, verified badge, stars and text.
+
+  @param {object} review - A review entry with author, rating, date, title,
+    body and verified keys.
+
+  @example
+  {% render 'd2p-review', review: r %}
+{%- enddoc -%}
+
+<li class="d2p-reviews__item">
+  <div class="d2p-reviews__meta">
+    <span class="d2p-reviews__avatar" aria-hidden="true">
+      {{- review.author | slice: 0 | upcase -}}
+    </span>
+    <span class="d2p-reviews__who">
+      <span class="d2p-reviews__author">{{ review.author }}</span>
+      {%- if review.date != blank -%}
+        <span class="d2p-reviews__date">{{ review.date | date: '%d %b %Y' }}</span>
+      {%- endif -%}
+    </span>
+    {%- if review.verified -%}
+      <span class="d2p-reviews__badge">
+        <span aria-hidden="true">{%- render 'd2p-icon', name: 'check' -%}</span>
+        Verified
+      </span>
+    {%- endif -%}
+  </div>
+
+  <span class="d2p-reviews__stars d2p-reviews__stars--sm" role="img" aria-label="{{ review.rating }} out of 5">
+    {%- for i in (1..5) -%}
+      {%- if i <= review.rating -%}
+        <span class="d2p-reviews__star is-on" aria-hidden="true">{%- render 'd2p-icon', name: 'star' -%}</span>
+      {%- else -%}
+        <span class="d2p-reviews__star" aria-hidden="true">{%- render 'd2p-icon', name: 'star' -%}</span>
+      {%- endif -%}
+    {%- endfor -%}
+  </span>
+
+  {%- if review.title != blank -%}
+    <p class="d2p-reviews__title">{{ review.title }}</p>
+  {%- endif -%}
+  {%- if review.body != blank -%}
+    <p class="d2p-reviews__body">{{ review.body }}</p>
+  {%- endif -%}
+</li>

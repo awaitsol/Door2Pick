@@ -2116,5 +2116,49 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "WhatsApp",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "whatsapp_enabled",
+        "label": "Show WhatsApp button",
+        "info": "A floating button on every page that opens a WhatsApp chat.",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_number",
+        "label": "WhatsApp number",
+        "info": "Full international format, for example +923174970123. Spaces, dashes and brackets are ignored.",
+        "default": "+923174970123"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_message",
+        "label": "Pre-filled message",
+        "info": "Text already typed in the customer's chat when it opens. Leave blank for none.",
+        "default": "Hi Door2Pick, I'd like to ask about a product."
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_label",
+        "label": "Screen reader description",
+        "info": "Read aloud in place of the icon.",
+        "default": "Chat with us on WhatsApp"
+      }
+    ]
+  },
+  {
+    "name": "Search engines",
+    "settings": [
+      {
+        "type": "text",
+        "id": "google_site_verification",
+        "label": "Google site verification token",
+        "info": "From Search Console's HTML tag method: paste only the content value, not the whole tag."
+      }
+    ]
   }
 ]

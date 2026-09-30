@@ -1,0 +1,713 @@
+{%- comment -%}
+  Reassurance row and share control for the product page: delivery, returns
+  and secure payment on the left, a share button on the right.
+
+  Sharing uses the Web Share API where the browser offers it, which opens the
+  device's own sheet — WhatsApp, Messages, Mail — and falls back to copying
+  the link. That covers phones, where most sharing happens, without embedding
+  third-party buttons that track the visitor.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign items = section.blocks | where: 'type', 'item'
+-%}
+
+<div class="d2p-extras" style="
+  padding-block-start: {{ s.padding_top }}px;
+  padding-block-end: {{ s.padding_bottom }}px;
+">
+  <div class="d2p-extras__inner">
+    {%- if items.size > 0 -%}
+      <ul class="d2p-extras__list">
+        {%- for block in items -%}
+          <li class="d2p-extras__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != 'none' -%}
+              <span class="d2p-extras__icon" aria-hidden="true">
+                {%- render 'd2p-icon', name: block.settings.icon -%}
+              </span>
+            {%- endif -%}
+            <span class="d2p-extras__text">
+              <strong>{{ block.settings.heading }}</strong>
+              {%- if block.settings.subtext != blank -%}
+                <span>{{ block.settings.subtext }}</span>
+              {%- endif -%}
+            </span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if s.show_share -%}
+      {%- comment -%}
+        A share popover rather than a single button: the networks people
+        actually use in Pakistan are WhatsApp and Facebook, and naming them
+        removes a step compared with the browser's own sheet. The native
+        sheet is still offered first on touch devices, where it is better.
+
+        Each link is a plain href to the network's share endpoint, so they
+        work without JavaScript; only the copy button and the native sheet
+        need it.
+      {%- endcomment -%}
+      {%- liquid
+        assign share_url = shop.url | append: product.url
+        assign enc_url = share_url | url_encode
+        assign enc_title = product.title | url_encode
+      -%}
+      <span data-d2p-share-host><d2p-share class="d2p-share" data-title="{{ product.title | escape }}" data-url="{{ share_url }}">
+        <button
+          class="d2p-share__trigger"
+          type="button"
+          aria-expanded="false"
+          aria-controls="d2p-share-menu-{{ section.id }}"
+          data-d2p-share-btn
+        >
+          <span class="d2p-share__trigger-icon" aria-hidden="true">
+            {%- render 'd2p-icon', name: 'share' -%}
+          </span>
+          <span class="d2p-share__trigger-label">{{ s.share_label }}</span>
+        </button>
+
+        <div class="d2p-share__menu" id="d2p-share-menu-{{ section.id }}" hidden data-d2p-share-menu>
+          <p class="d2p-share__heading">Share to</p>
+
+          {%- comment -%}
+            The product's SKU doubles as an item reference someone can quote
+            when asking about it on WhatsApp — which is how most enquiries
+            here arrive. It falls back to the variant id so the row always
+            has something to copy.
+          {%- endcomment -%}
+          {%- liquid
+            assign variant = product.selected_or_first_available_variant | default: product.variants.first
+            assign item_ref = variant.sku | default: variant.id
+          -%}
+          <p class="d2p-share__ref">
+            <span class="d2p-share__ref-label">Item ID:</span>
+            <span class="d2p-share__ref-value" data-d2p-ref>{{ item_ref }}</span>
+            <button class="d2p-share__ref-copy" type="button" data-d2p-copy-ref>Copy</button>
+          </p>
+
+          <ul class="d2p-share__list">
+            <li>
+              <a
+                class="d2p-share__link d2p-share__link--whatsapp"
+                href="https://wa.me/?text={{ enc_title }}%20{{ enc_url }}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Share on WhatsApp"
+              >
+                <svg viewBox="0 0 20 20" fill="none" focusable="false">{%- render 'icon', icon: 'whatsapp' -%}</svg>
+              </a>
+            </li>
+            <li>
+              <a
+                class="d2p-share__link d2p-share__link--facebook"
+                href="https://www.facebook.com/sharer/sharer.php?u={{ enc_url }}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Share on Facebook"
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'facebook' -%}</svg>
+              </a>
+            </li>
+            <li>
+              <a
+                class="d2p-share__link d2p-share__link--x"
+                href="https://twitter.com/intent/tweet?url={{ enc_url }}&text={{ enc_title }}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Share on X"
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'twitter' -%}</svg>
+              </a>
+            </li>
+            <li>
+              <a
+                class="d2p-share__link d2p-share__link--pinterest"
+                href="https://pinterest.com/pin/create/button/?url={{ enc_url }}&description={{ enc_title }}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Share on Pinterest"
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'pinterest' -%}</svg>
+              </a>
+            </li>
+            <li>
+              <a
+                class="d2p-share__link d2p-share__link--email"
+                href="mailto:?subject={{ enc_title }}&body={{ enc_url }}"
+                aria-label="Share by email"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" focusable="false">
+                  <rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6l9 7 9-7"/>
+                </svg>
+              </a>
+            </li>
+          </ul>
+
+          <button class="d2p-share__copy-link" type="button" data-d2p-copy>
+            <span class="d2p-share__copy-icon" aria-hidden="true">
+              {%- render 'd2p-icon', name: 'copy' -%}
+            </span>
+            Copy product link
+          </button>
+
+          <p class="d2p-share__status" role="status" aria-live="polite"></p>
+        </div>
+      </d2p-share></span>
+    {%- endif -%}
+  </div>
+</div>
+
+{% javascript %}
+  class D2PShare extends HTMLElement {
+    connectedCallback() {
+      this.button = this.querySelector('[data-d2p-share-btn]');
+      this.menu = this.querySelector('[data-d2p-share-menu]');
+      this.status = this.querySelector('.d2p-share__status');
+      this.ref = this.querySelector('[data-d2p-ref]');
+      if (!this.button || !this.menu) return;
+
+      this.onDocClick = this.onDocClick.bind(this);
+      this.onKey = this.onKey.bind(this);
+
+      // The element is relocated beside the title after it first connects,
+      // and moving a custom element runs disconnectedCallback then
+      // connectedCallback again. Binding twice would fire every handler
+      // twice, so the listeners are attached once and guarded by a flag.
+      if (this.bound) return;
+      this.bound = true;
+
+      // One delegated listener rather than per-button bindings: it survives
+      // the move and covers both copy actions.
+      this.addEventListener('click', (event) => {
+        if (event.target.closest('[data-d2p-share-btn]')) {
+          this.toggle();
+        } else if (event.target.closest('[data-d2p-copy-ref]')) {
+          this.copyRef();
+        } else if (event.target.closest('[data-d2p-copy]')) {
+          this.copy();
+        }
+      });
+    }
+
+    disconnectedCallback() {
+      document.removeEventListener('click', this.onDocClick);
+      document.removeEventListener('keydown', this.onKey);
+    }
+
+    get isOpen() {
+      return !this.menu.hidden;
+    }
+
+    async toggle() {
+      // On a phone the OS share sheet is better than any menu we can draw:
+      // it lists the apps the person actually has. Desktop browsers mostly
+      // lack it, so they get the popover.
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        try {
+          await navigator.share({ title: this.dataset.title, url: this.dataset.url });
+          return;
+        } catch (error) {
+          // A cancelled sheet throws AbortError and should not fall through
+          // to opening the menu.
+          if (error && error.name === 'AbortError') return;
+        }
+      }
+      this.isOpen ? this.close() : this.open();
+    }
+
+    open() {
+      this.menu.hidden = false;
+      this.button.setAttribute('aria-expanded', 'true');
+      document.addEventListener('click', this.onDocClick);
+      document.addEventListener('keydown', this.onKey);
+    }
+
+    close() {
+      this.menu.hidden = true;
+      this.button.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('click', this.onDocClick);
+      document.removeEventListener('keydown', this.onKey);
+    }
+
+    onDocClick(event) {
+      if (!this.contains(event.target)) this.close();
+    }
+
+    onKey(event) {
+      if (event.key === 'Escape') {
+        this.close();
+        this.button.focus();
+      }
+    }
+
+    async copy() {
+      this.write(this.dataset.url, 'Link copied');
+    }
+
+    async copyRef() {
+      if (!this.ref) return;
+      this.write(this.ref.textContent.trim(), 'Item ID copied');
+    }
+
+    async write(text, message) {
+      try {
+        await navigator.clipboard.writeText(text);
+        this.flash(message);
+      } catch (error) {
+        // Clipboard access can be denied; show the value so it can be copied
+        // by hand rather than leaving the person with nothing.
+        window.prompt('Copy this', text);
+      }
+    }
+
+    flash(message) {
+      if (!this.status) return;
+      this.status.textContent = message;
+      this.status.classList.add('is-on');
+      window.setTimeout(() => {
+        this.status.textContent = '';
+        this.status.classList.remove('is-on');
+      }, 2000);
+    }
+  }
+
+  if (!customElements.get('d2p-share')) {
+    customElements.define('d2p-share', D2PShare);
+  }
+
+  // The share control belongs beside the product title, but this section
+  // renders after the whole product-information block, so Liquid cannot put
+  // it there.
+  //
+  // .view-product-title is NOT the target: the theme renders it hidden
+  // (display: none in blocks/_product-details.liquid) and the visible title
+  // is a separate text block whose class carries a generated id. So the
+  // heading is found by position instead — the first heading-level text
+  // block inside the buy column.
+  (() => {
+    const place = () => {
+      const share = document.querySelector('[data-d2p-share-host]');
+      if (!share || share.dataset.d2pMoved) return;
+
+      const column = document.querySelector('.product-details');
+      if (!column) return;
+
+      const title = column.querySelector(
+        '.text-block.h1, .text-block.h2, .text-block.h3, .text-block.h4'
+      );
+      if (!title) return;
+
+      const row = document.createElement('div');
+      row.className = 'd2p-title-row';
+      title.parentNode.insertBefore(row, title);
+      row.appendChild(title);
+      row.appendChild(share);
+      share.dataset.d2pMoved = 'true';
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', place);
+    } else {
+      place();
+    }
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .d2p-extras {
+    background: var(--d2p-page);
+    color: var(--d2p-text);
+  }
+
+  .d2p-extras__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding: 18px 26px;
+    border-radius: 16px;
+    background: var(--d2p-surface);
+    border: 1px solid var(--d2p-border);
+  }
+
+  /* The row sits inside the page gutter rather than spanning edge to edge,
+     so it reads as a panel like the sections below it. */
+  .d2p-extras {
+    padding-inline: 24px;
+  }
+
+  .d2p-extras__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-extras__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .d2p-extras__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--d2p-gold) 14%, transparent);
+    color: var(--d2p-gold-text);
+  }
+
+  .d2p-extras__icon svg {
+    inline-size: 20px;
+    block-size: 20px;
+    display: block;
+  }
+
+  .d2p-extras__text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .d2p-extras__text strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .d2p-extras__text span {
+    font-size: 0.75rem;
+    color: var(--d2p-muted);
+  }
+
+  /* A custom element is inline by default, which would ignore the layout. */
+  .d2p-share {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* The row the script builds around the title, so the share sits at the end
+     of the title line rather than under it. The parent may be a grid or a
+     flex column, so the row claims the full track and lays itself out. */
+  .d2p-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    inline-size: 100%;
+    grid-column: 1 / -1;
+  }
+
+  .d2p-title-row > .text-block {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin-block: 0;
+  }
+
+  .d2p-title-row [data-d2p-share-host] {
+    flex: 0 0 auto;
+    margin-block-start: 2px;
+  }
+
+  /* Beside a title the label is redundant: the icon is the convention, and
+     the space belongs to the product name. */
+  .d2p-title-row .d2p-share__trigger {
+    inline-size: 40px;
+    block-size: 40px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .d2p-title-row .d2p-share__trigger-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .d2p-share__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid rgb(2 188 135);
+    border-radius: 999px;
+    background: transparent;
+    /* The darker teal for the glyph: as a line drawing on the page the
+       lighter rgb(2 188 135) is 2.46:1, while this reaches 5.49:1. */
+    color: rgb(1 120 87);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  }
+
+  /* Filled on hover and while open, so the control reads as active. The
+     glyph turns near-black, which is 8.55:1 on the teal. */
+  .d2p-share__trigger:hover,
+  .d2p-share__trigger[aria-expanded='true'] {
+    background: rgb(2 188 135);
+    border-color: rgb(2 188 135);
+    color: #06251d;
+  }
+
+  .d2p-share__trigger-icon svg {
+    inline-size: 17px;
+    block-size: 17px;
+    display: block;
+  }
+
+  /* The popover is anchored to the trigger and clipped to the viewport edge
+     by the inset-inline-end, so it never runs off a narrow screen. */
+  .d2p-share__menu {
+    position: absolute;
+    inset-block-start: calc(100% + 10px);
+    inset-inline-end: 0;
+    z-index: 30;
+    min-inline-size: 260px;
+    padding: 16px;
+    border: 1px solid var(--d2p-border);
+    border-radius: 14px;
+    background: var(--d2p-surface);
+    box-shadow: 0 18px 44px -20px rgb(0 0 0 / 55%);
+    animation: d2p-share-in 0.18s ease both;
+  }
+
+  .d2p-share__menu[hidden] {
+    display: none;
+  }
+
+  @keyframes d2p-share-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .d2p-share__heading {
+    margin: 0 0 12px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--d2p-text);
+  }
+
+  /* The item reference row, above the networks. */
+  .d2p-share__ref {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-size: 0.8125rem;
+    color: var(--d2p-muted);
+  }
+
+  .d2p-share__ref-value {
+    font-weight: 600;
+    color: var(--d2p-text);
+    /* A reference is read character by character, so a monospaced face makes
+       it easier to check against a message. */
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  .d2p-share__ref-copy {
+    padding: 3px 11px;
+    border: 1px solid var(--d2p-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--d2p-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .d2p-share__ref-copy:hover {
+    border-color: rgb(2 188 135);
+    color: rgb(1 120 87);
+  }
+
+  /* A labelled copy action under the icons: "copy the link" is the most
+     common thing people want and an icon alone does not say it. */
+  .d2p-share__copy-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    inline-size: 100%;
+    margin-block-start: 14px;
+    padding: 10px 14px;
+    border: 1px solid var(--d2p-border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--d2p-text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .d2p-share__copy-link:hover {
+    border-color: rgb(2 188 135);
+    color: rgb(1 120 87);
+  }
+
+  .d2p-share__copy-icon svg {
+    inline-size: 15px;
+    block-size: 15px;
+    display: block;
+  }
+
+  .d2p-share__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Each network keeps its own colour: they are recognised by colour before
+     the glyph is read, which is the point of showing them individually. */
+  .d2p-share__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border: 0;
+    border-radius: 50%;
+    color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .d2p-share__link:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+  }
+
+  .d2p-share__link svg {
+    inline-size: 19px;
+    block-size: 19px;
+    display: block;
+  }
+
+  .d2p-share__link--whatsapp { background: rgb(2 188 135); }
+  .d2p-share__link--facebook { background: #1877f2; }
+  .d2p-share__link--x        { background: #000000; }
+  .d2p-share__link--pinterest { background: #e60023; }
+  .d2p-share__link--email    { background: #6b7280; }
+
+  .d2p-share__link--copy {
+    background: transparent;
+    border: 1px solid var(--d2p-border);
+    color: var(--d2p-text);
+  }
+
+  .d2p-share__status {
+    margin: 10px 0 0;
+    min-block-size: 1.1em;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--d2p-success);
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-extras {
+      padding-inline: 16px;
+    }
+
+    .d2p-extras__inner {
+      padding-inline: 18px;
+    }
+
+    .d2p-extras__list {
+      gap: 12px 20px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-share__trigger,
+    .d2p-share__link,
+    .d2p-share__ref-copy,
+    .d2p-share__copy-link {
+      transition: none;
+    }
+
+    .d2p-share__link:hover {
+      transform: none;
+    }
+
+    .d2p-share__menu {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product extras",
+  "tag": "section",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "checkbox", "id": "show_share", "label": "Show share button", "default": true },
+    { "type": "text", "id": "share_label", "label": "Share label", "default": "Share" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 8 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 8 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "shield", "label": "Secure" },
+            { "value": "return", "label": "Returns" },
+            { "value": "headset", "label": "Support" },
+            { "value": "sparkle", "label": "Quality" },
+            { "value": "tag", "label": "Price" }
+          ],
+          "default": "truck"
+        },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Free Delivery" },
+        { "type": "text", "id": "subtext", "label": "Subtext", "default": "on orders over Rs. 1,999" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product extras",
+      "blocks": [{ "type": "item" }, { "type": "item" }, { "type": "item" }]
+    }
+  ]
+}
+{% endschema %}

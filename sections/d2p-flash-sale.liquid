@@ -1,0 +1,277 @@
+{%- comment -%}
+  Flash sale countdown.
+
+  The end time comes from a product metafield (custom.sale_ends, a date_time),
+  so the timer counts to a real deadline and disappears once it passes. It is
+  deliberately NOT a rolling "resets on refresh" timer: those are recognised
+  by shoppers and cost more trust than the urgency gains.
+
+  With no metafield set, nothing renders.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign ends = product.metafields.custom.sale_ends.value
+  assign now = 'now' | date: '%s' | times: 1
+  assign end_ts = 0
+  if ends != blank
+    assign end_ts = ends | date: '%s' | times: 1
+  endif
+-%}
+
+{%- if end_ts > now -%}
+  <div class="d2p-flash" style="
+    padding-block-start: {{ s.padding_top }}px;
+    padding-block-end: {{ s.padding_bottom }}px;
+  ">
+    <div class="d2p-flash__inner">
+      <d2p-countdown class="d2p-flash__bar" data-ends="{{ ends | date: '%Y-%m-%dT%H:%M:%S%z' }}">
+        <span class="d2p-flash__label">
+          <span class="d2p-flash__bolt" aria-hidden="true">
+            {%- render 'd2p-icon', name: 'flame' -%}
+          </span>
+          {{ s.label }}
+        </span>
+
+        <span class="d2p-flash__clock">
+          <span class="d2p-flash__unit">
+            <span class="d2p-flash__num" data-d2p-hours>--</span>
+            <span class="d2p-flash__cap">Hours</span>
+          </span>
+          <span class="d2p-flash__sep" aria-hidden="true">:</span>
+          <span class="d2p-flash__unit">
+            <span class="d2p-flash__num" data-d2p-minutes>--</span>
+            <span class="d2p-flash__cap">Minutes</span>
+          </span>
+          <span class="d2p-flash__sep" aria-hidden="true">:</span>
+          <span class="d2p-flash__unit">
+            <span class="d2p-flash__num" data-d2p-seconds>--</span>
+            <span class="d2p-flash__cap">Seconds</span>
+          </span>
+        </span>
+      </d2p-countdown>
+    </div>
+  </div>
+{%- endif -%}
+
+{% javascript %}
+  class D2PCountdown extends HTMLElement {
+    connectedCallback() {
+      this.end = Date.parse(this.dataset.ends);
+      if (Number.isNaN(this.end)) return;
+
+      this.hours = this.querySelector('[data-d2p-hours]');
+      this.minutes = this.querySelector('[data-d2p-minutes]');
+      this.seconds = this.querySelector('[data-d2p-seconds]');
+
+      this.tick();
+      this.timer = window.setInterval(() => this.tick(), 1000);
+    }
+
+    disconnectedCallback() {
+      window.clearInterval(this.timer);
+    }
+
+    tick() {
+      const left = this.end - Date.now();
+
+      if (left <= 0) {
+        window.clearInterval(this.timer);
+        // The sale is genuinely over, so the bar goes rather than sitting at
+        // zero or looping back to the top.
+        this.closest('.d2p-flash').hidden = true;
+        return;
+      }
+
+      const total = Math.floor(left / 1000);
+      // Hours run past 24 rather than adding a days column: a sale measured
+      // in days is not a flash sale, and the row stays three units wide.
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+
+      this.set(this.hours, h);
+      this.set(this.minutes, m);
+      this.set(this.seconds, s);
+    }
+
+    set(node, value) {
+      if (!node) return;
+      const text = String(value).padStart(2, '0');
+      if (node.textContent !== text) node.textContent = text;
+    }
+  }
+
+  if (!customElements.get('d2p-countdown')) {
+    customElements.define('d2p-countdown', D2PCountdown);
+  }
+
+  // The bar belongs directly under the buy buttons, where the decision is
+  // made, but this section renders after the whole product-information
+  // block. Moving it keeps one copy of the markup; if the buttons are not on
+  // the page the bar simply stays where it was rendered.
+  (() => {
+    const place = () => {
+      const flash = document.querySelector('.d2p-flash');
+      const buttons = document.querySelector('.product-form-buttons');
+      if (!flash || !buttons || flash.dataset.d2pMoved) return;
+
+      buttons.insertAdjacentElement('afterend', flash);
+      flash.classList.add('d2p-flash--inline');
+      flash.dataset.d2pMoved = 'true';
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', place);
+    } else {
+      place();
+    }
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .d2p-flash {
+    background: var(--d2p-page);
+  }
+
+  .d2p-flash__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* Once moved into the buy column the bar is inside the column's own
+     padding, so it drops the page gutter and tightens up. */
+  .d2p-flash--inline {
+    padding-block: 0;
+    margin-block: 14px 4px;
+  }
+
+  .d2p-flash--inline .d2p-flash__inner {
+    padding-inline: 0;
+  }
+
+  .d2p-flash--inline .d2p-flash__bar {
+    padding: 12px 16px;
+    gap: 10px 14px;
+  }
+
+  .d2p-flash--inline .d2p-flash__label {
+    font-size: 0.8125rem;
+  }
+
+  .d2p-flash--inline .d2p-flash__unit {
+    min-inline-size: 48px;
+    padding: 5px 8px;
+  }
+
+  .d2p-flash--inline .d2p-flash__num {
+    font-size: 1.125rem;
+  }
+
+  /* Teal, light to dark, with NEAR-BLACK text rather than white: white on
+     rgb(2 188 135) is 2.46:1, while #0b2b22 on it reaches 8.55:1. The
+     gradient darkens toward the end, so the text is only more legible
+     across the bar, never less. */
+  .d2p-flash__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 20px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgb(2 188 135) 0%, rgb(2 168 120) 55%, rgb(2 150 108) 100%);
+    color: #06251d;
+    box-shadow: 0 14px 30px -18px rgb(2 150 108 / 70%);
+  }
+
+  .d2p-flash__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .d2p-flash__bolt {
+    display: flex;
+  }
+
+  .d2p-flash__bolt svg {
+    inline-size: 19px;
+    block-size: 19px;
+    display: block;
+  }
+
+  .d2p-flash__clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .d2p-flash__unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-inline-size: 58px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    /* A white chip on the teal, so each unit reads as its own block while
+       the dark digits stay on a lighter ground. */
+    background: rgb(255 255 255 / 38%);
+  }
+
+  .d2p-flash__num {
+    font-size: 1.375rem;
+    font-weight: 800;
+    line-height: 1.1;
+    /* Tabular figures stop the row jittering as the digits change. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  .d2p-flash__cap {
+    font-size: 0.6875rem;
+    opacity: 0.85;
+  }
+
+  .d2p-flash__sep {
+    font-size: 1.25rem;
+    font-weight: 700;
+    opacity: 0.6;
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-flash__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-flash__bar {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .d2p-flash__unit {
+      min-inline-size: 52px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Flash sale countdown",
+  "tag": "section",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Counts down to the date in the product's custom.sale_ends metafield. Nothing shows when that is empty or has passed."
+    },
+    { "type": "text", "id": "label", "label": "Label", "default": "Flash Sale Ends in:" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 6 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 10 }
+  ],
+  "presets": [{ "name": "Flash sale countdown" }]
+}
+{% endschema %}

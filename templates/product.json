@@ -387,7 +387,7 @@
                     "b_ship_t": {
                       "type": "text",
                       "settings": {
-                        "text": "<p>Free delivery over Rs. 3,000</p>",
+                        "text": "<p>Free delivery over Rs. 1,999</p>",
                         "width": "fit-content",
                         "max_width": "none",
                         "alignment": "left",
@@ -841,7 +841,7 @@
               "type": "_product-card-gallery",
               "name": "t:names.product_card_media",
               "settings": {
-                "image_ratio": "adapt",
+                "image_ratio": "square",
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
@@ -931,10 +931,122 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "d2p_extras": {
+      "type": "d2p-product-extras",
+      "blocks": {
+        "e1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "heading": "Free Delivery",
+            "subtext": "on orders over Rs. 1,999"
+          }
+        },
+        "e2": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "heading": "Easy Returns",
+            "subtext": "Hassle-free returns"
+          }
+        },
+        "e3": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "heading": "Secure Payments",
+            "subtext": "100% safe & secure"
+          }
+        }
+      },
+      "block_order": [
+        "e1",
+        "e2",
+        "e3"
+      ],
+      "settings": {
+        "show_share": true,
+        "share_label": "Share",
+        "padding_top": 8,
+        "padding_bottom": 8
+      }
+    },
+    "d2p_reviews": {
+      "type": "d2p-reviews",
+      "settings": {
+        "heading": "Customer Reviews",
+        "verified_note": "All reviews are from verified purchases",
+        "initial_count": 4,
+        "more_label": "See all reviews",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "d2p_features": {
+      "type": "d2p-product-features",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "icon": "sparkle",
+            "title": "Quality Checked",
+            "text": "Inspected before dispatch"
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "icon": "gift",
+            "title": "Ready to Gift",
+            "text": "Arrives neatly packed"
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "icon": "tag",
+            "title": "Honest Pricing",
+            "text": "No hidden charges"
+          }
+        },
+        "f4": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Buyer Protection",
+            "text": "Secure checkout"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "settings": {
+        "heading": "Why You Will Like It",
+        "body": "Chosen for everyday use, checked before it leaves us, and delivered across Pakistan.",
+        "padding_top": 24,
+        "padding_bottom": 12
+      }
+    },
+    "d2p_flash": {
+      "type": "d2p-flash-sale",
+      "settings": {
+        "label": "Flash Sale Ends in:",
+        "padding_top": 6,
+        "padding_bottom": 10
+      }
     }
   },
   "order": [
     "main",
+    "d2p_flash",
+    "d2p_extras",
+    "d2p_features",
+    "d2p_reviews",
     "product_recommendations_qggXJq"
   ]
 }

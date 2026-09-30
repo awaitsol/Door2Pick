@@ -1,0 +1,564 @@
+{%- comment -%}
+  Door2Pick footer.
+
+  Two bands:
+    1. main   — logo + blurb, link columns, newsletter and social
+    2. bottom — copyright and payment icons, split by a hairline
+
+  Colours come from the store palette (--d2p-*), so the footer follows light
+  and dark mode with the rest of the site rather than pinning its own.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign columns = section.blocks | where: 'type', 'menu'
+-%}
+
+<div class="d2p-footer" style="
+  padding-block-start: {{ s.padding_top }}px;
+  padding-block-end: {{ s.padding_bottom }}px;
+">
+  <div class="d2p-footer__inner">
+    <div class="d2p-footer__main">
+
+      <div class="d2p-footer__brand">
+        <a class="d2p-footer__logo" href="{{ routes.root_url }}">
+          {%- if s.logo_asset != blank -%}
+            <img
+              class="d2p-footer__logo-img d2p-footer__logo-img--dark"
+              src="{{ s.logo_asset | asset_url }}"
+              alt="{{ shop.name | escape }}"
+              width="220"
+              height="64"
+              loading="lazy"
+            >
+            {%- if s.logo_asset_light != blank -%}
+              <img
+                class="d2p-footer__logo-img d2p-footer__logo-img--light"
+                src="{{ s.logo_asset_light | asset_url }}"
+                alt=""
+                width="220"
+                height="64"
+                loading="lazy"
+                aria-hidden="true"
+              >
+            {%- endif -%}
+          {%- else -%}
+            <span class="d2p-footer__wordmark">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+
+        {%- if s.blurb != blank -%}
+          <p class="d2p-footer__blurb">{{ s.blurb }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%}
+        A column prefers a Shopify menu so its links stay correct when the
+        menus change. Menus live in the admin, so the typed pairs are the
+        fallback until one is chosen — without them a column with no menu set
+        would render empty.
+      {%- endcomment -%}
+      {%- for block in columns -%}
+        <nav class="d2p-footer__col" aria-label="{{ block.settings.heading | escape }}" {{ block.shopify_attributes }}>
+          <h2 class="d2p-footer__col-heading">{{ block.settings.heading }}</h2>
+          <ul class="d2p-footer__links">
+            {%- assign menu = linklists[block.settings.menu] -%}
+            {%- if menu.links.size > 0 -%}
+              {%- for link in menu.links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+            {%- else -%}
+              {%- for i in (1..5) -%}
+                {%- liquid
+                  case i
+                    when 1
+                      assign label = block.settings.label_1
+                      assign url = block.settings.url_1
+                    when 2
+                      assign label = block.settings.label_2
+                      assign url = block.settings.url_2
+                    when 3
+                      assign label = block.settings.label_3
+                      assign url = block.settings.url_3
+                    when 4
+                      assign label = block.settings.label_4
+                      assign url = block.settings.url_4
+                    when 5
+                      assign label = block.settings.label_5
+                      assign url = block.settings.url_5
+                  endcase
+                -%}
+                {%- if label != blank -%}
+                  <li><a href="{{ url | default: '#' }}">{{ label }}</a></li>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+        </nav>
+      {%- endfor -%}
+
+      <div class="d2p-footer__news">
+        <h2 class="d2p-footer__col-heading">{{ s.newsletter_heading }}</h2>
+        {%- if s.newsletter_body != blank -%}
+          <p class="d2p-footer__news-body">{{ s.newsletter_body }}</p>
+        {%- endif -%}
+
+        {%- form 'customer', class: 'd2p-footer__form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="visually-hidden" for="d2p-footer-email">
+            {{ s.newsletter_placeholder }}
+          </label>
+          <div class="d2p-footer__field">
+            <input
+              id="d2p-footer-email"
+              class="d2p-footer__input"
+              type="email"
+              name="contact[email]"
+              placeholder="{{ s.newsletter_placeholder | escape }}"
+              autocomplete="email"
+              required
+            >
+            <button class="d2p-footer__submit" type="submit">
+              {{ s.newsletter_button }}
+            </button>
+          </div>
+          {%- if form.posted_successfully? -%}
+            <p class="d2p-footer__note" role="status">{{ s.newsletter_success }}</p>
+          {%- elsif form.errors -%}
+            <p class="d2p-footer__note d2p-footer__note--error" role="alert">
+              {{ form.errors.messages['email'] }}
+            </p>
+          {%- endif -%}
+        {%- endform -%}
+
+        {%- liquid
+          assign has_social = false
+          if s.facebook != blank or s.instagram != blank or s.tiktok != blank or s.youtube != blank or s.whatsapp != blank
+            assign has_social = true
+          endif
+        -%}
+        {%- if has_social -%}
+          <ul class="d2p-footer__social">
+            {%- if s.facebook != blank -%}
+              <li><a href="{{ s.facebook }}" target="_blank" rel="noopener" aria-label="Facebook">
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'facebook' -%}</svg>
+              </a></li>
+            {%- endif -%}
+            {%- if s.instagram != blank -%}
+              <li><a href="{{ s.instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'instagram' -%}</svg>
+              </a></li>
+            {%- endif -%}
+            {%- if s.tiktok != blank -%}
+              <li><a href="{{ s.tiktok }}" target="_blank" rel="noopener" aria-label="TikTok">
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'tiktok' -%}</svg>
+              </a></li>
+            {%- endif -%}
+            {%- if s.youtube != blank -%}
+              <li><a href="{{ s.youtube }}" target="_blank" rel="noopener" aria-label="YouTube">
+                <svg viewBox="0 0 20 20" fill="currentColor" focusable="false">{%- render 'icon', icon: 'youtube' -%}</svg>
+              </a></li>
+            {%- endif -%}
+            {%- if s.whatsapp != blank -%}
+              <li><a href="{{ s.whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <svg viewBox="0 0 20 20" fill="none" focusable="false">{%- render 'icon', icon: 'whatsapp' -%}</svg>
+              </a></li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="d2p-footer__bottom">
+      <p class="d2p-footer__copy">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ s.rights_text }}
+      </p>
+
+      {%- if s.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <ul class="d2p-footer__pay">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'd2p-footer__pay-icon' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Every colour is a store palette variable, so the footer follows light and
+     dark mode with the rest of the site. */
+  .d2p-footer {
+    background: var(--d2p-surface-alt, #17171a);
+    color: var(--d2p-text, #ffffff);
+    border-block-start: 1px solid var(--d2p-border, #26262a);
+  }
+
+  .d2p-footer__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* Brand column is wider than the rest, as in the design. The link columns
+     are separated by hairlines drawn with border-inline-start. */
+  .d2p-footer__main {
+    display: grid;
+    grid-template-columns: 1.5fr 0.9fr 0.9fr 1.4fr;
+    gap: 48px;
+    padding-block: 48px;
+  }
+
+  .d2p-footer__col,
+  .d2p-footer__news {
+    border-inline-start: 1px solid var(--d2p-border, #26262a);
+    padding-inline-start: 48px;
+  }
+
+  /* ---------- brand ---------- */
+  .d2p-footer__logo {
+    display: inline-block;
+    margin-block-end: 18px;
+  }
+
+  .d2p-footer__logo-img {
+    display: block;
+    block-size: 56px;
+    inline-size: auto;
+  }
+
+  /* One logo file per mode, the same pair the header uses. The class is
+     repeated on the img selector so this wins over the sizing rule above. */
+  .d2p-footer__logo img.d2p-footer__logo-img--light {
+    display: none;
+  }
+
+  :root[data-theme='light'] .d2p-footer__logo img.d2p-footer__logo-img--dark {
+    display: none;
+  }
+
+  :root[data-theme='light'] .d2p-footer__logo img.d2p-footer__logo-img--light {
+    display: block;
+  }
+
+  .d2p-footer__wordmark {
+    font-family: var(--font-heading--family);
+    font-size: 1.5rem;
+    color: var(--d2p-gold-text, #c9a45c);
+  }
+
+  .d2p-footer__blurb {
+    margin: 0;
+    max-inline-size: 34ch;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  /* ---------- headings ---------- */
+  /* The short gold rule under each heading, as in the design. */
+  .d2p-footer__col-heading {
+    position: relative;
+    margin: 0 0 30px;
+    padding-block-end: 12px;
+    font-family: var(--font-heading--family);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--d2p-heading, #ffffff);
+  }
+
+  .d2p-footer__col-heading::after {
+    content: '';
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    inline-size: 34px;
+    block-size: 3px;
+    border-radius: 2px;
+    background: var(--d2p-gold, #c9a45c);
+  }
+
+  /* ---------- links ---------- */
+  .d2p-footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-footer__links a {
+    display: inline-block;
+    font-size: 0.9375rem;
+    color: var(--d2p-text, #ffffff);
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .d2p-footer__links a:hover,
+  .d2p-footer__links a:focus-visible {
+    color: var(--d2p-gold-text, #c9a45c);
+    transform: translateX(3px);
+  }
+
+  /* ---------- newsletter ---------- */
+  .d2p-footer__news-body {
+    margin: 0 0 18px;
+    max-inline-size: 30ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  /* The input and button share one pill, so the field is the bordered box and
+     the input inside it is borderless. */
+  .d2p-footer__field {
+    display: flex;
+    align-items: center;
+    inline-size: min(100%, 380px);
+    padding: 4px 4px 4px 6px;
+    border: 1px solid var(--d2p-border, #26262a);
+    border-radius: 999px;
+    background: var(--d2p-surface, #141416);
+  }
+
+  .d2p-footer__field:focus-within {
+    border-color: var(--d2p-gold, #c9a45c);
+  }
+
+  /* base.css styles every input with a border and background at a specificity
+     a single class cannot beat, so this matches its shape. */
+  input.d2p-footer__input:not([type='checkbox'], [type='radio']) {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    padding: 10px 14px;
+    border: 0;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    background-color: transparent;
+    color: var(--d2p-text, #ffffff);
+    font-size: 0.875rem;
+  }
+
+  .d2p-footer__input::placeholder {
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  .d2p-footer__submit {
+    flex: 0 0 auto;
+    padding: 11px 24px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--d2p-gold, #c9a45c);
+    color: var(--d2p-on-gold, #0b0b0d);
+    font-size: 0.875rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+  }
+
+  .d2p-footer__submit:hover {
+    filter: brightness(1.08);
+  }
+
+  .d2p-footer__note {
+    margin: 10px 0 0;
+    font-size: 0.8125rem;
+    color: var(--d2p-gold-text, #c9a45c);
+  }
+
+  .d2p-footer__note--error {
+    color: var(--d2p-error, #d46a6a);
+  }
+
+  /* ---------- social ---------- */
+  .d2p-footer__social {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-footer__social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 42px;
+    block-size: 42px;
+    border: 1px solid var(--d2p-border, #26262a);
+    border-radius: 50%;
+    color: var(--d2p-text, #ffffff);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  }
+
+  .d2p-footer__social a:hover {
+    background: var(--d2p-gold, #c9a45c);
+    border-color: var(--d2p-gold, #c9a45c);
+    color: var(--d2p-on-gold, #0b0b0d);
+    transform: translateY(-2px);
+  }
+
+  .d2p-footer__social svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+
+  /* ---------- bottom bar ---------- */
+  .d2p-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 22px;
+    border-block-start: 1px solid var(--d2p-border, #26262a);
+  }
+
+  .d2p-footer__copy {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  .d2p-footer__pay {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Card marks are supplied as full-colour artwork on white, so they keep a
+     light plate in dark mode rather than being tinted. */
+  .d2p-footer__pay-icon {
+    display: block;
+    block-size: 26px;
+    inline-size: auto;
+    border-radius: 4px;
+    background: #ffffff;
+    padding: 2px 4px;
+  }
+
+  @media screen and (max-width: 1099px) {
+    .d2p-footer__main {
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    /* The hairlines only make sense between columns on one row. */
+    .d2p-footer__col,
+    .d2p-footer__news {
+      border-inline-start: 0;
+      padding-inline-start: 0;
+    }
+
+    .d2p-footer__brand,
+    .d2p-footer__news {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-footer__inner {
+      padding-inline: 16px;
+    }
+
+    /* The link columns stay side by side on a phone: two short lists read
+       better than one long scroll, and each is narrow enough at this size.
+       Brand and newsletter still span the full width above and below them. */
+    .d2p-footer__main {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px 20px;
+      padding-block: 36px;
+    }
+
+    .d2p-footer__bottom {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-footer__links a,
+    .d2p-footer__social a,
+    .d2p-footer__submit {
+      transition: none;
+    }
+
+    .d2p-footer__links a:hover,
+    .d2p-footer__social a:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Door2Pick footer",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "info": "Pick a menu, or leave empty and type the links below." },
+        { "type": "text", "id": "label_1", "label": "Link 1 text" },
+        { "type": "url", "id": "url_1", "label": "Link 1 URL" },
+        { "type": "text", "id": "label_2", "label": "Link 2 text" },
+        { "type": "url", "id": "url_2", "label": "Link 2 URL" },
+        { "type": "text", "id": "label_3", "label": "Link 3 text" },
+        { "type": "url", "id": "url_3", "label": "Link 3 URL" },
+        { "type": "text", "id": "label_4", "label": "Link 4 text" },
+        { "type": "url", "id": "url_4", "label": "Link 4 URL" },
+        { "type": "text", "id": "label_5", "label": "Link 5 text" },
+        { "type": "url", "id": "url_5", "label": "Link 5 URL" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Brand" },
+    { "type": "text", "id": "logo_asset", "label": "Logo filename (dark mode)", "info": "A file in the theme's assets folder.", "default": "logo-dark.png" },
+    { "type": "text", "id": "logo_asset_light", "label": "Logo filename (light mode)", "default": "logo-light.png" },
+    { "type": "textarea", "id": "blurb", "label": "About text", "default": "Quality products for your everyday needs, delivered right to your door." },
+
+    { "type": "header", "content": "Newsletter" },
+    { "type": "text", "id": "newsletter_heading", "label": "Heading", "default": "Stay Updated" },
+    { "type": "text", "id": "newsletter_body", "label": "Body", "default": "Get the latest deals and new arrivals straight to your inbox." },
+    { "type": "text", "id": "newsletter_placeholder", "label": "Input placeholder", "default": "Enter your email address" },
+    { "type": "text", "id": "newsletter_button", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "newsletter_success", "label": "Success message", "default": "Thanks for subscribing." },
+
+    { "type": "header", "content": "Social" },
+    { "type": "url", "id": "facebook", "label": "Facebook" },
+    { "type": "url", "id": "instagram", "label": "Instagram" },
+    { "type": "url", "id": "tiktok", "label": "TikTok" },
+    { "type": "url", "id": "youtube", "label": "YouTube" },
+    { "type": "url", "id": "whatsapp", "label": "WhatsApp" },
+
+    { "type": "header", "content": "Bottom bar" },
+    { "type": "text", "id": "rights_text", "label": "Rights text", "default": "All rights reserved." },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "info": "Shows the gateways enabled in Settings -> Payments.", "default": true },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0 }
+  ],
+  "presets": [
+    {
+      "name": "Door2Pick footer",
+      "blocks": [{ "type": "menu" }, { "type": "menu" }]
+    }
+  ]
+}
+{% endschema %}

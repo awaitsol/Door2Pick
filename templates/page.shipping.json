@@ -27,20 +27,41 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "effective": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Effective date: 21 September 2026</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "0.8125rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 4,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
         "intro": {
           "type": "text",
           "settings": {
-            "text": "<p>How and when your order reaches you.</p>",
+            "text": "<p>At Door2Pick, we work to make your shopping experience simple, reliable and convenient. We currently deliver orders across Pakistan.</p>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
@@ -52,13 +73,11 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 8,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
@@ -68,16 +87,16 @@
             "ship_0": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Dispatch times",
+                "heading": "Delivery coverage",
                 "open_by_default": true,
-                "icon": "stopwatch",
-                "width": 24
+                "icon": "truck",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ship_0_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Orders placed before 4pm on a working day are dispatched the same or next working day. Orders placed at the weekend are dispatched on the next working day.</p>",
+                    "text": "<p>We deliver to most cities and areas across Pakistan through our courier partners. Some remote or restricted areas may have limited delivery availability.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -89,34 +108,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ship_0_b"
               ]
             },
             "ship_1": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Delivery times",
+                "heading": "Processing time",
                 "open_by_default": false,
-                "icon": "truck",
-                "width": 24
+                "icon": "stopwatch",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ship_1_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Major cities: 2–3 working days. Other areas: 3–5 working days. You will receive tracking details by email once your parcel leaves us.</p>",
+                    "text": "<p>Orders are generally processed within 1–2 business days after confirmation. Orders placed at weekends or on public holidays may be processed on the next business day.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -128,34 +145,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ship_1_b"
               ]
             },
             "ship_2": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Shipping costs",
+                "heading": "Estimated delivery time",
                 "open_by_default": false,
-                "icon": "price_tag",
-                "width": 24
+                "icon": "plane",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ship_2_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Free on orders over Rs. 3,000. A flat rate applies below that and is shown at checkout before payment.</p>",
+                    "text": "<p>Major cities: 2–5 business days.<br>Other areas: 3–7 business days.<br>Remote areas: 5–10 business days.</p><p>Delivery times are estimates and may vary due to courier delays, weather, public holidays, peak shopping periods or other circumstances beyond our control.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -167,34 +182,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ship_2_b"
               ]
             },
             "ship_3": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Tracking your order",
+                "heading": "Shipping charges",
                 "open_by_default": false,
-                "icon": "box",
-                "width": 24
+                "icon": "price_tag",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ship_3_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Every shipment includes a tracking number, sent by email. If you have an account, your orders page shows live status.</p>",
+                    "text": "<p>Shipping charges, where they apply, are shown at checkout before you complete your order. From time to time Door2Pick may offer free shipping on selected products or on orders above a stated amount.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -206,34 +219,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ship_3_b"
               ]
             },
             "ship_4": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Damaged or missing parcels",
+                "heading": "Cash on Delivery",
                 "open_by_default": false,
-                "icon": "question_mark",
-                "width": 24
+                "icon": "box",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ship_4_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Contact us within 48 hours of the delivery date and we will resolve it — a replacement or a full refund.</p>",
+                    "text": "<p>Cash on Delivery may be available for eligible locations and products. For COD orders you may be contacted by our team or the courier to confirm the order.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -245,19 +256,128 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ship_4_b"
+              ]
+            },
+            "ship_5": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Order tracking",
+                "open_by_default": false,
+                "icon": "check_box",
+                "width": 22
+              },
+              "blocks": {
+                "ship_5_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Once your order has been dispatched we may provide tracking information through your registered contact details. Where tracking is available you can also check your order status on our Track Order page.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "ship_5_b"
+              ]
+            },
+            "ship_6": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Delivery delays",
+                "open_by_default": false,
+                "icon": "question_mark",
+                "width": 22
+              },
+              "blocks": {
+                "ship_6_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Door2Pick is not responsible for delays caused by incorrect or incomplete delivery information, customer unavailability, courier service disruptions, weather, public holidays or unexpected logistical issues. If your order is significantly delayed, please contact our support team.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "ship_6_b"
+              ]
+            },
+            "ship_7": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Incorrect address",
+                "open_by_default": false,
+                "icon": "ruler",
+                "width": 22
+              },
+              "blocks": {
+                "ship_7_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Please make sure your delivery address and contact number are correct before placing your order. If an incorrect address causes the parcel to be returned, additional shipping charges may apply for reshipment.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "ship_7_b"
               ]
             }
           },
@@ -266,19 +386,18 @@
             "ship_1",
             "ship_2",
             "ship_3",
-            "ship_4"
+            "ship_4",
+            "ship_5",
+            "ship_6",
+            "ship_7"
           ],
           "settings": {
             "icon": "plus",
             "dividers": true,
-            "divider_color": "",
             "type_preset": "h6",
-            "background_color": "#00000000",
-            "text_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -286,31 +405,40 @@
             "padding-inline-end": 0
           }
         },
-        "cta": {
-          "type": "button",
+        "contact": {
+          "type": "text",
           "settings": {
-            "label": "Contact support",
-            "link": "/pages/contact",
-            "open_in_new_tab": false,
-            "style_class": "button-secondary",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
+            "text": "<p>For shipping questions, please <a href='/pages/contact'>contact us</a>.</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "0.9375rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 8,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
           },
           "blocks": {}
         }
       },
       "block_order": [
         "title",
+        "effective",
         "intro",
         "detail",
-        "cta"
+        "contact"
       ],
       "settings": {
         "content_direction": "column",
-        "gap": 32,
-        "background_color": "{{ settings.color_palette.background }}",
+        "gap": 28,
         "padding-block-start": 48,
         "padding-block-end": 72
       }

@@ -27,13 +27,11 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
@@ -52,20 +50,18 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 8,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "ordering_h": {
+        "about_h": {
           "type": "text",
           "settings": {
-            "text": "<h2>Ordering</h2>",
+            "text": "<h2>About Door2Pick</h2>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
@@ -77,32 +73,30 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
-            "padding-block-start": 16,
+            "padding-block-start": 12,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "ordering": {
+        "about": {
           "type": "accordion",
           "blocks": {
-            "ord_0": {
+            "abt_0": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "How do I place an order?",
+                "heading": "What is Door2Pick?",
                 "open_by_default": true,
-                "icon": "box",
-                "width": 24
+                "icon": "star",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "abt_0_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Add what you want to your cart, open the cart drawer and choose Checkout. You can pay as a guest — an account is optional.</p>",
+                    "text": "<p>Door2Pick is an online store offering a curated selection of products across jewellery, home decor, tech and gadgets, kitchen, health and wellness, and trending products.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -114,34 +108,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "abt_0_b"
               ]
             },
-            "ord_1": {
+            "abt_1": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Can I change or cancel an order?",
+                "heading": "Where does Door2Pick deliver?",
                 "open_by_default": false,
-                "icon": "stopwatch",
-                "width": 24
+                "icon": "plane",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "abt_1_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Contact us as soon as possible. If the order has not yet shipped we can usually amend or cancel it.</p>",
+                    "text": "<p>We currently deliver across Pakistan, subject to courier availability in your area.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -153,34 +145,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "abt_1_b"
               ]
             },
-            "ord_2": {
+            "abt_2": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Do you sell authentic products?",
+                "heading": "How can I contact Door2Pick?",
                 "open_by_default": false,
-                "icon": "check_box",
-                "width": 24
+                "icon": "question_mark",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "abt_2_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Yes. Everything we list is sourced from authorised suppliers.</p>",
+                    "text": "<p>You can reach us through the contact options on our <a href='/pages/contact'>contact page</a>.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -192,38 +182,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "abt_2_b"
               ]
             }
           },
           "block_order": [
-            "ord_0",
-            "ord_1",
-            "ord_2"
+            "abt_0",
+            "abt_1",
+            "abt_2"
           ],
           "settings": {
             "icon": "plus",
             "dividers": true,
-            "divider_color": "",
             "type_preset": "h6",
-            "background_color": "#00000000",
-            "text_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -231,10 +215,10 @@
             "padding-inline-end": 0
           }
         },
-        "delivery_h": {
+        "orders_h": {
           "type": "text",
           "settings": {
-            "text": "<h2>Delivery</h2>",
+            "text": "<h2>Orders &amp; delivery</h2>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
@@ -246,32 +230,30 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
-            "padding-block-start": 16,
+            "padding-block-start": 12,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "delivery": {
+        "orders": {
           "type": "accordion",
           "blocks": {
-            "del_0": {
+            "ord_0": {
               "type": "_accordion-row",
               "settings": {
                 "heading": "How long does delivery take?",
                 "open_by_default": true,
                 "icon": "truck",
-                "width": 24
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ord_0_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Orders are dispatched within 1–2 working days. Delivery typically takes 2–5 working days depending on your city.</p>",
+                    "text": "<p>Most orders arrive within 2–7 business days depending on your location. Remote areas may take longer.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -283,34 +265,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ord_0_b"
               ]
             },
-            "del_1": {
+            "ord_1": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "Do you ship nationwide?",
+                "heading": "Do you offer Cash on Delivery?",
                 "open_by_default": false,
-                "icon": "plane",
-                "width": 24
+                "icon": "box",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ord_1_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Yes, we deliver across the country.</p>",
+                    "text": "<p>Yes. Cash on Delivery may be available for eligible products and locations.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -322,34 +302,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ord_1_b"
               ]
             },
-            "del_2": {
+            "ord_2": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "How much is shipping?",
+                "heading": "How can I track my order?",
                 "open_by_default": false,
-                "icon": "price_tag",
-                "width": 24
+                "icon": "check_box",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ord_2_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Delivery is free on orders over Rs. 3,000. Below that a flat fee applies, shown at checkout before you pay.</p>",
+                    "text": "<p>Once your order has shipped you may receive tracking information. Where tracking is available you can also check the Track Order section of our site.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -361,38 +339,70 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ord_2_b"
+              ]
+            },
+            "ord_3": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Can I cancel my order?",
+                "open_by_default": false,
+                "icon": "stopwatch",
+                "width": 22
+              },
+              "blocks": {
+                "ord_3_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Please request cancellation as soon as possible after ordering. Cancellation may not be possible once the order has been dispatched.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "ord_3_b"
               ]
             }
           },
           "block_order": [
-            "del_0",
-            "del_1",
-            "del_2"
+            "ord_0",
+            "ord_1",
+            "ord_2",
+            "ord_3"
           ],
           "settings": {
             "icon": "plus",
             "dividers": true,
-            "divider_color": "",
             "type_preset": "h6",
-            "background_color": "#00000000",
-            "text_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -403,7 +413,7 @@
         "returns_h": {
           "type": "text",
           "settings": {
-            "text": "<h2>Returns & refunds</h2>",
+            "text": "<h2>Returns &amp; problems</h2>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
@@ -415,13 +425,11 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
-            "padding-block-start": 16,
+            "padding-block-start": 12,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
@@ -431,16 +439,16 @@
             "ret_0": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "What is your returns window?",
+                "heading": "Can I return a product?",
                 "open_by_default": true,
                 "icon": "return",
-                "width": 24
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ret_0_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Seven days from delivery, provided the item is unused and in its original packaging.</p>",
+                    "text": "<p>Eligible products may be returned according to our return policy and its conditions. Please contact customer support before sending anything back.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -452,34 +460,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ret_0_b"
               ]
             },
             "ret_1": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "How do I return something?",
+                "heading": "What if I receive a damaged or incorrect product?",
                 "open_by_default": false,
-                "icon": "box",
-                "width": 24
+                "icon": "question_mark",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ret_1_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Contact us with your order number and we will arrange collection or give you a return address.</p>",
+                    "text": "<p>Please contact support as soon as possible after receiving your order, with your order details and photographs where requested.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -491,34 +497,32 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ret_1_b"
               ]
             },
             "ret_2": {
               "type": "_accordion-row",
               "settings": {
-                "heading": "When will I get my refund?",
+                "heading": "Are all products covered by the same return policy?",
                 "open_by_default": false,
-                "icon": "recycle",
-                "width": 24
+                "icon": "ruler",
+                "width": 22
               },
               "blocks": {
-                "body": {
+                "ret_2_b": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Refunds are issued within 5–7 working days of the returned item reaching us.</p>",
+                    "text": "<p>Not necessarily. Some products have specific return or exchange conditions, so please check the applicable terms before purchasing.</p>",
                     "width": "100%",
                     "max_width": "normal",
                     "alignment": "left",
@@ -530,19 +534,17 @@
                     "case": "none",
                     "wrap": "pretty",
                     "background": false,
-                    "background_color": "#00000000",
                     "corner_radius": 0,
                     "padding-block-start": 0,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "body"
+                "ret_2_b"
               ]
             }
           },
@@ -554,14 +556,205 @@
           "settings": {
             "icon": "plus",
             "dividers": true,
-            "divider_color": "",
             "type_preset": "h6",
-            "background_color": "#00000000",
-            "text_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "payment_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Payment &amp; pricing</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1.25rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 12,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "payment": {
+          "type": "accordion",
+          "blocks": {
+            "pay_0": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "What payment methods do you accept?",
+                "open_by_default": true,
+                "icon": "price_tag",
+                "width": 22
+              },
+              "blocks": {
+                "pay_0_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Available payment methods are shown at checkout and may include Cash on Delivery and online payment options, depending on your location and order.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "pay_0_b"
+              ]
+            },
+            "pay_1": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Do product prices change?",
+                "open_by_default": false,
+                "icon": "price_tag",
+                "width": 22
+              },
+              "blocks": {
+                "pay_1_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Yes. Prices and promotions may change from time to time. The price shown at checkout is the one that applies to your order.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "pay_1_b"
+              ]
+            },
+            "pay_2": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Is my information secure?",
+                "open_by_default": false,
+                "icon": "lock",
+                "width": 22
+              },
+              "blocks": {
+                "pay_2_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>We take reasonable measures to protect customer information. Payment details are processed by third-party payment providers.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "pay_2_b"
+              ]
+            },
+            "pay_3": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "Do you offer discounts?",
+                "open_by_default": false,
+                "icon": "star",
+                "width": 22
+              },
+              "blocks": {
+                "pay_3_b": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>We may offer promotional discounts, seasonal offers or free shipping promotions from time to time.</p>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "paragraph",
+                    "font": "var(--font-body--family)",
+                    "font_size": "0.9375rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "background": false,
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "pay_3_b"
+              ]
+            }
+          },
+          "block_order": [
+            "pay_0",
+            "pay_1",
+            "pay_2",
+            "pay_3"
+          ],
+          "settings": {
+            "icon": "plus",
+            "dividers": true,
+            "type_preset": "h6",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -573,17 +766,18 @@
       "block_order": [
         "title",
         "intro",
-        "ordering_h",
-        "ordering",
-        "delivery_h",
-        "delivery",
+        "about_h",
+        "about",
+        "orders_h",
+        "orders",
         "returns_h",
-        "returns"
+        "returns",
+        "payment_h",
+        "payment"
       ],
       "settings": {
         "content_direction": "column",
-        "gap": 32,
-        "background_color": "{{ settings.color_palette.background }}",
+        "gap": 28,
         "padding-block-start": 48,
         "padding-block-end": 72
       }

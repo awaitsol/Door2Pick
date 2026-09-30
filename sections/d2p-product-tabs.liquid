@@ -1,0 +1,425 @@
+{%- comment -%}
+  Tabbed product detail: Overview, What's Included, Specifications, Shipping.
+
+  Built from radio inputs and CSS rather than JavaScript, so the tabs work
+  before any script runs and keep native keyboard support — arrow keys move
+  between radios in a group, which is the expected behaviour for a tablist.
+
+  A block's body is rich text, so each tab can hold lists and tables.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign tabs = section.blocks | where: 'type', 'tab'
+  assign marks = section.blocks | where: 'type', 'mark'
+-%}
+
+{%- if tabs.size > 0 -%}
+  <div class="d2p-tabs" style="
+    padding-block-start: {{ s.padding_top }}px;
+    padding-block-end: {{ s.padding_bottom }}px;
+  ">
+    <div class="d2p-tabs__inner">
+      <div class="d2p-tabs__panel">
+        <div class="d2p-tabs__main">
+          {%- comment -%}
+            A tab bar holding a single tab is just a label taking up a row, so
+            the strip is only drawn when there is something to switch between.
+            The radio still renders, because the content rules key off it.
+          {%- endcomment -%}
+          <div class="d2p-tabs__strip{% if tabs.size < 2 %} d2p-tabs__strip--single{% endif %}" role="tablist">
+            {%- for block in tabs -%}
+              <input
+                class="d2p-tabs__radio"
+                type="radio"
+                name="d2p-tabs-{{ section.id }}"
+                id="d2p-tab-{{ block.id }}"
+                {% if forloop.first %}checked{% endif %}
+              >
+              <label class="d2p-tabs__label" for="d2p-tab-{{ block.id }}" {{ block.shopify_attributes }}>
+                {{ block.settings.title }}
+              </label>
+            {%- endfor -%}
+          </div>
+
+          {%- for block in tabs -%}
+            <div class="d2p-tabs__content" data-tab="{{ forloop.index0 }}">
+              {%- comment -%}
+                A richtext setting does not render Liquid, so a tab that should
+                show the product's own description opts in with a checkbox
+                instead of trying to write {{ product.description }} in the
+                editor, which would print as literal text.
+              {%- endcomment -%}
+              {%- if block.settings.use_description -%}
+                {{ product.description }}
+              {%- else -%}
+                {{ block.settings.body }}
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if marks.size > 0 -%}
+          <ul class="d2p-tabs__marks">
+            {%- for block in marks -%}
+              <li class="d2p-tabs__mark" {{ block.shopify_attributes }}>
+                {%- if block.settings.icon != 'none' -%}
+                  <span class="d2p-tabs__mark-icon" aria-hidden="true">
+                    {%- render 'd2p-icon', name: block.settings.icon -%}
+                  </span>
+                {%- endif -%}
+                <span class="d2p-tabs__mark-text">{{ block.settings.text }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-tabs {
+    background: var(--d2p-page);
+    color: var(--d2p-text);
+  }
+
+  .d2p-tabs__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* Same gradient-hairline treatment as the features panel, so the two read
+     as one system down the page. */
+  .d2p-tabs__panel {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 36px;
+    padding: 28px 32px 32px;
+    border-radius: 20px;
+    background:
+      linear-gradient(var(--d2p-surface), var(--d2p-surface)) padding-box,
+      var(--d2p-gold-gradient) border-box;
+    border: 1px solid transparent;
+    box-shadow: 0 24px 60px -40px rgb(0 0 0 / 70%);
+  }
+
+  .d2p-tabs__strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--d2p-surface-alt);
+  }
+
+  /* One tab: drop the pill chrome and present the title as a heading, which
+     is what it actually is at that point. */
+  .d2p-tabs__strip--single {
+    padding: 0;
+    background: none;
+  }
+
+  .d2p-tabs__strip--single .d2p-tabs__label {
+    padding: 0 0 4px;
+    border-radius: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-weight: 700;
+    color: var(--d2p-heading);
+    cursor: default;
+  }
+
+  .d2p-tabs__strip--single .d2p-tabs__radio:checked + .d2p-tabs__label {
+    background: none;
+    color: var(--d2p-heading);
+    box-shadow: none;
+  }
+
+  /* A short gold rule under the heading, matching the other sections. */
+  .d2p-tabs__strip--single .d2p-tabs__label::after {
+    content: '';
+    display: block;
+    inline-size: 42px;
+    block-size: 3px;
+    margin-block-start: 10px;
+    border-radius: 2px;
+    background: var(--d2p-gold-gradient);
+  }
+
+  /* The radios drive which panel shows; they are visually hidden but stay in
+     the layout and focusable, so keyboard users can still reach them. */
+  .d2p-tabs__radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Tabs are pills rather than underlined text: more present, and the active
+     one can carry the gold gradient. */
+  .d2p-tabs__label {
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--d2p-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .d2p-tabs__label:hover {
+    color: var(--d2p-text);
+  }
+
+  /* Each radio sits immediately before its own label, so :checked + label
+     styles the active tab without needing an index. */
+  .d2p-tabs__radio:checked + .d2p-tabs__label {
+    background: var(--d2p-gold-gradient);
+    color: var(--d2p-on-gold);
+    box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--d2p-gold) 85%, transparent);
+  }
+
+  .d2p-tabs__radio:focus-visible + .d2p-tabs__label {
+    outline: 2px solid var(--d2p-gold);
+    outline-offset: 2px;
+  }
+
+  .d2p-tabs__content {
+    display: none;
+    padding-block-start: 22px;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    /* Supplier descriptions are long; a measure keeps lines readable rather
+       than running the full panel width. */
+    max-inline-size: 68ch;
+    color: var(--d2p-muted);
+    /* A short fade so switching tabs is not an abrupt swap. */
+    animation: d2p-tab-in 0.35s ease both;
+  }
+
+  @keyframes d2p-tab-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Pair the nth radio with the nth content panel. The selectors are written
+     out rather than generated because CSS has no loop; four tabs is the
+     practical maximum for this layout anyway. */
+  .d2p-tabs__main > .d2p-tabs__strip:has(.d2p-tabs__radio:nth-of-type(1):checked) ~ .d2p-tabs__content[data-tab='0'],
+  .d2p-tabs__main > .d2p-tabs__strip:has(.d2p-tabs__radio:nth-of-type(2):checked) ~ .d2p-tabs__content[data-tab='1'],
+  .d2p-tabs__main > .d2p-tabs__strip:has(.d2p-tabs__radio:nth-of-type(3):checked) ~ .d2p-tabs__content[data-tab='2'],
+  .d2p-tabs__main > .d2p-tabs__strip:has(.d2p-tabs__radio:nth-of-type(4):checked) ~ .d2p-tabs__content[data-tab='3'] {
+    display: block;
+  }
+
+  .d2p-tabs__content :is(p, ul, ol) {
+    margin-block: 0 14px;
+  }
+
+  .d2p-tabs__content > :first-child {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--d2p-text);
+  }
+
+  .d2p-tabs__content :is(h2, h3, h4) {
+    margin-block: 18px 6px;
+    color: var(--d2p-text);
+    font-size: 1rem;
+  }
+
+  .d2p-tabs__content strong {
+    color: var(--d2p-text);
+  }
+
+  /* Gold bullets instead of the browser's default discs. */
+  .d2p-tabs__content ul {
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .d2p-tabs__content ul li {
+    position: relative;
+    padding-inline-start: 28px;
+    margin-block-end: 12px;
+  }
+
+  /* A gold check rather than a dot: each line of a product description is a
+     claim about what you get, so a tick reads better than a bullet. */
+  .d2p-tabs__content ul li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.45em;
+    inline-size: 16px;
+    block-size: 16px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--d2p-gold) 18%, transparent);
+  }
+
+  .d2p-tabs__content ul li::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 5px;
+    inset-block-start: 0.72em;
+    inline-size: 5px;
+    block-size: 8px;
+    border-inline-end: 2px solid var(--d2p-gold);
+    border-block-end: 2px solid var(--d2p-gold);
+    transform: rotate(45deg);
+  }
+
+  .d2p-tabs__marks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-tabs__mark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 12px;
+    border: 1px solid var(--d2p-border);
+    border-radius: 14px;
+    background: var(--d2p-surface-alt);
+    text-align: center;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+
+  .d2p-tabs__mark:hover {
+    border-color: var(--d2p-gold);
+    transform: translateY(-3px);
+  }
+
+  .d2p-tabs__mark-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 46px;
+    block-size: 46px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--d2p-gold) 14%, transparent);
+    color: var(--d2p-gold-text);
+  }
+
+  .d2p-tabs__mark-icon svg {
+    inline-size: 22px;
+    block-size: 22px;
+    display: block;
+  }
+
+  .d2p-tabs__mark-text {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-tabs__panel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-tabs__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-tabs__panel {
+      padding: 20px;
+      border-radius: 16px;
+    }
+
+    .d2p-tabs__strip {
+      gap: 6px;
+    }
+
+    .d2p-tabs__label {
+      padding: 9px 16px;
+      font-size: 0.8125rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-tabs__label,
+    .d2p-tabs__mark {
+      transition: none;
+    }
+
+    .d2p-tabs__content {
+      animation: none;
+    }
+
+    .d2p-tabs__mark:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product tabs",
+  "tag": "section",
+  "enabled_on": { "templates": ["product"] },
+  "max_blocks": 8,
+  "settings": [
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 12 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab title", "default": "Overview" },
+        { "type": "checkbox", "id": "use_description", "label": "Use the product description", "info": "Shows the description from the product itself and ignores the content below.", "default": false },
+        { "type": "richtext", "id": "body", "label": "Content", "default": "<p>Describe the product here.</p>" }
+      ]
+    },
+    {
+      "type": "mark",
+      "name": "Highlight",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "sparkle", "label": "Quality" },
+            { "value": "shield", "label": "Secure" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "heart", "label": "Favourite" },
+            { "value": "star", "label": "Star" },
+            { "value": "tag", "label": "Value" }
+          ],
+          "default": "sparkle"
+        },
+        { "type": "text", "id": "text", "label": "Text", "default": "Quality you can trust" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product tabs",
+      "blocks": [{ "type": "tab" }, { "type": "tab" }, { "type": "mark" }, { "type": "mark" }]
+    }
+  ]
+}
+{% endschema %}

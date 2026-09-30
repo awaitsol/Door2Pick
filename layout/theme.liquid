@@ -6,13 +6,33 @@
   lang="{{ request.locale.iso_code }}"
 >
   <head>
-    {%- if settings.favicon != blank -%}
-      <link
-        rel="icon"
-        type="image/png"
-        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
-      >
-    {%- endif -%}
+    {%- comment -%}
+      Favicon. Google needs an icon of at least 48x48 to show one beside a
+      search result, and it must be reachable on a stable URL — it fetches the
+      icon separately from the page, often days apart.
+
+      The theme asset is the fallback so the site is never iconless; a file
+      chosen in theme settings takes precedence.
+    {%- endcomment -%}
+    {%- liquid
+      if settings.favicon != blank
+        assign favicon_32 = settings.favicon | image_url: width: 32, height: 32
+        assign favicon_180 = settings.favicon | image_url: width: 180, height: 180
+        assign favicon_192 = settings.favicon | image_url: width: 192, height: 192
+      else
+        comment
+          asset_url returns a protocol-relative //cdn URL. Browsers resolve
+          that, but Google fetches the icon out of page context, so it wants
+          an absolute https URL.
+        endcomment
+        assign favicon_32 = 'favicon.png' | asset_url | prepend: 'https:' | replace: 'https:https:', 'https:'
+        assign favicon_180 = favicon_32
+        assign favicon_192 = favicon_32
+      endif
+    -%}
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ favicon_192 }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ favicon_180 }}">
 
     {%- comment -%}
       Sets data-theme before any stylesheet loads, so the page never paints in
@@ -21,6 +41,15 @@
     {%- render 'theme-mode' -%}
 
     {%- render 'view-transition-opt-in' -%}
+
+    {%- comment -%}
+      Search engine site verification. The token comes from the property in
+      Google Search Console; Shopify's admin no longer has a field for it, so
+      it lives in theme settings instead. Removing it un-verifies the site.
+    {%- endcomment -%}
+    {%- if settings.google_site_verification != blank -%}
+      <meta name="google-site-verification" content="{{ settings.google_site_verification | strip | escape }}">
+    {%- endif -%}
 
     {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
@@ -169,6 +198,8 @@
         {% sections 'footer-group' %}
       </footer>
     </div>
+
+    {% render 'd2p-whatsapp' %}
 
     {% render 'cart-drawer', render_wrapper: true %}
     {% render 'theme-drawer' %}

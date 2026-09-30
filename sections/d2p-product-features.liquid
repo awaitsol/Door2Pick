@@ -1,0 +1,311 @@
+{%- comment -%}
+  A row of feature cards for the product page — the "5 Styling Options in One
+  Tool" band in the design, where each card is one included item or benefit
+  with a small image and a short line of copy.
+
+  Images come from block settings rather than the product gallery, because
+  these are curated explainers, not the product photos themselves.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign cards = section.blocks | where: 'type', 'feature'
+-%}
+
+{%- if cards.size > 0 -%}
+  <div class="d2p-feats" style="
+    padding-block-start: {{ s.padding_top }}px;
+    padding-block-end: {{ s.padding_bottom }}px;
+  ">
+    <div class="d2p-feats__inner">
+      <div class="d2p-feats__panel">
+        {%- if s.heading != blank or s.body != blank -%}
+          <div class="d2p-feats__intro">
+            {%- if s.heading != blank -%}
+              <h2 class="d2p-feats__heading">{{ s.heading }}</h2>
+            {%- endif -%}
+            {%- if s.body != blank -%}
+              <p class="d2p-feats__body">{{ s.body }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <ul class="d2p-feats__list">
+          {%- for block in cards -%}
+            <li class="d2p-feats__card" {{ block.shopify_attributes }}>
+              <span class="d2p-feats__media">
+                {%- if block.settings.image != blank -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 320
+                    | image_tag: class: 'd2p-feats__img', alt: '', widths: '120, 200, 320', loading: 'lazy'
+                  }}
+                {%- elsif block.settings.icon != 'none' -%}
+                  <span class="d2p-feats__icon" aria-hidden="true">
+                    {%- render 'd2p-icon', name: block.settings.icon -%}
+                  </span>
+                {%- endif -%}
+              </span>
+              <span class="d2p-feats__title">{{ block.settings.title }}</span>
+              {%- if block.settings.text != blank -%}
+                <span class="d2p-feats__text">{{ block.settings.text }}</span>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-feats {
+    background: var(--d2p-page);
+    color: var(--d2p-text);
+  }
+
+  .d2p-feats__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* A gold hairline drawn as a gradient border: the panel sits on a padded
+     gradient background and its own surface covers the middle, which gives a
+     1px rule that shifts colour along its length. A plain border cannot do
+     this, and it costs no extra element. */
+  .d2p-feats__panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) 2.2fr;
+    align-items: center;
+    gap: 36px;
+    padding: 34px;
+    border-radius: 20px;
+    background:
+      linear-gradient(var(--d2p-surface), var(--d2p-surface)) padding-box,
+      var(--d2p-gold-gradient) border-box;
+    border: 1px solid transparent;
+    box-shadow: 0 24px 60px -40px rgb(0 0 0 / 70%);
+    overflow: hidden;
+  }
+
+  /* A soft gold bloom behind the heading, so the panel is not a flat slab. */
+  .d2p-feats__panel::before {
+    content: '';
+    position: absolute;
+    inset-block-start: -40%;
+    inset-inline-start: -10%;
+    inline-size: 420px;
+    block-size: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--d2p-gold) 18%, transparent) 0%, transparent 68%);
+    pointer-events: none;
+  }
+
+  .d2p-feats__intro {
+    position: relative;
+  }
+
+  .d2p-feats__heading {
+    margin: 0 0 10px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+    line-height: 1.15;
+    /* The heading takes the gold gradient itself rather than a flat colour. */
+    background: var(--d2p-gold-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .d2p-feats__body {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--d2p-muted);
+  }
+
+  .d2p-feats__list {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-feats__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 22px 14px 18px;
+    border: 1px solid var(--d2p-border);
+    border-radius: 16px;
+    background: var(--d2p-surface-alt);
+    text-align: center;
+    overflow: hidden;
+    transition:
+      border-color 0.3s ease,
+      transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1),
+      box-shadow 0.3s ease;
+  }
+
+  /* A gold wash rises from the base of the card on hover. It is a pseudo
+     element rather than a background change so it can fade independently of
+     the card's own surface. */
+  .d2p-feats__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, color-mix(in srgb, var(--d2p-gold) 16%, transparent), transparent 62%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .d2p-feats__card:hover {
+    border-color: var(--d2p-gold);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 34px -22px color-mix(in srgb, var(--d2p-gold) 70%, transparent);
+  }
+
+  .d2p-feats__card:hover::after {
+    opacity: 1;
+  }
+
+  .d2p-feats__media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 66px;
+    block-size: 66px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--d2p-gold) 12%, transparent);
+    transition: transform 0.3s ease;
+  }
+
+  .d2p-feats__card:hover .d2p-feats__media {
+    transform: scale(1.08);
+  }
+
+  .d2p-feats__img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+  }
+
+  .d2p-feats__icon {
+    color: var(--d2p-gold-text);
+  }
+
+  .d2p-feats__icon svg {
+    inline-size: 30px;
+    block-size: 30px;
+    display: block;
+  }
+
+  .d2p-feats__title {
+    position: relative;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .d2p-feats__text {
+    position: relative;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--d2p-muted);
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-feats__panel {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-feats__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-feats__panel {
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    .d2p-feats__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-feats__card,
+    .d2p-feats__card::after,
+    .d2p-feats__media {
+      transition: none;
+    }
+
+    .d2p-feats__card:hover {
+      transform: none;
+    }
+
+    .d2p-feats__card:hover .d2p-feats__media {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product features",
+  "tag": "section",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Everything in One Tool" },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "Everything you need, included in the box." },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 12 }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Falls back to the icon below when empty." },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "sparkle", "label": "Quality" },
+            { "value": "shield", "label": "Secure" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "tag", "label": "Value" },
+            { "value": "star", "label": "Star" },
+            { "value": "heart", "label": "Favourite" }
+          ],
+          "default": "sparkle"
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "Feature" },
+        { "type": "text", "id": "text", "label": "Text", "default": "A short line of detail." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product features",
+      "blocks": [{ "type": "feature" }, { "type": "feature" }, { "type": "feature" }, { "type": "feature" }]
+    }
+  ]
+}
+{% endschema %}

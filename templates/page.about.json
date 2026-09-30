@@ -27,20 +27,18 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "lede": {
+        "tagline": {
           "type": "text",
           "settings": {
-            "text": "<p>Door2Pick began with a simple idea: that finding well-made things shouldn't mean visiting five different shops.</p>",
+            "text": "<p>Better Picks. Made for Everyday.</p>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
@@ -52,45 +50,41 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
-            "padding-block-end": 8,
+            "padding-block-end": 16,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "body": {
+        "welcome": {
           "type": "text",
           "settings": {
-            "text": "<p>We bring five categories under one roof — fine jewellery, considered home decor, kitchen tools worth keeping, technology that earns its place, and the pieces everyone is talking about. Each one is chosen the same way: we look for things that last, that feel good to use, and that we would keep ourselves.</p><p>Every order is packed by hand and shipped nationwide. If something isn't right, our seven-day return window means you are never stuck with it.</p>",
+            "text": "<p>Welcome to <strong>Door2Pick</strong>, your online destination for products that make everyday life easier, smarter, and more convenient.</p><p>We carefully select products across categories such as <strong>home essentials, kitchen, jewellery, tech gadgets, lifestyle products, and more</strong> — focusing on quality, usefulness, and value.</p>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
             "type_preset": "paragraph",
             "font": "var(--font-body--family)",
-            "font_size": "1rem",
+            "font_size": "1.125rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
             "padding-block-start": 0,
-            "padding-block-end": 0,
+            "padding-block-end": 24,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "values_h": {
+        "believe_h": {
           "type": "text",
           "settings": {
-            "text": "<h2>What we stand for</h2>",
+            "text": "<h2>What We Believe</h2>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "left",
@@ -102,187 +96,240 @@
             "case": "none",
             "wrap": "pretty",
             "background": false,
-            "background_color": "#00000000",
             "corner_radius": 0,
-            "padding-block-start": 16,
-            "padding-block-end": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 4,
             "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "text_color": ""
+            "padding-inline-end": 0
           },
           "blocks": {}
         },
-        "values": {
-          "type": "accordion",
-          "blocks": {
-            "val_0": {
-              "type": "_accordion-row",
-              "settings": {
-                "heading": "Chosen, not stocked",
-                "open_by_default": true,
-                "icon": "star",
-                "width": 24
-              },
-              "blocks": {
-                "body": {
-                  "type": "text",
-                  "settings": {
-                    "text": "<p>We don't list everything we can source. Each product earns its place on the shelf, and we say no far more often than we say yes.</p>",
-                    "width": "100%",
-                    "max_width": "normal",
-                    "alignment": "left",
-                    "type_preset": "paragraph",
-                    "font": "var(--font-body--family)",
-                    "font_size": "0.9375rem",
-                    "line_height": "normal",
-                    "letter_spacing": "normal",
-                    "case": "none",
-                    "wrap": "pretty",
-                    "background": false,
-                    "background_color": "#00000000",
-                    "corner_radius": 0,
-                    "padding-block-start": 0,
-                    "padding-block-end": 0,
-                    "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
-                  },
-                  "blocks": {}
-                }
-              },
-              "block_order": [
-                "body"
-              ]
-            },
-            "val_1": {
-              "type": "_accordion-row",
-              "settings": {
-                "heading": "Honest about delivery",
-                "open_by_default": false,
-                "icon": "truck",
-                "width": 24
-              },
-              "blocks": {
-                "body": {
-                  "type": "text",
-                  "settings": {
-                    "text": "<p>We quote delivery windows we can actually meet, and we tell you the moment something changes.</p>",
-                    "width": "100%",
-                    "max_width": "normal",
-                    "alignment": "left",
-                    "type_preset": "paragraph",
-                    "font": "var(--font-body--family)",
-                    "font_size": "0.9375rem",
-                    "line_height": "normal",
-                    "letter_spacing": "normal",
-                    "case": "none",
-                    "wrap": "pretty",
-                    "background": false,
-                    "background_color": "#00000000",
-                    "corner_radius": 0,
-                    "padding-block-start": 0,
-                    "padding-block-end": 0,
-                    "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
-                  },
-                  "blocks": {}
-                }
-              },
-              "block_order": [
-                "body"
-              ]
-            },
-            "val_2": {
-              "type": "_accordion-row",
-              "settings": {
-                "heading": "Easy to undo",
-                "open_by_default": false,
-                "icon": "return",
-                "width": 24
-              },
-              "blocks": {
-                "body": {
-                  "type": "text",
-                  "settings": {
-                    "text": "<p>Seven days to change your mind, no questions and no restocking fees.</p>",
-                    "width": "100%",
-                    "max_width": "normal",
-                    "alignment": "left",
-                    "type_preset": "paragraph",
-                    "font": "var(--font-body--family)",
-                    "font_size": "0.9375rem",
-                    "line_height": "normal",
-                    "letter_spacing": "normal",
-                    "case": "none",
-                    "wrap": "pretty",
-                    "background": false,
-                    "background_color": "#00000000",
-                    "corner_radius": 0,
-                    "padding-block-start": 0,
-                    "padding-block-end": 0,
-                    "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "text_color": ""
-                  },
-                  "blocks": {}
-                }
-              },
-              "block_order": [
-                "body"
-              ]
-            }
-          },
-          "block_order": [
-            "val_0",
-            "val_1",
-            "val_2"
-          ],
+        "believe_b": {
+          "type": "text",
           "settings": {
-            "icon": "plus",
-            "dividers": true,
-            "divider_color": "",
-            "type_preset": "h6",
-            "background_color": "#00000000",
-            "text_color": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_color": "",
-            "border_radius": 0,
+            "text": "<p>At Door2Pick, we believe shopping should be <strong>simple, reliable, and convenient</strong>. Instead of spending hours searching through countless products, we aim to bring useful and interesting picks together in one place.</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 24,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "why_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Why Door2Pick?</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h3",
+            "font": "var(--font-body--family)",
+            "font_size": "1.75rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 4,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "why_b": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li><strong>Carefully Selected Products</strong> — We focus on products that offer real everyday value.</li><li><strong>Quality First</strong> — We aim to provide reliable products at reasonable prices.</li><li><strong>Easy Shopping</strong> — A simple and convenient online shopping experience.</li><li><strong>Delivery Across Pakistan</strong> — We deliver to customers across Pakistan.</li><li><strong>Customer Focused</strong> — We’re here to make your shopping experience better.</li></ul>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 24,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "mission_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Our Mission</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h3",
+            "font": "var(--font-body--family)",
+            "font_size": "1.75rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 4,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "mission_b": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our mission is simple:</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "mission_q": {
+          "type": "text",
+          "settings": {
+            "text": "<blockquote><p><strong>To bring better products to your doorstep without making shopping complicated.</strong></p></blockquote>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1.125rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 16,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "mission_c": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Whether you’re looking for something useful for your home, a gift, a new gadget, or something simply worth picking up — <strong>Door2Pick is here to help you find it.</strong></p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 24,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "close_h": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Shop Smarter. Pick Better.</h2>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h3",
+            "font": "var(--font-body--family)",
+            "font_size": "1.75rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 4,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "close_b": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Door2Pick</strong><br>Better Picks. Made for Everyday.</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "paragraph",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
-          }
-        },
-        "cta": {
-          "type": "button",
-          "settings": {
-            "label": "Browse the collection",
-            "link": "shopify://collections/all",
-            "open_in_new_tab": false,
-            "style_class": "button",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
           },
           "blocks": {}
         }
       },
       "block_order": [
         "title",
-        "lede",
-        "body",
-        "values_h",
-        "values",
-        "cta"
+        "tagline",
+        "welcome",
+        "believe_h",
+        "believe_b",
+        "why_h",
+        "why_b",
+        "mission_h",
+        "mission_b",
+        "mission_q",
+        "mission_c",
+        "close_h",
+        "close_b"
       ],
       "settings": {
         "content_direction": "column",
-        "gap": 32,
-        "background_color": "{{ settings.color_palette.background }}",
+        "gap": 20,
         "padding-block-start": 48,
         "padding-block-end": 72
       }

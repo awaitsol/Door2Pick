@@ -32,10 +32,16 @@
     class="hero-banner"
     style="
       --hero-radius: {{ section.settings.corner_radius }}px;
-      --hero-height: {{ section.settings.height }}svh;
-      --hero-max-height: {{ section.settings.max_height }}px;
-      --hero-height-mobile: {{ section.settings.height_mobile }}svh;
-      --hero-focus: {{ section.settings.focal_point }};
+      {%- comment -%}
+        Full width means exactly that: no width cap and no height-derived cap,
+        so the banner spans the viewport. Page width keeps the capped band.
+      {%- endcomment -%}
+      {%- if section.settings.section_width != 'full-width' -%}
+        --hero-max-width: {{ section.settings.max_width }}px;
+      {%- endif -%}
+      --hero-vh: {{ section.settings.viewport_height }};
+      --hero-band: {{ section.settings.band_ratio_x100 | divided_by: 100.0 }};
+      --hero-ratio: {{ section.settings.aspect_ratio_x100 | divided_by: 100.0 }};
     "
   >
     <hero-banner-carousel
@@ -53,6 +59,7 @@
           -%}
           <div
             class="hero-banner__slide"
+            style="--hero-focus: {{ block.settings.focal_point | default: 'top' }};"
             data-index="{{ forloop.index0 }}"
             {% if forloop.first == false %}aria-hidden="true"{% endif %}
             role="group"
@@ -158,16 +165,53 @@
 {% stylesheet %}
   .hero-banner {
     display: block;
+    /* The banner is narrower than the page, so the strip behind it carries the
+       page colour and the margins read as deliberate rather than as a gap. */
+    background: var(--d2p-page);
+    padding-block: var(--hero-gutter, 0);
   }
 
+  /* The banner is capped by HEIGHT, not width: a 2:1 image at full width fills
+     most of a laptop screen. Limiting the height and letting the width follow
+     the ratio keeps it to a band, and because the image is contained rather
+     than cropped, the artwork stays whole. */
+  /* The viewport is the query container, so the track's 100cqw resolves
+     against the banner's real width — correct whatever the section is nested
+     inside, unlike 100vw which overstates it when the section is not
+     full-bleed and includes the scrollbar. An element cannot answer its own
+     container query, so this must sit on the parent. */
   .hero-banner__viewport {
+    container-type: inline-size;
+    /* hero-banner-carousel is a custom element, which defaults to
+       display: inline — and max-inline-size does nothing on an inline box.
+       Without this the width cap below was silently ignored. */
+    display: block;
     position: relative;
     overflow: hidden;
     border-radius: var(--hero-radius, 0);
+    /* Only set when the section is Page width; full width leaves it at 100%. */
+    max-inline-size: var(--hero-max-width, 100%);
+    margin-inline: auto;
   }
 
   .hero-banner__track {
     display: grid;
+    grid-template-rows: 100%;
+    inline-size: 100%;
+    overflow: hidden;
+    /* The height follows the WIDTH, so the crop stays the same proportion at
+       every window size. A fixed viewport-height alone kept the frame the
+       same height while the frame widened, so widening the window silently
+       cropped more and more off the bottom — at 2560px it was losing 61% of
+       the artwork against 23% at 1286px.
+       --hero-band is how much shorter than the artwork's own ratio the band
+       is allowed to be; the svh term is a ceiling so the banner still cannot
+       swallow a short window. */
+    block-size: min(
+      calc(100cqw / var(--hero-band, 2.55)),
+      calc(var(--hero-vh, 78) * 1svh)
+    );
+    min-block-size: 240px;
   }
 
   /* Slides stack; only the active one is visible. Grid keeps the section's
@@ -177,6 +221,14 @@
      data-active and takes over. */
   .hero-banner__slide {
     grid-area: 1 / 1;
+    /* The track's height is set outright, so each slide and the link inside
+       it must fill that box for the image to crop against it. The min-*: 0
+       pair stops a grid item refusing to shrink below its content size. */
+    inline-size: 100%;
+    block-size: 100%;
+    min-inline-size: 0;
+    min-block-size: 0;
+    overflow: hidden;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.6s ease, visibility 0.6s ease;
@@ -196,28 +248,34 @@
 
   .hero-banner__link {
     display: block;
+    block-size: 100%;
   }
 
+  /* The artwork carries its own headline and button, so it must never be
+     cropped — a fixed height with object-fit: cover cut the words off. The
+     image scales to the container instead, and the container is capped, so
+     the banner stays whole at every width.
+     `contain` matters when slides differ slightly in ratio: every slide shares
+     one grid cell sized to the tallest, and it keeps the shorter ones whole
+     and centred rather than stretching them. */
   .hero-banner__image {
     display: block;
     inline-size: 100%;
-    /* The artwork is ~2:1, so at full width the hero grows very tall on wide
-       monitors. Capping the height and cropping keeps it to a usable band
-       while the setting below still controls how tall that band is. */
-    block-size: var(--hero-height, 62svh);
-    max-block-size: var(--hero-max-height, 620px);
-    object-fit: cover;
-    /* The headline sits on the left of this artwork, so the crop favours that
-       side — centring would cut the words off on a wide screen. */
-    object-position: var(--hero-focus, left center);
+    block-size: 100%;
+    /* `contain` is what makes a height cap safe: the frame may be shorter
+       than the artwork, and the image fits inside it whole rather than being
+       cropped. The banner then scales down as a unit — nothing is ever cut
+       off, which is the whole point for artwork that carries its own
+       headline, logo and category icons. Any leftover width shows the
+       section background, so the ratios are kept close. */
+    object-fit: contain;
+    /* The band is shorter than the artwork, so `cover` has to crop vertically.
+       Anchoring to the top by default keeps headlines — which sit high in
+       every slide — intact and takes the trim from the bottom instead of
+       splitting it across both edges. Each slide can override this. */
+    object-position: center var(--hero-focus, top);
   }
 
-  @media screen and (max-width: 749px) {
-    .hero-banner__image {
-      block-size: var(--hero-height-mobile, 48svh);
-      max-block-size: none;
-    }
-  }
 
   .hero-banner__arrow {
     position: absolute;
@@ -419,46 +477,47 @@
     },
     {
       "type": "range",
-      "id": "height",
-      "label": "Height",
-      "min": 30,
-      "max": 90,
+      "id": "aspect_ratio_x100",
+      "label": "Banner aspect ratio",
+      "min": 100,
+      "max": 300,
       "step": 2,
       "unit": "%",
-      "info": "Share of the screen height the banner fills on desktop.",
-      "default": 62
+      "info": "Width as a share of height: 196 for a 1800x920 image. Reserves the right space so the page does not shift while the image loads.",
+      "default": 196
     },
     {
       "type": "range",
-      "id": "max_height",
-      "label": "Maximum height",
-      "min": 320,
-      "max": 900,
-      "step": 20,
-      "unit": "px",
-      "default": 620
+      "id": "band_ratio_x100",
+      "label": "Banner shape",
+      "min": 200,
+      "max": 400,
+      "step": 5,
+      "unit": "%",
+      "info": "Width as a share of height for the banner itself. Higher is a shorter, wider band. Values above the artwork's own ratio crop it top and bottom.",
+      "default": 255
     },
     {
       "type": "range",
-      "id": "height_mobile",
-      "label": "Height on mobile",
+      "id": "viewport_height",
+      "label": "Height share",
       "min": 30,
       "max": 80,
       "step": 2,
       "unit": "%",
-      "default": 48
+      "info": "The most of the window height the banner may take. The banner narrows to respect this rather than cropping.",
+      "default": 58
     },
     {
-      "type": "select",
-      "id": "focal_point",
-      "label": "Crop from",
-      "info": "Which part of the image to keep when it is cropped to height.",
-      "options": [
-        { "value": "left center", "label": "Left" },
-        { "value": "center center", "label": "Centre" },
-        { "value": "right center", "label": "Right" }
-      ],
-      "default": "left center"
+      "type": "range",
+      "id": "max_width",
+      "label": "Maximum width",
+      "min": 800,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "info": "The banner scales to this width, then stops. Height follows the artwork's ratio, so nothing is cropped.",
+      "default": 1100
     },
     {
       "type": "range",
@@ -520,6 +579,18 @@
           "id": "alt_text",
           "label": "Alt text",
           "info": "Describe the image, including any words shown inside it."
+        },
+        {
+          "type": "select",
+          "id": "focal_point",
+          "label": "Crop from",
+          "options": [
+            { "value": "top", "label": "Keep the top" },
+            { "value": "center", "label": "Keep the middle" },
+            { "value": "bottom", "label": "Keep the bottom" }
+          ],
+          "info": "Which part of the image to protect when the banner is shorter than the artwork. Use Keep the top when the headline sits high.",
+          "default": "top"
         },
         {
           "type": "url",
