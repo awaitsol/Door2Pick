@@ -17,9 +17,10 @@
           "settings": {
             "image_asset": "hero-1.jpg",
             "alt_text": "Curated for every corner — jewellery, home, tech and trending products, chosen with care. Shop all.",
+            "focal_point": "center",
             "link": "shopify://collections/all",
             "link_label": "Shop all products",
-            "focal_point": "center"
+            "focus_y": 30
           }
         },
         "slide_2": {
@@ -27,9 +28,10 @@
           "settings": {
             "image_asset": "hero-2.jpg",
             "alt_text": "Discover a better way to shop. Curated for every corner. Shop all.",
+            "focal_point": "center",
             "link": "shopify://collections/all",
             "link_label": "Shop all products",
-            "focal_point": "center"
+            "focus_y": 45
           }
         },
         "slide_3": {
@@ -37,9 +39,10 @@
           "settings": {
             "image_asset": "hero-3.jpg",
             "alt_text": "New arrivals in jewellery, home decor and tech. Built for the everyday. Shop now.",
+            "focal_point": "center",
             "link": "shopify://collections/all",
             "link_label": "Shop new arrivals",
-            "focal_point": "center"
+            "focus_y": 0
           }
         }
       },
@@ -50,15 +53,16 @@
       ],
       "settings": {
         "section_width": "full-width",
+        "aspect_ratio_x100": 196,
+        "band_ratio_x100": 255,
+        "viewport_height": 78,
+        "max_width": 1100,
         "corner_radius": 0,
         "autoplay": true,
         "autoplay_speed": 6,
         "aria_label": "Featured promotions",
         "background_color": "",
-        "max_width": 1100,
-        "aspect_ratio_x100": 196,
-        "viewport_height": 62,
-        "band_ratio_x100": 196
+        "desktop_ratio_x100": 220
       }
     },
     "guarantee": {
@@ -103,14 +107,45 @@
     },
     "just_for_you_v2": {
       "type": "d2p-product-grid",
-      "blocks": {},
-      "block_order": [],
       "settings": {
+        "collection_handle": "just-for-you",
+        "use_all_products": true,
+        "fallback_to_all": false,
         "heading": "Just For You",
         "subheading": "",
-        "max_products": 12,
+        "max_products": 30,
         "columns": 6,
         "show_discount_badge": true,
+        "show_rating": true,
+        "show_wishlist": false,
+        "card_style": "boutique",
+        "show_add_to_cart": false,
+        "show_discount_percent": true,
+        "hide_sold_out": false,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "show_view_all": true,
+        "view_all_label": "Show All",
+        "empty_text": "Products from this collection will appear here.",
+        "background_color": "",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "new_arrivals": {
+      "type": "d2p-product-marquee",
+      "settings": {
+        "heading": "New Arrivals",
+        "subheading": "Fresh picks, just landed.",
+        "collection_handle": "new-arrivals",
+        "max_products": 16,
+        "hide_sold_out": false,
+        "visible_desktop": 6,
+        "visible_mobile": 2,
+        "seconds_per_product": 7,
+        "card_style": "boutique",
+        "show_discount_badge": true,
+        "show_discount_percent": true,
         "show_rating": true,
         "show_wishlist": false,
         "show_add_to_cart": false,
@@ -118,21 +153,16 @@
         "wishlist_label": "Save for later",
         "show_view_all": true,
         "view_all_label": "View All",
-        "empty_text": "Products from this collection will appear here.",
+        "empty_text": "New products will appear here soon.",
         "background_color": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "use_all_products": false,
-        "collection_handle": "just-for-you",
-        "fallback_to_all": false,
-        "hide_sold_out": false,
-        "card_style": "compact",
-        "show_discount_percent": true
+        "padding_top": 40,
+        "padding_bottom": 24
       }
     }
   },
   "order": [
     "hero_banner",
+    "new_arrivals",
     "just_for_you_v2",
     "guarantee"
   ]

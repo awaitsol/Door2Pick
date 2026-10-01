@@ -1,0 +1,323 @@
+{%- comment -%}
+  Sits under the buy buttons on the product page: a Buy Now button, a Cash on
+  Delivery line and an estimated delivery date.
+
+  Buy Now reads the product form already on the page (selected variant and
+  quantity), adds that to the cart and goes straight to checkout. It does not
+  keep its own copy of the variant, so it always buys what the shopper picked.
+  When the Add to cart button is disabled (sold out or unavailable variant),
+  Buy Now is disabled with it.
+
+  The delivery date is worked out in the browser, not in Liquid, because
+  Shopify caches rendered pages and a server-side "today" would go stale.
+  Sundays are skipped, matching the working days couriers use.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = block.settings
+  assign product = closest.product
+-%}
+
+<d2p-purchase-extras
+  class="d2p-purchase"
+  data-min-days="{{ s.min_days }}"
+  data-max-days="{{ s.max_days }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if s.show_buy_now and product != blank -%}
+    <button type="button" class="d2p-purchase__buy" data-d2p-buy-now>
+      <span class="d2p-purchase__buy-label">{{ s.buy_now_label | default: 'Buy Now' }}</span>
+      <span class="d2p-purchase__buy-busy" aria-hidden="true"></span>
+    </button>
+    <p class="d2p-purchase__error" role="alert" hidden></p>
+  {%- endif -%}
+
+  {%- if s.show_cod or s.show_delivery -%}
+    <ul class="d2p-purchase__info" role="list">
+      {%- if s.show_cod -%}
+        <li class="d2p-purchase__row">
+          <span class="d2p-purchase__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>
+          </span>
+          <span>
+            <strong>{{ s.cod_heading }}</strong>
+            {%- if s.cod_text != blank %} <span class="d2p-purchase__muted">{{ s.cod_text }}</span>{% endif %}
+          </span>
+        </li>
+      {%- endif -%}
+
+      {%- if s.show_delivery -%}
+        {%- comment -%} Filled in by the script; hidden until it has a date to show. {%- endcomment -%}
+        <li class="d2p-purchase__row" data-d2p-delivery hidden>
+          <span class="d2p-purchase__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h11v9H3zM14 9.5h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/></svg>
+          </span>
+          <span>
+            {{ s.delivery_prefix }} <strong data-d2p-delivery-range></strong>
+            {%- if s.delivery_note != blank %} <span class="d2p-purchase__muted">{{ s.delivery_note }}</span>{% endif %}
+          </span>
+        </li>
+      {%- endif -%}
+    </ul>
+  {%- endif -%}
+</d2p-purchase-extras>
+
+{% stylesheet %}
+  .d2p-purchase {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    inline-size: 100%;
+  }
+
+  .d2p-purchase__buy {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    min-block-size: 50px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--style-border-radius-buttons-primary, 6px);
+    background: var(--d2p-gold-gradient, #c9a45c);
+    color: var(--d2p-on-gold, #0b0b0d);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+  }
+
+  .d2p-purchase__buy:hover:not(:disabled) {
+    filter: brightness(1.07);
+  }
+
+  .d2p-purchase__buy:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .d2p-purchase__buy:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .d2p-purchase__buy-busy {
+    display: none;
+    inline-size: 18px;
+    block-size: 18px;
+    border: 2px solid currentColor;
+    border-inline-end-color: transparent;
+    border-radius: 50%;
+    animation: d2p-spin 0.7s linear infinite;
+  }
+
+  .d2p-purchase__buy[aria-busy='true'] .d2p-purchase__buy-label {
+    visibility: hidden;
+  }
+
+  .d2p-purchase__buy[aria-busy='true'] .d2p-purchase__buy-busy {
+    position: absolute;
+    display: block;
+  }
+
+  @keyframes d2p-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .d2p-purchase__error {
+    margin: -6px 0 0;
+    color: var(--d2p-error, #d46a6a);
+    font-size: 0.8125rem;
+  }
+
+  .d2p-purchase__info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--d2p-border, #26262a);
+    border-radius: 10px;
+    background: var(--d2p-surface, #141416);
+    list-style: none;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .d2p-purchase__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .d2p-purchase__row[hidden] {
+    display: none;
+  }
+
+  .d2p-purchase__icon {
+    display: flex;
+    flex: 0 0 auto;
+    color: var(--d2p-gold, #c9a45c);
+  }
+
+  .d2p-purchase__icon svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
+  .d2p-purchase__muted {
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-purchase__buy {
+      transition: none;
+    }
+
+    .d2p-purchase__buy-busy {
+      animation-duration: 2s;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class D2PPurchaseExtras extends HTMLElement {
+    connectedCallback() {
+      this.buyButton = this.querySelector('[data-d2p-buy-now]');
+      this.error = this.querySelector('.d2p-purchase__error');
+      this.renderDelivery();
+
+      if (!this.buyButton) return;
+      this.buyButton.addEventListener('click', this.onBuy);
+
+      // Follow the Add to cart button's disabled state, which the theme
+      // updates whenever the shopper changes variant.
+      const addButton = this.addToCartButton();
+      if (addButton) {
+        this.syncDisabled();
+        this.observer = new MutationObserver(this.syncDisabled);
+        this.observer.observe(addButton, { attributes: true, attributeFilter: ['disabled'] });
+      }
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+      this.buyButton?.removeEventListener('click', this.onBuy);
+    }
+
+    productForm() {
+      const scope = this.closest('.shopify-section') || document;
+      return scope.querySelector('form[data-type="add-to-cart-form"]');
+    }
+
+    addToCartButton() {
+      return this.productForm()?.querySelector('[name="add"]') || null;
+    }
+
+    syncDisabled = () => {
+      const addButton = this.addToCartButton();
+      if (addButton) this.buyButton.disabled = addButton.disabled;
+    };
+
+    onBuy = async () => {
+      const form = this.productForm();
+      if (!form || this.buyButton.disabled) return;
+
+      this.buyButton.setAttribute('aria-busy', 'true');
+      this.buyButton.disabled = true;
+      this.error.hidden = true;
+
+      try {
+        const response = await fetch(`${window.Shopify?.routes?.root || '/'}cart/add.js`, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.description || data.message || 'Could not add this item.');
+        }
+        window.location.href = `${window.Shopify?.routes?.root || '/'}checkout`;
+      } catch (err) {
+        this.error.textContent = err.message;
+        this.error.hidden = false;
+        this.buyButton.removeAttribute('aria-busy');
+        this.syncDisabled();
+      }
+    };
+
+    // Adds working days (Monday to Saturday) to a date.
+    addWorkingDays(date, days) {
+      const result = new Date(date);
+      let added = 0;
+      while (added < days) {
+        result.setDate(result.getDate() + 1);
+        if (result.getDay() !== 0) added += 1;
+      }
+      return result;
+    }
+
+    renderDelivery() {
+      const row = this.querySelector('[data-d2p-delivery]');
+      const target = this.querySelector('[data-d2p-delivery-range]');
+      if (!row || !target) return;
+
+      const min = parseInt(this.dataset.minDays, 10);
+      const max = parseInt(this.dataset.maxDays, 10);
+      if (!(min > 0) || !(max >= min)) return;
+
+      const today = new Date();
+      const from = this.addWorkingDays(today, min);
+      const to = this.addWorkingDays(today, max);
+      const format = (d, withMonth) =>
+        d.toLocaleDateString('en-GB', withMonth ? { weekday: 'short', day: 'numeric', month: 'short' } : { weekday: 'short', day: 'numeric' });
+
+      const sameMonth = from.getMonth() === to.getMonth();
+      target.textContent = `${format(from, !sameMonth)} – ${format(to, true)}`;
+      row.hidden = false;
+    }
+  }
+
+  if (!customElements.get('d2p-purchase-extras')) {
+    customElements.define('d2p-purchase-extras', D2PPurchaseExtras);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Buy Now, COD & delivery",
+  "settings": [
+    { "type": "header", "content": "Buy Now" },
+    { "type": "checkbox", "id": "show_buy_now", "label": "Show Buy Now button", "default": true },
+    { "type": "text", "id": "buy_now_label", "label": "Button label", "default": "Buy Now" },
+
+    { "type": "header", "content": "Cash on Delivery" },
+    { "type": "checkbox", "id": "show_cod", "label": "Show Cash on Delivery", "default": true },
+    { "type": "text", "id": "cod_heading", "label": "Heading", "default": "Cash on Delivery available" },
+    { "type": "text", "id": "cod_text", "label": "Text", "default": "Pay when your order arrives." },
+
+    { "type": "header", "content": "Delivery estimate" },
+    { "type": "checkbox", "id": "show_delivery", "label": "Show delivery estimate", "default": true },
+    {
+      "type": "range",
+      "id": "min_days",
+      "label": "Fastest delivery",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "d",
+      "info": "Working days from today (Sundays skipped), including dispatch.",
+      "default": 3
+    },
+    { "type": "range", "id": "max_days", "label": "Slowest delivery", "min": 1, "max": 15, "step": 1, "unit": "d", "default": 7 },
+    { "type": "text", "id": "delivery_prefix", "label": "Text before date", "default": "Order now, get it by" },
+    { "type": "text", "id": "delivery_note", "label": "Note after date", "default": "Tracking sent by email." }
+  ],
+  "presets": [{ "name": "Buy Now, COD & delivery" }]
+}
+{% endschema %}

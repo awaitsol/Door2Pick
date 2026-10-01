@@ -1146,3 +1146,150 @@ main[data-template='product'] .product-details .rte ul li::before {
 :root:root[data-theme='light'] .price-facet__input::placeholder {
   color: var(--d2p-muted);
 }
+
+/* ---------- product page: savings tag ----------
+ * Rendered by snippets/price.liquid next to the sale price when the price
+ * block's "Show savings tag" is on. Green reads as a gain in either mode. */
+.d2p-savings {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 10px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--d2p-success, #4c9a6a) 18%, transparent);
+  color: var(--d2p-success, #4c9a6a);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ---------- product page: description feature list ----------
+ * The description is the only rich-text block in the product details that is
+ * not a "paragraph" preset, which is how it is told apart from the accordion
+ * text. Its bullet list becomes a "Key features" panel: a two-column grid of
+ * small tiles, each with a gold check. */
+.product-information .text-block.rte:not(.paragraph) ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 16px;
+  border: 1px solid var(--d2p-border, #26262a);
+  border-radius: 14px;
+  background: var(--d2p-surface, #141416);
+  list-style: none;
+}
+
+.product-information .text-block.rte:not(.paragraph) ul::before {
+  content: 'Key features';
+  grid-column: 1 / -1;
+  margin-block-end: 4px;
+  color: var(--d2p-gold-text, #c9a45c);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.product-information .text-block.rte:not(.paragraph) ul li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-block-size: 44px;
+  margin: 0;
+  padding: 10px 12px 10px 42px;
+  border-radius: 10px;
+  background: var(--d2p-surface-alt, #17171a);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+/* Gold disc with a dark tick drawn by ::after. */
+.product-information .text-block.rte:not(.paragraph) ul li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 12px;
+  inset-block-start: 50%;
+  inline-size: 20px;
+  block-size: 20px;
+  margin-block-start: -10px;
+  border-radius: 50%;
+  background: var(--d2p-gold-gradient, #c9a45c);
+}
+
+.product-information .text-block.rte:not(.paragraph) ul li::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 19px;
+  inset-block-start: 50%;
+  inline-size: 5px;
+  block-size: 9px;
+  margin-block-start: -6px;
+  border: solid var(--d2p-on-gold, #0b0b0d);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+:root[data-theme='light'] .product-information .text-block.rte:not(.paragraph) ul li {
+  background: var(--d2p-page, #faf8f3);
+}
+
+@media screen and (max-width: 749px) {
+  .product-information .text-block.rte:not(.paragraph) ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- product page: title ----------
+ * The theme's h3 preset is Playfair Display Bold, which is hard to read at
+ * product-title length. The title uses the sans-serif subheading font
+ * (Jost 500, already loaded) instead. */
+.product-information .text-block h1 {
+  font-family: var(--font-subheading--family);
+  font-weight: var(--font-subheading--weight, 500);
+  font-style: normal;
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+/* ---------- product page: Buy it now ----------
+ * Shopify's own Buy it now button, in the gold of the store's primary
+ * actions, so it does not read as a second plain button under Add to cart. */
+.product-information .shopify-payment-button__button--unbranded {
+  min-block-size: 50px;
+  border-radius: var(--style-border-radius-buttons-primary, 6px);
+  background: var(--d2p-gold-gradient, #c9a45c);
+  color: var(--d2p-on-gold, #0b0b0d);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-information .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+  background: var(--d2p-gold-gradient, #c9a45c);
+  filter: brightness(1.07);
+}
+
+/* ---------- collection & search grids: shared product card ----------
+ * main-collection and search-results render snippets/d2p-product-card inside
+ * the theme's own grid items, so filters, sorting and paging keep working.
+ * The card fills its grid cell so prices line up across a row. */
+.product-grid__item > .d2p-card {
+  block-size: 100%;
+}
+
+/* The grid's zoomed-out view packs many small columns: show the photo only. */
+[product-grid-view='zoom-out'] .d2p-card__body,
+[product-grid-view='zoom-out'] .d2p-card__view,
+[product-grid-view='zoom-out'] .d2p-card__badge {
+  display: none;
+}
+
+[product-grid-view='zoom-out'] .d2p-grid--boutique .d2p-card,
+.d2p-grid--boutique [product-grid-view='zoom-out'] .d2p-card {
+  padding: 4px;
+  border-radius: 10px;
+}
