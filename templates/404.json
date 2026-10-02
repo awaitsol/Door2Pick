@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "main": {
       "type": "main-404",
@@ -94,8 +95,6 @@
     },
     "d2p_discover": {
       "type": "d2p-product-grid",
-      "blocks": {},
-      "block_order": [],
       "settings": {
         "collection_handle": "",
         "use_all_products": true,
