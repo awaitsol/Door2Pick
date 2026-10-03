@@ -15,24 +15,46 @@
       chosen in theme settings takes precedence.
     {%- endcomment -%}
     {%- liquid
+      comment
+        image_url and asset_url both return a protocol-relative //cdn URL.
+        Browsers resolve that fine, but Google fetches the icon outside page
+        context and wants an absolute https URL, so one is prepended. The
+        replace guards against a leading https: that is already there.
+      endcomment
       if settings.favicon != blank
         assign favicon_32 = settings.favicon | image_url: width: 32, height: 32
         assign favicon_180 = settings.favicon | image_url: width: 180, height: 180
         assign favicon_192 = settings.favicon | image_url: width: 192, height: 192
       else
-        comment
-          asset_url returns a protocol-relative //cdn URL. Browsers resolve
-          that, but Google fetches the icon out of page context, so it wants
-          an absolute https URL.
-        endcomment
-        assign favicon_32 = 'favicon.png' | asset_url | prepend: 'https:' | replace: 'https:https:', 'https:'
+        assign favicon_32 = 'favicon.png' | asset_url
         assign favicon_180 = favicon_32
         assign favicon_192 = favicon_32
       endif
+
+      assign favicon_32 = favicon_32 | prepend: 'https:' | replace: 'https:https:', 'https:'
+      assign favicon_180 = favicon_180 | prepend: 'https:' | replace: 'https:https:', 'https:'
+      assign favicon_192 = favicon_192 | prepend: 'https:' | replace: 'https:https:', 'https:'
+      assign favicon_type = 'image/png'
     -%}
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ favicon_192 }}">
+    {%- comment -%}
+      Google fetches the icon separately from the page and caches it against
+      the URL, so a theme asset is a poor home: asset_url carries a ?v= hash
+      that changes on every push, which invalidates the cached copy each time.
+      A file uploaded in Settings > Files keeps one permanent URL, so
+      settings.favicon is strongly preferred and the asset is only a fallback.
+
+      A single unsized rel="icon" is listed as well as the sized pair: Google
+      ignores sizes and takes the first usable icon it finds, and the plain
+      declaration is the one it handles most predictably.
+    {%- endcomment -%}
+    {%- liquid
+      assign favicon_type = 'image/png'
+    -%}
+    <link rel="icon" href="{{ favicon_192 }}" type="{{ favicon_type }}">
+    <link rel="icon" type="{{ favicon_type }}" sizes="32x32" href="{{ favicon_32 }}">
+    <link rel="icon" type="{{ favicon_type }}" sizes="192x192" href="{{ favicon_192 }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ favicon_180 }}">
+    <link rel="shortcut icon" href="{{ favicon_32 }}" type="{{ favicon_type }}">
 
     {%- comment -%}
       Sets data-theme before any stylesheet loads, so the page never paints in
