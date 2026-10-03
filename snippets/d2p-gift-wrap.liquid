@@ -1,0 +1,55 @@
+{%- doc -%}
+  Gift options in the cart: a "Gift wrap this order" checkbox that adds or
+  removes the hidden Gift Wrapping product (which carries the price), and a
+  gift message saved as a cart attribute so it appears on the order.
+
+  Rendered inside snippets/cart-summary.liquid, which the theme refreshes after
+  every cart change. The behaviour lives in assets/d2p-cart-extras.js, loaded
+  on every page, because scripts inside refreshed cart HTML do not run.
+
+  @example
+  {% render 'd2p-gift-wrap' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign gift = settings.d2p_gift_product
+  assign gift_variant = gift.selected_or_first_available_variant
+  assign wrapped = false
+  assign other_items = 0
+  for item in cart.items
+    if item.variant_id == gift_variant.id
+      assign wrapped = true
+    else
+      assign other_items = other_items | plus: item.quantity
+    endif
+  endfor
+-%}
+
+{%- if settings.d2p_gift_enabled and gift_variant != blank and gift_variant.available and other_items > 0 -%}
+  <div class="d2p-gift" data-d2p-gift data-variant-id="{{ gift_variant.id }}">
+    <label class="d2p-gift__check">
+      <input type="checkbox" data-d2p-gift-toggle {% if wrapped %}checked{% endif %}>
+      <span class="d2p-gift__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1.5"/><path d="M3 12h18M12 8v13M12 8S10 3 7.5 4.2 9 8 12 8zm0 0s2-5 4.5-3.8S15 8 12 8z"/></svg>
+      </span>
+      <span class="d2p-gift__text">
+        {{ settings.d2p_gift_label | default: 'Gift wrap this order' }}
+        <strong>(+{{ gift_variant.price | money_without_trailing_zeros }})</strong>
+      </span>
+    </label>
+
+    <label class="d2p-gift__msg-label" for="d2p-gift-msg-{{ section_id | default: 'cart' }}">
+      {{ settings.d2p_gift_message_label | default: 'Gift message (optional)' }}
+    </label>
+    <textarea
+      id="d2p-gift-msg-{{ section_id | default: 'cart' }}"
+      class="d2p-gift__msg"
+      rows="2"
+      maxlength="200"
+      placeholder="e.g. Happy Eid! With love, Sara"
+      data-d2p-gift-message
+    >{{ cart.attributes['Gift message'] }}</textarea>
+    <p class="d2p-gift__status" role="status" aria-live="polite" data-d2p-gift-status></p>
+  </div>
+
+{%- endif -%}

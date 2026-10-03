@@ -197,7 +197,7 @@
               "type": "variant-picker",
               "settings": {
                 "variant_style": "buttons",
-                "show_swatches": false,
+                "show_swatches": true,
                 "option_label_text_color": "",
                 "variant_style_class": "default",
                 "custom_variant_background": "{{ settings.color_palette.background }}",
@@ -421,34 +421,13 @@
                     "width": 22
                   },
                   "blocks": {
-                    "f_care_b": {
-                      "type": "text",
-                      "settings": {
-                        "text": "<p>Store in a dry place away from direct sunlight. Clean with a soft dry cloth; avoid solvents and abrasive cleaners.</p>",
-                        "width": "fit-content",
-                        "max_width": "none",
-                        "alignment": "left",
-                        "type_preset": "paragraph",
-                        "font": "var(--font-body--family)",
-                        "font_size": "0.875rem",
-                        "line_height": "normal",
-                        "letter_spacing": "normal",
-                        "case": "none",
-                        "wrap": "pretty",
-                        "text_color": "",
-                        "background": false,
-                        "background_color": "#00000000",
-                        "corner_radius": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 0,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0
-                      },
-                      "blocks": {}
+                    "f_care_d2p": {
+                      "type": "d2p-care-text",
+                      "settings": {}
                     }
                   },
                   "block_order": [
-                    "f_care_b"
+                    "f_care_d2p"
                   ]
                 }
               },
@@ -472,15 +451,48 @@
                 "delivery_prefix": "Order now, get it by",
                 "delivery_note": "Tracking sent by email."
               }
+            },
+            "d2p_crumbs": {
+              "type": "d2p-breadcrumbs",
+              "settings": {}
+            },
+            "d2p_size": {
+              "type": "d2p-size-guide",
+              "settings": {
+                "link_label": "Ring size guide",
+                "note": ""
+              }
+            },
+            "d2p_wish": {
+              "type": "d2p-wishlist-button",
+              "settings": {
+                "label_add": "Add to wishlist",
+                "label_saved": "Saved to wishlist"
+              }
+            },
+            "d2p_pay": {
+              "type": "d2p-payment-badges",
+              "settings": {
+                "heading": "We accept",
+                "show_cod": true,
+                "show_cards": true,
+                "show_jazzcash": true,
+                "show_easypaisa": true,
+                "show_bank": true
+              }
             }
           },
           "block_order": [
+            "d2p_crumbs",
             "group_icgrde",
             "divider_VJhene",
             "variant_picker_R3rGDr",
+            "d2p_size",
             "product_inventory_d2p",
             "buy_buttons_eYQEYi",
             "d2p_purchase",
+            "d2p_wish",
+            "d2p_pay",
             "text_aEtTtq",
             "product_faq_d2p"
           ]
@@ -583,7 +595,7 @@
         "show_discount_badge": true,
         "show_discount_percent": true,
         "show_rating": true,
-        "show_wishlist": false,
+        "show_wishlist": true,
         "show_add_to_cart": false,
         "add_to_cart_label": "Add to Cart",
         "wishlist_label": "Save for later",
@@ -591,13 +603,48 @@
         "padding_top": 48,
         "padding_bottom": 48
       }
+    },
+    "d2p_recent": {
+      "type": "d2p-recently-viewed",
+      "settings": {
+        "heading": "Recently Viewed",
+        "max_products": 4,
+        "min_products": 2,
+        "columns": 4,
+        "clear_label": "Clear history",
+        "background_color": "",
+        "padding_top": 24,
+        "padding_bottom": 48
+      }
+    },
+    "d2p_look": {
+      "type": "d2p-complete-look",
+      "settings": {
+        "heading": "Complete the Look",
+        "offer_text": "Buy any 3 products, get 10% off. Applied automatically at checkout.",
+        "collection": "jewellery",
+        "max_products": 4,
+        "card_style": "boutique",
+        "show_discount_badge": true,
+        "show_discount_percent": true,
+        "show_rating": true,
+        "show_wishlist": true,
+        "show_add_to_cart": true,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "padding_top": 24,
+        "padding_bottom": 32,
+        "heading_other": "Pairs Well With"
+      }
     }
   },
   "order": [
     "main",
+    "d2p_look",
     "d2p_flash",
     "d2p_features",
     "d2p_reviews",
-    "d2p_recs"
+    "d2p_recs",
+    "d2p_recent"
   ]
 }

@@ -105,7 +105,7 @@
         "columns": 4,
         "show_discount_badge": true,
         "show_rating": true,
-        "show_wishlist": false,
+        "show_wishlist": true,
         "card_style": "boutique",
         "show_add_to_cart": false,
         "show_discount_percent": true,

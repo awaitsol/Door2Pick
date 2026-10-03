@@ -1,0 +1,343 @@
+{%- comment -%}
+  "Watch in Action": a swipeable row of product videos.
+
+  Lists every product (up to the limit) that has a video uploaded to Shopify,
+  so new videos appear without editing the section. Each card plays its video
+  muted and looping while it is on screen and pauses when scrolled away, so
+  only the visible videos download and play. Tapping a card opens the product.
+  Visitors who ask for reduced motion see the still poster with a play badge.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign source = s.collection | default: collections.all
+  assign found = 0
+-%}
+
+{%- capture cards -%}
+  {%- paginate source.products by 250 -%}
+    {%- for product in source.products -%}
+      {%- if found >= s.max_videos -%}{%- break -%}{%- endif -%}
+      {%- assign video = product.media | where: 'media_type', 'video' | first -%}
+      {%- if video == blank or product.available == false -%}{%- continue -%}{%- endif -%}
+      {%- liquid
+        comment
+          Pick the smallest MP4 that is at least 480 px tall: sharp enough for a
+          card, light enough for mobile data.
+        endcomment
+        assign mp4s = video.sources | where: 'format', 'mp4' | sort: 'height'
+        assign src = mp4s.last
+        for m in mp4s
+          if m.height >= 480
+            assign src = m
+            break
+          endif
+        endfor
+        assign found = found | plus: 1
+        assign variant = product.selected_or_first_available_variant
+      -%}
+      <li class="d2p-vid__item">
+        <a class="d2p-vid__card" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+          <video
+            class="d2p-vid__video"
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster="{{ video.preview_image | image_url: width: 480 }}"
+            data-src="{{ src.url }}"
+            aria-hidden="true"
+          ></video>
+          <span class="d2p-vid__play" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+          </span>
+          <span class="d2p-vid__info">
+            <span class="d2p-vid__title">{{ product.title }}</span>
+            <span class="d2p-vid__meta">
+              <span class="d2p-vid__price">{{ variant.price | money_without_trailing_zeros }}</span>
+              {%- if variant.compare_at_price > variant.price -%}
+                <s class="d2p-vid__compare">{{ variant.compare_at_price | money_without_trailing_zeros }}</s>
+              {%- endif -%}
+              <span class="d2p-vid__shop">{{ s.button_label }} →</span>
+            </span>
+          </span>
+        </a>
+      </li>
+    {%- endfor -%}
+  {%- endpaginate -%}
+{%- endcapture -%}
+
+{%- if found > 0 -%}
+  <div class="section-background"></div>
+  <d2p-video-showcase
+    class="d2p-vid"
+    style="
+      {% if s.background_color != blank %}--d2p-vid-bg: {{ s.background_color }};{% endif %}
+      --d2p-vid-visible: {{ s.visible_desktop }};
+      padding-block-start: {{ s.padding_top }}px;
+      padding-block-end: {{ s.padding_bottom }}px;
+    "
+  >
+    <div class="d2p-vid__inner">
+      <div class="d2p-grid__header">
+        <div class="d2p-grid__titles">
+          <h2 class="d2p-grid__heading">{{ s.heading }}</h2>
+          {%- if s.subheading != blank -%}
+            <p class="d2p-grid__subheading">{{ s.subheading }}</p>
+          {%- endif -%}
+        </div>
+        {%- if found > s.visible_desktop -%}
+          <div class="d2p-grid__arrows">
+            <button class="d2p-grid__arrow" type="button" data-d2p-vid-scroll="prev" aria-label="{{ 'accessibility.slideshow_previous' | t }}">
+              {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+            </button>
+            <button class="d2p-grid__arrow" type="button" data-d2p-vid-scroll="next" aria-label="{{ 'accessibility.slideshow_next' | t }}">
+              {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+      <ul class="d2p-vid__list" role="list" data-d2p-vid-track>
+        {{ cards }}
+      </ul>
+    </div>
+  </d2p-video-showcase>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-vid {
+    display: block;
+    background: var(--d2p-vid-bg, var(--d2p-page));
+  }
+
+  .d2p-vid__inner {
+    max-inline-size: var(--page-max-width, 1400px);
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .d2p-vid__list {
+    --gap: 14px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - (var(--d2p-vid-visible) - 1) * var(--gap)) / var(--d2p-vid-visible));
+    gap: var(--gap);
+    margin: 0;
+    padding: 0 0 6px;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .d2p-vid__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .d2p-vid__item {
+    scroll-snap-align: start;
+  }
+
+  .d2p-vid__card {
+    position: relative;
+    display: block;
+    aspect-ratio: 9 / 14;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--d2p-surface-alt, #17171a);
+    color: #fff;
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  .d2p-vid__video {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .d2p-vid__card:hover .d2p-vid__video {
+    transform: scale(1.04);
+  }
+
+  /* Dark fade at the bottom so the name and price read over any video. */
+  .d2p-vid__card::after {
+    content: '';
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 82%), transparent);
+    pointer-events: none;
+  }
+
+  .d2p-vid__play {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 12px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 32px;
+    block-size: 32px;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 45%);
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+  }
+
+  .d2p-vid__play svg {
+    inline-size: 16px;
+    block-size: 16px;
+  }
+
+  /* Hide the play badge once the video is actually playing. */
+  .d2p-vid__card[data-playing] .d2p-vid__play {
+    opacity: 0;
+  }
+
+  .d2p-vid__info {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+  }
+
+  .d2p-vid__title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .d2p-vid__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    font-size: 0.875rem;
+  }
+
+  .d2p-vid__price {
+    font-weight: 700;
+    color: #e3c989;
+  }
+
+  .d2p-vid__compare {
+    opacity: 0.7;
+    font-size: 0.8125rem;
+  }
+
+  .d2p-vid__shop {
+    margin-inline-start: auto;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--d2p-gold-gradient, #c9a45c);
+    color: #0b0b0d;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-vid__list {
+      grid-auto-columns: calc((100% - 2 * var(--gap)) / 2.6);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-vid__inner {
+      padding-inline: 16px;
+    }
+
+    .d2p-vid__list {
+      --gap: 10px;
+      grid-auto-columns: 62%;
+    }
+
+    .d2p-vid .d2p-grid__arrows {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-vid__video {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class D2PVideoShowcase extends HTMLElement {
+    connectedCallback() {
+      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.track = this.querySelector('[data-d2p-vid-track]');
+      this.addEventListener('click', this.onArrow);
+      if (this.reduced) return; // posters only
+
+      // Play only what is on screen; the video file loads the first time.
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const video = entry.target;
+            if (entry.isIntersecting) {
+              if (!video.src && video.dataset.src) video.src = video.dataset.src;
+              const p = video.play();
+              if (p) p.then(() => video.closest('.d2p-vid__card')?.setAttribute('data-playing', '')).catch(() => {});
+            } else if (!video.paused) {
+              video.pause();
+              video.closest('.d2p-vid__card')?.removeAttribute('data-playing');
+            }
+          }
+        },
+        { threshold: 0.5 }
+      );
+      this.querySelectorAll('.d2p-vid__video').forEach((v) => this.observer.observe(v));
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+      this.removeEventListener('click', this.onArrow);
+    }
+
+    onArrow = (event) => {
+      const btn = event.target.closest('[data-d2p-vid-scroll]');
+      if (!btn) return;
+      const card = this.track.querySelector('.d2p-vid__item');
+      const step = card ? card.getBoundingClientRect().width + 14 : 300;
+      this.track.scrollBy({ left: btn.dataset.d2pVidScroll === 'next' ? step * 2 : -step * 2, behavior: 'smooth' });
+    };
+  }
+
+  if (!customElements.get('d2p-video-showcase')) {
+    customElements.define('d2p-video-showcase', D2PVideoShowcase);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Watch in Action",
+  "tag": "section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Watch in Action" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "See our products at work. Tap a video to shop it." },
+    { "type": "collection", "id": "collection", "label": "Only products from", "info": "Leave empty to use every product that has a video." },
+    { "type": "range", "id": "max_videos", "label": "Most videos", "min": 2, "max": 20, "step": 1, "default": 12 },
+    { "type": "range", "id": "visible_desktop", "label": "Videos visible on desktop", "min": 3, "max": 6, "step": 1, "default": 5 },
+    { "type": "text", "id": "button_label", "label": "Card button", "default": "Shop" },
+    { "type": "color", "id": "background_color", "label": "Background color" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "presets": [{ "name": "Watch in Action" }]
+}
+{% endschema %}

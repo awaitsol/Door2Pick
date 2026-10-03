@@ -1,0 +1,49 @@
+{%- doc -%}
+  "Add Rs. X more for FREE delivery" progress bar for the cart.
+
+  Rendered at the top of snippets/cart-summary.liquid, which the theme morphs
+  after every cart change, so the amount and bar update without a reload.
+  The threshold is a theme setting (Free delivery bar) in rupees; cart totals
+  are in paisa, so it is multiplied by 100 before comparing.
+
+  @example
+  {% render 'd2p-free-shipping-bar' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign threshold = settings.d2p_free_ship_threshold | times: 100
+  assign total = cart.total_price
+-%}
+
+{%- if settings.d2p_free_ship_enabled and threshold > 0 and cart.item_count > 0 -%}
+  {%- liquid
+    assign remaining = threshold | minus: total
+    assign progress = total | times: 100 | divided_by: threshold
+    if progress > 100
+      assign progress = 100
+    endif
+  -%}
+  <div class="d2p-freeship{% if remaining <= 0 %} d2p-freeship--done{% endif %}">
+    <p class="d2p-freeship__text">
+      <span class="d2p-freeship__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h11v9H3zM14 9.5h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/></svg>
+      </span>
+      {%- if remaining > 0 -%}
+        {%- capture amount -%}<strong>{{ remaining | money_without_trailing_zeros }}</strong>{%- endcapture -%}
+        <span>{{ settings.d2p_free_ship_progress | default: 'Add [amount] more for FREE delivery' | replace: '[amount]', amount }}</span>
+      {%- else -%}
+        <span><strong>{{ settings.d2p_free_ship_done | default: "You've unlocked FREE delivery!" }}</strong></span>
+      {%- endif -%}
+    </p>
+    <div
+      class="d2p-freeship__track"
+      role="progressbar"
+      aria-label="Progress towards free delivery"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="{{ progress }}"
+    >
+      <span class="d2p-freeship__fill" style="inline-size: {{ progress }}%;"></span>
+    </div>
+  </div>
+{%- endif -%}

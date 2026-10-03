@@ -1293,3 +1293,150 @@ main[data-template='product'] .product-details .rte ul li::before {
   padding: 4px;
   border-radius: 10px;
 }
+
+/* ---------- cart: free delivery progress bar ----------
+ * snippets/d2p-free-shipping-bar.liquid, at the top of the cart summary in
+ * the drawer and on the cart page. */
+.d2p-freeship {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-block-end: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--d2p-border, #26262a);
+  border-radius: 10px;
+  background: var(--d2p-surface-alt, #17171a);
+}
+
+.d2p-freeship__text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--d2p-text, #ede7db);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.d2p-freeship__text strong {
+  color: var(--d2p-gold-text, #c9a45c);
+}
+
+.d2p-freeship__icon {
+  display: flex;
+  flex: 0 0 auto;
+  color: var(--d2p-gold, #c9a45c);
+}
+
+.d2p-freeship__icon svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.d2p-freeship__track {
+  position: relative;
+  block-size: 6px;
+  border-radius: 999px;
+  background: var(--d2p-border, #26262a);
+  overflow: hidden;
+}
+
+.d2p-freeship__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: var(--d2p-gold-gradient, #c9a45c);
+  transition: inline-size 0.5s ease;
+}
+
+.d2p-freeship--done .d2p-freeship__text strong,
+.d2p-freeship--done .d2p-freeship__icon {
+  color: var(--d2p-success, #4c9a6a);
+}
+
+.d2p-freeship--done .d2p-freeship__fill {
+  background: var(--d2p-success, #4c9a6a);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d2p-freeship__fill {
+    transition: none;
+  }
+}
+
+/* ---------- cart: gift options ----------
+ * snippets/d2p-gift-wrap.liquid, under the free delivery bar. */
+.d2p-gift {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-block-end: 14px;
+  padding: 12px 14px;
+  border: 1px dashed color-mix(in srgb, var(--d2p-gold, #c9a45c) 55%, transparent);
+  border-radius: 10px;
+}
+
+.d2p-gift__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--d2p-text, #ede7db);
+}
+
+.d2p-gift__check input {
+  inline-size: 18px;
+  block-size: 18px;
+  accent-color: var(--d2p-gold, #c9a45c);
+}
+
+.d2p-gift__icon {
+  display: flex;
+  color: var(--d2p-gold, #c9a45c);
+}
+
+.d2p-gift__icon svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.d2p-gift__msg-label {
+  font-size: 0.75rem;
+  color: var(--d2p-muted, #a9a296);
+}
+
+.d2p-gift__msg {
+  inline-size: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--d2p-border, #26262a);
+  border-radius: 8px;
+  background: var(--d2p-input, #141416);
+  color: var(--d2p-text, #ede7db);
+  font: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+.d2p-gift__status {
+  margin: 0;
+  min-block-size: 1em;
+  font-size: 0.75rem;
+  color: var(--d2p-success, #4c9a6a);
+}
+
+/* ---------- product page: option labels ----------
+ * The theme draws the option label and the selected colour name from
+ * --color-foreground-subdued, which is derived from the dark palette and turns
+ * near-white on the light page. Both use the mode tokens instead; the selected
+ * value is gold, which each mode keeps legible (#8A5F12 on white). */
+.product-information .variant-option legend {
+  color: var(--d2p-text, #ede7db);
+  font-weight: 600;
+}
+
+.product-information .variant-option__swatch-value {
+  color: var(--d2p-gold-text, #c9a45c);
+  font-weight: 600;
+}

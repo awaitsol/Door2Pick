@@ -16,6 +16,7 @@
 {%- liquid
   assign s = block.settings
   assign product = closest.product
+  assign wa_digits = settings.whatsapp_number | default: '' | strip | remove: '+' | remove: ' ' | remove: '-' | remove: '(' | remove: ')'
 -%}
 
 <d2p-purchase-extras
@@ -30,6 +31,47 @@
       <span class="d2p-purchase__buy-busy" aria-hidden="true"></span>
     </button>
     <p class="d2p-purchase__error" role="alert" hidden></p>
+  {%- endif -%}
+
+  {%- comment -%}
+    Order on WhatsApp: opens a chat with the product, chosen option, quantity,
+    price and link already typed. The link below works without JavaScript for
+    the default option; the script rewrites it at click time for whatever the
+    shopper has selected.
+  {%- endcomment -%}
+  {%- if s.show_whatsapp and wa_digits != blank and product != blank -%}
+    {%- liquid
+      assign v = product.selected_or_first_available_variant
+      assign wa_text = s.whatsapp_intro | append: ' ' | append: product.title
+      unless product.has_only_default_variant
+        assign wa_text = wa_text | append: ' (' | append: v.title | append: ')'
+      endunless
+      assign wa_price = v.price | money_without_trailing_zeros
+      assign wa_text = wa_text | append: ' - ' | append: wa_price | append: ' ' | append: shop.url | append: product.url
+    -%}
+    <a
+      class="d2p-purchase__whatsapp"
+      href="https://wa.me/{{ wa_digits }}?text={{ wa_text | url_encode | replace: '+', '%20' }}"
+      target="_blank"
+      rel="noopener"
+      data-d2p-whatsapp
+      data-number="{{ wa_digits }}"
+      data-intro="{{ s.whatsapp_intro | escape }}"
+      data-title="{{ product.title | escape }}"
+      data-url="{{ shop.url }}{{ product.url }}"
+    >
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+        {%- render 'icon', icon: 'whatsapp' -%}
+      </svg>
+      <span>{{ s.whatsapp_label | default: 'Order on WhatsApp' }}</span>
+    </a>
+    <script type="application/json" data-d2p-variants>
+      {
+        {%- for variant in product.variants -%}
+          "{{ variant.id }}": { "title": {{ variant.title | json }}, "price": {{ variant.price | money_without_trailing_zeros | json }}, "default": {{ product.has_only_default_variant | json }} }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      }
+    </script>
   {%- endif -%}
 
   {%- if s.show_cod or s.show_delivery -%}
@@ -135,6 +177,42 @@
     font-size: 0.8125rem;
   }
 
+  .d2p-purchase__whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    inline-size: 100%;
+    min-block-size: 48px;
+    padding: 11px 20px;
+    border: 1px solid #25d366;
+    border-radius: var(--style-border-radius-buttons-primary, 6px);
+    background: transparent;
+    color: #1fa855;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  :root:not([data-theme='light']) .d2p-purchase__whatsapp {
+    color: #3ddc78;
+  }
+
+  .d2p-purchase__whatsapp:hover {
+    background: #25d366;
+    color: #0b0b0d;
+  }
+
+  :root:not([data-theme='light']) .d2p-purchase__whatsapp:hover {
+    color: #0b0b0d;
+  }
+
+  .d2p-purchase__whatsapp svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
   .d2p-purchase__info {
     display: flex;
     flex-direction: column;
@@ -192,6 +270,9 @@
       this.error = this.querySelector('.d2p-purchase__error');
       this.renderDelivery();
 
+      this.whatsapp = this.querySelector('[data-d2p-whatsapp]');
+      this.whatsapp?.addEventListener('click', this.onWhatsApp);
+
       if (!this.buyButton) return;
       this.buyButton.addEventListener('click', this.onBuy);
 
@@ -206,6 +287,7 @@
     }
 
     disconnectedCallback() {
+      this.whatsapp?.removeEventListener('click', this.onWhatsApp);
       this.observer?.disconnect();
       this.buyButton?.removeEventListener('click', this.onBuy);
     }
@@ -251,6 +333,29 @@
       }
     };
 
+    // Rewrites the WhatsApp link for the option and quantity picked right now.
+    onWhatsApp = () => {
+      const link = this.whatsapp;
+      const form = this.productForm();
+      let variants = {};
+      try {
+        variants = JSON.parse(this.querySelector('[data-d2p-variants]')?.textContent || '{}');
+      } catch (err) {
+        return; // keep the default link
+      }
+      const id = form?.querySelector('[name="id"]')?.value;
+      const variant = variants[id];
+      if (!variant) return;
+
+      const qty = parseInt(form.querySelector('[name="quantity"]')?.value || '1', 10) || 1;
+      const { intro, title, url, number } = link.dataset;
+      let text = `${intro} ${title}`;
+      if (!variant.default) text += ` (${variant.title})`;
+      if (qty > 1) text += ` x${qty}`;
+      text += ` - ${variant.price} ${url}?variant=${id}`;
+      link.href = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+    };
+
     // Adds working days (Monday to Saturday) to a date.
     addWorkingDays(date, days) {
       const result = new Date(date);
@@ -292,17 +397,78 @@
 {
   "name": "Buy Now, COD & delivery",
   "settings": [
-    { "type": "header", "content": "Buy Now" },
-    { "type": "checkbox", "id": "show_buy_now", "label": "Show Buy Now button", "default": true },
-    { "type": "text", "id": "buy_now_label", "label": "Button label", "default": "Buy Now" },
-
-    { "type": "header", "content": "Cash on Delivery" },
-    { "type": "checkbox", "id": "show_cod", "label": "Show Cash on Delivery", "default": true },
-    { "type": "text", "id": "cod_heading", "label": "Heading", "default": "Cash on Delivery available" },
-    { "type": "text", "id": "cod_text", "label": "Text", "default": "Pay when your order arrives." },
-
-    { "type": "header", "content": "Delivery estimate" },
-    { "type": "checkbox", "id": "show_delivery", "label": "Show delivery estimate", "default": true },
+    {
+      "type": "header",
+      "content": "Buy Now"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Show Buy Now button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "buy_now_label",
+      "label": "Button label",
+      "default": "Buy Now"
+    },
+    {
+      "type": "header",
+      "content": "Order on WhatsApp"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_whatsapp",
+      "label": "Show Order on WhatsApp",
+      "info": "Uses the number in Theme settings > WhatsApp.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_label",
+      "label": "Button label",
+      "default": "Order on WhatsApp"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_intro",
+      "label": "Message start",
+      "info": "Followed by the product, option, quantity, price and link.",
+      "default": "Hi Door2Pick, I'd like to order:"
+    },
+    {
+      "type": "header",
+      "content": "Cash on Delivery"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cod",
+      "label": "Show Cash on Delivery",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cod_heading",
+      "label": "Heading",
+      "default": "Cash on Delivery available"
+    },
+    {
+      "type": "text",
+      "id": "cod_text",
+      "label": "Text",
+      "default": "Pay when your order arrives."
+    },
+    {
+      "type": "header",
+      "content": "Delivery estimate"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_delivery",
+      "label": "Show delivery estimate",
+      "default": true
+    },
     {
       "type": "range",
       "id": "min_days",
@@ -314,10 +480,33 @@
       "info": "Working days from today (Sundays skipped), including dispatch.",
       "default": 3
     },
-    { "type": "range", "id": "max_days", "label": "Slowest delivery", "min": 1, "max": 15, "step": 1, "unit": "d", "default": 7 },
-    { "type": "text", "id": "delivery_prefix", "label": "Text before date", "default": "Order now, get it by" },
-    { "type": "text", "id": "delivery_note", "label": "Note after date", "default": "Tracking sent by email." }
+    {
+      "type": "range",
+      "id": "max_days",
+      "label": "Slowest delivery",
+      "min": 1,
+      "max": 15,
+      "step": 1,
+      "unit": "d",
+      "default": 7
+    },
+    {
+      "type": "text",
+      "id": "delivery_prefix",
+      "label": "Text before date",
+      "default": "Order now, get it by"
+    },
+    {
+      "type": "text",
+      "id": "delivery_note",
+      "label": "Note after date",
+      "default": "Tracking sent by email."
+    }
   ],
-  "presets": [{ "name": "Buy Now, COD & delivery" }]
+  "presets": [
+    {
+      "name": "Buy Now, COD & delivery"
+    }
+  ]
 }
 {% endschema %}

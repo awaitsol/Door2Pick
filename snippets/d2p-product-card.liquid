@@ -85,7 +85,7 @@
     {%- endif -%}
 
     {%- if s.show_wishlist -%}
-      <button class="d2p-card__wish" type="button" aria-pressed="false" aria-label="{{ s.wishlist_label | default: 'Save for later' }}" data-d2p-wish>
+      <button class="d2p-card__wish" type="button" aria-pressed="false" aria-label="{{ s.wishlist_label | default: 'Save for later' }}" data-d2p-wish data-handle="{{ product.handle }}">
         {%- render 'd2p-icon', name: 'heart' -%}
       </button>
     {%- endif -%}

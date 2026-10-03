@@ -64,6 +64,35 @@
   {%- assign products = products | where: 'available' -%}
 {%- endif -%}
 
+{%- comment -%}
+  Top deals: keep only products on sale, biggest saving first. Liquid cannot
+  sort by a computed value, so each sale product gets a text key of
+  "(9999 - saving in tenths of a percent)|index" — zero-padded so text order
+  is number order — and the products are picked back out of the pool in key
+  order. Tenths keep 35.6% (shown as 36%) ahead of 35.4% (shown as 35%).
+{%- endcomment -%}
+{%- if s.deals_only -%}
+  {%- assign pool = products | sort: 'title' -%}
+  {%- assign keys = '' -%}
+  {%- for p in pool limit: 50 -%}
+    {%- assign v = p.selected_or_first_available_variant | default: p.variants.first -%}
+    {%- if v.compare_at_price > v.price -%}
+      {%- assign pct = v.compare_at_price | minus: v.price | times: 1000 | divided_by: v.compare_at_price -%}
+      {%- assign rank = 9999 | minus: pct | prepend: '000' | slice: -4, 4 -%}
+      {%- assign idx = forloop.index0 | prepend: '00' | slice: -3, 3 -%}
+      {%- assign keys = keys | append: rank | append: '|' | append: idx | append: ',' -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- assign sorted_keys = keys | split: ',' | sort -%}
+  {%- assign deals = '' | split: '' -%}
+  {%- for key in sorted_keys -%}
+    {%- assign i = key | split: '|' | last | plus: 0 -%}
+    {%- assign one = pool | slice: i, 1 -%}
+    {%- assign deals = deals | concat: one -%}
+  {%- endfor -%}
+  {%- assign products = deals -%}
+{%- endif -%}
+
 {%- assign limit = s.max_products -%}
 
 {%- comment -%}
@@ -74,7 +103,7 @@
 {%- endcomment -%}
 <div class="section-background"></div>
 
-<div class="d2p-grid d2p-grid--{{ s.card_style | default: 'panel' }}" style="
+<div{% if s.anchor != blank %} id="{{ s.anchor | handleize }}"{% endif %} class="d2p-grid d2p-grid--{{ s.card_style | default: 'panel' }}" style="
   {% if s.background_color != blank %}--d2p-grid-bg: {{ s.background_color }};{% endif %}
   --d2p-grid-columns: {{ s.columns }};
   padding-block-start: {{ s.padding_top }}px;
@@ -856,14 +885,7 @@
       track.scrollBy({ left: step * direction * 2, behavior: 'smooth' });
     });
 
-    // The heart is a local visual toggle only: there is no wishlist backend,
-    // so it must not imply the choice is stored anywhere.
-    document.addEventListener('click', (event) => {
-      const wish = event.target.closest('[data-d2p-wish]');
-      if (!wish) return;
-      const pressed = wish.getAttribute('aria-pressed') === 'true';
-      wish.setAttribute('aria-pressed', pressed ? 'false' : 'true');
-    });
+    // Hearts are handled by assets/d2p-wishlist.js, which saves them.
   })();
 {% endjavascript %}
 
@@ -871,9 +893,18 @@
 {
   "name": "Product grid",
   "tag": "section",
-  "disabled_on": { "groups": ["header", "footer"] },
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
   "settings": [
-    { "type": "collection", "id": "collection", "label": "Collection" },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
     {
       "type": "text",
       "id": "collection_handle",
@@ -894,27 +925,86 @@
       "info": "Keeps the row populated if the collection is missing or empty.",
       "default": true
     },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Trending Products" },
-    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Popular picks everyone's loving right now." },
-    { "type": "range", "id": "max_products", "label": "Products", "min": 2, "max": 48, "step": 1, "default": 5 },
-    { "type": "range", "id": "columns", "label": "Columns", "min": 2, "max": 6, "step": 1, "default": 5 },
-
-    { "type": "header", "content": "Card" },
-    { "type": "checkbox", "id": "show_discount_badge", "label": "Show discount badge", "default": true },
-    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "info": "Needs a reviews app that writes the reviews.rating metafield.", "default": true },
-    { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist heart", "info": "Visual only — nothing is saved.", "default": true },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Trending Products"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Popular picks everyone's loving right now."
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Products",
+      "min": 2,
+      "max": 48,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discount_badge",
+      "label": "Show discount badge",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show rating",
+      "info": "Needs a reviews app that writes the reviews.rating metafield.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist heart",
+      "info": "Saves the product to the shopper's wishlist in their browser.",
+      "default": true
+    },
     {
       "type": "select",
       "id": "card_style",
       "label": "Card style",
       "options": [
-        { "value": "panel", "label": "Panel — bordered card" },
-        { "value": "compact", "label": "Compact — marketplace grid" },
-        { "value": "boutique", "label": "Boutique — premium card" }
+        {
+          "value": "panel",
+          "label": "Panel — bordered card"
+        },
+        {
+          "value": "compact",
+          "label": "Compact — marketplace grid"
+        },
+        {
+          "value": "boutique",
+          "label": "Boutique — premium card"
+        }
       ],
       "default": "panel"
     },
-    { "type": "checkbox", "id": "show_add_to_cart", "label": "Show Add to Cart", "default": true },
+    {
+      "type": "checkbox",
+      "id": "show_add_to_cart",
+      "label": "Show Add to Cart",
+      "default": true
+    },
     {
       "type": "checkbox",
       "id": "show_discount_percent",
@@ -928,19 +1018,87 @@
       "info": "Shows only products that can be bought. The row may show fewer items than the limit above.",
       "default": false
     },
-    { "type": "text", "id": "add_to_cart_label", "label": "Add to Cart label", "default": "Add to Cart" },
-    { "type": "text", "id": "wishlist_label", "label": "Wishlist button description", "default": "Save for later" },
-
-    { "type": "header", "content": "Header" },
-    { "type": "checkbox", "id": "show_view_all", "label": "Show View All", "default": true },
-    { "type": "text", "id": "view_all_label", "label": "View All label", "default": "View All" },
-    { "type": "text", "id": "empty_text", "label": "Empty state text", "default": "Products from this collection will appear here." },
-
-    { "type": "header", "content": "Layout" },
-    { "type": "color", "id": "background_color", "label": "Background" },
-    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
-    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 }
+    {
+      "type": "checkbox",
+      "id": "deals_only",
+      "label": "Top deals",
+      "info": "Shows only products on sale, biggest discount first.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_label",
+      "label": "Add to Cart label",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "wishlist_label",
+      "label": "Wishlist button description",
+      "default": "Save for later"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View All label",
+      "default": "View All"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty state text",
+      "default": "Products from this collection will appear here."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump to this section, e.g. top-deals for /#top-deals."
+    }
   ],
-  "presets": [{ "name": "Product grid" }]
+  "presets": [
+    {
+      "name": "Product grid"
+    }
+  ]
 }
 {% endschema %}

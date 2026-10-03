@@ -2,9 +2,11 @@
   Circular category icons with labels underneath — the quick-jump row that
   sits directly beneath the hero.
 
-  Each block takes an image (an uploaded picture, as in the design) or falls
-  back to one of the theme's own line icons, so the row is usable before any
-  category artwork exists.
+  Each block takes an image (an uploaded picture, as in the design). With no
+  image it uses the picked collection's image, then the collection's first
+  product photo, then one of the theme's own line icons — so the row works
+  before any category artwork exists. The label and link also default to the
+  collection's title and page.
 {%- endcomment -%}
 
 {%- liquid
@@ -25,12 +27,21 @@
 
       <ul class="d2p-cats__list">
         {%- for block in items -%}
+          {%- liquid
+            assign cat = block.settings.collection
+            assign cat_image = block.settings.image
+            if cat_image == blank and cat != blank
+              assign cat_image = cat.featured_image | default: cat.products.first.featured_image
+            endif
+            assign cat_label = block.settings.label | default: cat.title
+            assign cat_link = block.settings.link | default: cat.url
+          -%}
           <li class="d2p-cats__item" {{ block.shopify_attributes }}>
-            <a class="d2p-cats__link" href="{{ block.settings.link }}">
-              <span class="d2p-cats__ring">
-                {%- if block.settings.image != blank -%}
+            <a class="d2p-cats__link" href="{{ cat_link }}">
+              <span class="d2p-cats__ring{% if cat_image != blank %} d2p-cats__ring--photo{% endif %}">
+                {%- if cat_image != blank -%}
                   {{
-                    block.settings.image
+                    cat_image
                     | image_url: width: 240
                     | image_tag: class: 'd2p-cats__image', alt: '', widths: '80, 120, 160, 240', loading: 'lazy'
                   }}
@@ -40,7 +51,7 @@
                   </span>
                 {%- endif -%}
               </span>
-              <span class="d2p-cats__label">{{ block.settings.label }}</span>
+              <span class="d2p-cats__label">{{ cat_label }}</span>
             </a>
           </li>
         {%- endfor -%}
@@ -120,6 +131,18 @@
     object-fit: cover;
   }
 
+  /* Photo circles get a soft panel behind them and a double gold ring, so
+     product shots with white backgrounds still read as a circle. */
+  .d2p-cats__ring--photo {
+    padding: 3px;
+    background: var(--d2p-surface-alt, #17171a);
+    box-shadow: inset 0 0 0 3px var(--d2p-page, #0b0b0d);
+  }
+
+  .d2p-cats__ring--photo .d2p-cats__image {
+    border-radius: 50%;
+  }
+
   .d2p-cats__icon {
     color: var(--d2p-gold, #c9a45c);
   }
@@ -196,40 +219,124 @@
 {
   "name": "Category icons",
   "tag": "section",
-  "disabled_on": { "groups": ["header", "footer"] },
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
   "settings": [
-    { "type": "text", "id": "heading", "label": "Heading" },
-    { "type": "color", "id": "background_color", "label": "Background" },
-    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
-    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 32 }
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
   ],
   "blocks": [
     {
       "type": "category",
       "name": "Category",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image", "info": "Falls back to the icon below when empty." },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Falls back to the icon below when empty."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Fills the picture, label and link when those are left empty."
+        },
         {
           "type": "select",
           "id": "icon",
           "label": "Icon",
           "options": [
-            { "value": "diamond", "label": "Jewellery" },
-            { "value": "house", "label": "Home decor" },
-            { "value": "phone", "label": "Tech" },
-            { "value": "pot", "label": "Kitchen" },
-            { "value": "flame", "label": "Trending" },
-            { "value": "sparkle", "label": "New" },
-            { "value": "tag", "label": "Deals" },
-            { "value": "gift", "label": "Gifts" }
+            {
+              "value": "diamond",
+              "label": "Jewellery"
+            },
+            {
+              "value": "house",
+              "label": "Home decor"
+            },
+            {
+              "value": "phone",
+              "label": "Tech"
+            },
+            {
+              "value": "pot",
+              "label": "Kitchen"
+            },
+            {
+              "value": "flame",
+              "label": "Trending"
+            },
+            {
+              "value": "sparkle",
+              "label": "New"
+            },
+            {
+              "value": "tag",
+              "label": "Deals"
+            },
+            {
+              "value": "gift",
+              "label": "Gifts"
+            }
           ],
           "default": "diamond"
         },
-        { "type": "text", "id": "label", "label": "Label", "default": "Category" },
-        { "type": "url", "id": "link", "label": "Link" }
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Category icons", "blocks": [{ "type": "category" }] }]
+  "presets": [
+    {
+      "name": "Category icons",
+      "blocks": [
+        {
+          "type": "category"
+        }
+      ]
+    }
+  ]
 }
 {% endschema %}

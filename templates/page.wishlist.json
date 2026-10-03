@@ -1,0 +1,25 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "d2p-wishlist",
+      "settings": {
+        "heading": "My Wishlist",
+        "columns": 4,
+        "empty_text": "Your wishlist is empty. Tap the heart on any product to save it here.",
+        "empty_button": "Start shopping",
+        "padding_top": 40,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -1,0 +1,23 @@
+{%- comment -%}
+  Renders one product card for the product in the URL, for scripts that build
+  card lists in the browser (Recently viewed). Fetched as
+  /products/<handle>?section_id=d2p-card-render and never placed on a page,
+  so its settings are always the schema defaults below.
+{%- endcomment -%}
+{%- if product != blank -%}
+  {%- render 'd2p-product-card', product: product, s: section.settings, section_id: section.id -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product card (rendered)",
+  "settings": [
+    { "type": "text", "id": "card_style", "label": "Card style", "default": "boutique" },
+    { "type": "checkbox", "id": "show_discount_badge", "label": "Show sale badge", "default": true },
+    { "type": "checkbox", "id": "show_discount_percent", "label": "Show discount percentage", "default": true },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist heart", "default": true },
+    { "type": "checkbox", "id": "show_add_to_cart", "label": "Show Add to Cart", "default": false }
+  ]
+}
+{% endschema %}

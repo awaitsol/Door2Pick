@@ -215,7 +215,8 @@
         "padding-inline-end": 0,
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 0,
-        "padding-block-end": 32
+        "padding-block-end": 32,
+        "show_wishlist": true
       }
     }
   },

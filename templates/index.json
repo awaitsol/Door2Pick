@@ -117,7 +117,7 @@
         "columns": 6,
         "show_discount_badge": true,
         "show_rating": true,
-        "show_wishlist": false,
+        "show_wishlist": true,
         "card_style": "boutique",
         "show_add_to_cart": false,
         "show_discount_percent": true,
@@ -147,7 +147,7 @@
         "show_discount_badge": true,
         "show_discount_percent": true,
         "show_rating": true,
-        "show_wishlist": false,
+        "show_wishlist": true,
         "show_add_to_cart": false,
         "add_to_cart_label": "Add to Cart",
         "wishlist_label": "Save for later",
@@ -158,12 +158,96 @@
         "padding_top": 40,
         "padding_bottom": 24
       }
+    },
+    "promo_tiles": {
+      "type": "d2p-promo-banners",
+      "blocks": {
+        "promo_kitchen": {
+          "type": "panel",
+          "settings": {
+            "collection": "kitchen-1",
+            "heading": "Kitchen Essentials",
+            "subheading": "Smart picks for every day",
+            "offer": "",
+            "auto_offer": true,
+            "button_label": "Shop Kitchen",
+            "button_link": "shopify://collections/kitchen-1"
+          }
+        },
+        "promo_tech": {
+          "type": "panel",
+          "settings": {
+            "collection": "tech-gadgets-1",
+            "heading": "Tech & Gadgets",
+            "subheading": "Gear that just works",
+            "offer": "",
+            "auto_offer": true,
+            "button_label": "Shop Tech",
+            "button_link": "shopify://collections/tech-gadgets-1"
+          }
+        }
+      },
+      "block_order": [
+        "promo_kitchen",
+        "promo_tech"
+      ],
+      "settings": {
+        "columns": 2,
+        "background_color": "",
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
+    "top_deals": {
+      "type": "d2p-product-grid",
+      "settings": {
+        "collection_handle": "",
+        "use_all_products": true,
+        "fallback_to_all": false,
+        "heading": "Top Deals",
+        "subheading": "Biggest savings right now",
+        "max_products": 6,
+        "columns": 6,
+        "show_discount_badge": true,
+        "show_rating": true,
+        "show_wishlist": true,
+        "card_style": "boutique",
+        "show_add_to_cart": false,
+        "show_discount_percent": true,
+        "hide_sold_out": false,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "show_view_all": true,
+        "view_all_label": "View All",
+        "empty_text": "Products from this collection will appear here.",
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "deals_only": true,
+        "anchor": "top-deals"
+      }
+    },
+    "watch_in_action": {
+      "type": "d2p-video-showcase",
+      "settings": {
+        "heading": "Watch in Action",
+        "subheading": "See our products at work. Tap a video to shop it.",
+        "max_videos": 12,
+        "visible_desktop": 5,
+        "button_label": "Shop",
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 48
+      }
     }
   },
   "order": [
     "hero_banner",
     "new_arrivals",
+    "promo_tiles",
+    "top_deals",
     "just_for_you_v2",
-    "guarantee"
+    "guarantee",
+    "watch_in_action"
   ]
 }

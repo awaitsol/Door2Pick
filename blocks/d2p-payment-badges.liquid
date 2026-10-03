@@ -1,0 +1,114 @@
+{%- comment -%}
+  "We accept" row under the buy buttons. Each method is a switch in the block
+  settings, so only methods the store really accepts are shown. Wallets and
+  COD are written as text badges rather than brand logos.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = block.settings
+-%}
+
+<div class="d2p-pay" {{ block.shopify_attributes }}>
+  {%- if s.heading != blank -%}
+    <span class="d2p-pay__label">{{ s.heading }}</span>
+  {%- endif -%}
+  <ul class="d2p-pay__list" role="list">
+    {%- if s.show_cod -%}
+      <li class="d2p-pay__badge d2p-pay__badge--cod">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg>
+        Cash on Delivery
+      </li>
+    {%- endif -%}
+    {%- if s.show_cards -%}
+      <li class="d2p-pay__badge d2p-pay__badge--icon" title="Visa">{{ 'visa' | payment_type_svg_tag: class: 'd2p-pay__svg' }}</li>
+      <li class="d2p-pay__badge d2p-pay__badge--icon" title="Mastercard">{{ 'master' | payment_type_svg_tag: class: 'd2p-pay__svg' }}</li>
+    {%- endif -%}
+    {%- if s.show_jazzcash -%}
+      <li class="d2p-pay__badge">JazzCash</li>
+    {%- endif -%}
+    {%- if s.show_easypaisa -%}
+      <li class="d2p-pay__badge">Easypaisa</li>
+    {%- endif -%}
+    {%- if s.show_bank -%}
+      <li class="d2p-pay__badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18L12 4zM5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>
+        Bank transfer
+      </li>
+    {%- endif -%}
+  </ul>
+</div>
+
+{% stylesheet %}
+  .d2p-pay {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .d2p-pay__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  .d2p-pay__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-pay__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-block-size: 30px;
+    padding: 4px 10px;
+    border: 1px solid var(--d2p-border, #26262a);
+    border-radius: 6px;
+    background: var(--d2p-surface, #141416);
+    color: var(--d2p-text, #ede7db);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .d2p-pay__badge svg {
+    inline-size: 16px;
+    block-size: 16px;
+    color: var(--d2p-gold, #c9a45c);
+  }
+
+  .d2p-pay__badge--cod {
+    border-color: color-mix(in srgb, var(--d2p-gold, #c9a45c) 55%, transparent);
+  }
+
+  .d2p-pay__badge--icon {
+    padding: 2px 4px;
+    background: #fff;
+  }
+
+  .d2p-pay__badge--icon .d2p-pay__svg {
+    inline-size: 38px;
+    block-size: 24px;
+    color: initial;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Payment methods",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "We accept" },
+    { "type": "checkbox", "id": "show_cod", "label": "Cash on Delivery", "default": true },
+    { "type": "checkbox", "id": "show_cards", "label": "Visa / Mastercard", "default": true },
+    { "type": "checkbox", "id": "show_jazzcash", "label": "JazzCash", "default": true },
+    { "type": "checkbox", "id": "show_easypaisa", "label": "Easypaisa", "default": true },
+    { "type": "checkbox", "id": "show_bank", "label": "Bank transfer", "default": true }
+  ],
+  "presets": [{ "name": "Payment methods" }]
+}
+{% endschema %}

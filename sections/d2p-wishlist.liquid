@@ -1,0 +1,152 @@
+{%- comment -%}
+  Wishlist page. Reads the saved product handles from this browser (see
+  assets/d2p-wishlist.js) and fetches each card from the d2p-card-render
+  section, so the cards match the rest of the site. Removing a heart takes the
+  card off the page straight away.
+{%- endcomment -%}
+
+{%- assign s = section.settings -%}
+
+<div class="section-background"></div>
+
+<d2p-wishlist-page
+  class="d2p-grid d2p-grid--boutique d2p-wishpage"
+  style="--d2p-grid-columns: {{ s.columns }}; padding-block-start: {{ s.padding_top }}px; padding-block-end: {{ s.padding_bottom }}px;"
+>
+  <div class="d2p-grid__inner">
+    <div class="d2p-grid__header">
+      <div class="d2p-grid__titles">
+        <h1 class="d2p-grid__heading">{{ s.heading }}</h1>
+        <p class="d2p-grid__subheading" data-d2p-wish-summary></p>
+      </div>
+    </div>
+
+    <ul class="d2p-grid__list" data-wrapped data-d2p-wish-list></ul>
+
+    <div class="d2p-wishpage__empty" data-d2p-wish-empty hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-9.2-8.6C1.2 8.3 3 4.8 6.4 4.8c2 0 3.2 1.1 3.9 2.2.3.5.8.5 1.1 0 .7-1.1 1.9-2.2 3.9-2.2 3.4 0 5.2 3.5 3.6 6.6C19 15.6 12 20 12 20z"/></svg>
+      <p>{{ s.empty_text }}</p>
+      <a class="d2p-wishpage__shop" href="{{ routes.all_products_collection_url }}">{{ s.empty_button }}</a>
+    </div>
+  </div>
+</d2p-wishlist-page>
+
+{% stylesheet %}
+  .d2p-wishpage {
+    display: block;
+  }
+
+  .d2p-wishpage__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-block: 48px;
+    text-align: center;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  .d2p-wishpage__empty[hidden] {
+    display: none;
+  }
+
+  .d2p-wishpage__empty svg {
+    inline-size: 48px;
+    block-size: 48px;
+    fill: none;
+    stroke: var(--d2p-gold, #c9a45c);
+    stroke-width: 1.4;
+  }
+
+  .d2p-wishpage__shop {
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: var(--d2p-gold, #c9a45c);
+    color: var(--d2p-on-gold, #0b0b0d);
+    font-weight: 600;
+    text-decoration: none;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class D2PWishlistPage extends HTMLElement {
+    connectedCallback() {
+      this.list = this.querySelector('[data-d2p-wish-list]');
+      this.empty = this.querySelector('[data-d2p-wish-empty]');
+      this.summary = this.querySelector('[data-d2p-wish-summary]');
+      document.addEventListener('d2p:wishlist-change', this.onChange);
+      this.render();
+    }
+
+    disconnectedCallback() {
+      document.removeEventListener('d2p:wishlist-change', this.onChange);
+    }
+
+    handles() {
+      try {
+        const list = JSON.parse(localStorage.getItem('d2p:wishlist') || '[]');
+        return Array.isArray(list) ? list : [];
+      } catch (err) {
+        return [];
+      }
+    }
+
+    // A heart removed on this page takes its card away.
+    onChange = () => {
+      const saved = this.handles();
+      this.list.querySelectorAll('.d2p-card').forEach((card) => {
+        const h = card.querySelector('[data-d2p-wish]')?.dataset.handle;
+        if (h && !saved.includes(h)) card.remove();
+      });
+      this.update(this.list.children.length);
+    };
+
+    update(count) {
+      this.empty.hidden = count > 0;
+      this.summary.textContent = count ? `${count} saved item${count === 1 ? '' : 's'}` : '';
+    }
+
+    async render() {
+      const handles = this.handles();
+      if (!handles.length) return this.update(0);
+      const root = window.Shopify?.routes?.root || '/';
+      const cards = await Promise.all(
+        handles.map(async (handle) => {
+          try {
+            const res = await fetch(`${root}products/${encodeURIComponent(handle)}?section_id=d2p-card-render`);
+            if (!res.ok) return null; // removed or unpublished product
+            const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+            return doc.querySelector('.d2p-card');
+          } catch (err) {
+            return null;
+          }
+        })
+      );
+      const found = cards.filter(Boolean);
+      this.list.replaceChildren(...found);
+      this.update(found.length);
+      window.D2PWishlist?.sync();
+    }
+  }
+
+  if (!customElements.get('d2p-wishlist-page')) {
+    customElements.define('d2p-wishlist-page', D2PWishlistPage);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Wishlist",
+  "tag": "section",
+  "enabled_on": { "templates": ["page"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "My Wishlist" },
+    { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 6, "step": 1, "default": 4 },
+    { "type": "text", "id": "empty_text", "label": "Empty message", "default": "Your wishlist is empty. Tap the heart on any product to save it here." },
+    { "type": "text", "id": "empty_button", "label": "Empty button label", "default": "Start shopping" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "presets": [{ "name": "Wishlist" }]
+}
+{% endschema %}

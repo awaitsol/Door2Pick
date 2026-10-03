@@ -1,0 +1,186 @@
+{%- comment -%}
+  "Ring size guide" link that opens a size chart. Only appears on products
+  with an option called "Size" (or "Ring Size") whose product type is
+  Jewellery, so it never shows on kitchen or tech items.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product
+  assign has_size = false
+  for o in product.options
+    assign o_name = o | downcase
+    if o_name == 'size' or o_name == 'ring size'
+      assign has_size = true
+    endif
+  endfor
+  assign p_type = product.type | downcase
+-%}
+
+{%- if has_size and p_type == 'jewellery' -%}
+  <div class="d2p-size" {{ block.shopify_attributes }}>
+    <button type="button" class="d2p-size__open" data-d2p-size-open aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 8h18v8H3z"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></svg>
+      {{ block.settings.link_label | default: 'Ring size guide' }}
+    </button>
+
+    <dialog class="d2p-size__dialog" aria-labelledby="d2p-size-title-{{ block.id }}">
+      <div class="d2p-size__panel">
+        <div class="d2p-size__head">
+          <h2 id="d2p-size-title-{{ block.id }}" class="d2p-size__title">Ring size guide</h2>
+          <button type="button" class="d2p-size__close" data-d2p-size-close aria-label="Close">&times;</button>
+        </div>
+
+        <p class="d2p-size__intro">
+          Take a ring that fits you well and measure the <strong>inside diameter</strong> (edge to edge
+          across the middle) in millimetres. Match it to the table below. If you are between two sizes,
+          choose the larger one.
+        </p>
+
+        <table class="d2p-size__table">
+          <thead>
+            <tr><th scope="col">Size</th><th scope="col">Inside diameter</th><th scope="col">Inside circumference</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>5</td><td>15.7 mm</td><td>49.3 mm</td></tr>
+            <tr><td>6</td><td>16.5 mm</td><td>51.9 mm</td></tr>
+            <tr><td>7</td><td>17.3 mm</td><td>54.4 mm</td></tr>
+            <tr><td>8</td><td>18.1 mm</td><td>57.0 mm</td></tr>
+            <tr><td>9</td><td>18.9 mm</td><td>59.5 mm</td></tr>
+            <tr><td>10</td><td>19.8 mm</td><td>62.1 mm</td></tr>
+          </tbody>
+        </table>
+
+        <p class="d2p-size__tip">
+          <strong>No ring to measure?</strong> Wrap a thin strip of paper around the base of your finger,
+          mark where it meets, and measure the length. That is the inside circumference.
+        </p>
+
+        {%- if block.settings.note != blank -%}
+          <p class="d2p-size__tip">{{ block.settings.note }}</p>
+        {%- endif -%}
+      </div>
+    </dialog>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-size__open {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--d2p-gold-text, #c9a45c);
+    font: inherit;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .d2p-size__open svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+
+  .d2p-size__dialog {
+    inline-size: min(92vw, 480px);
+    max-block-size: 88vh;
+    padding: 0;
+    border: 1px solid var(--d2p-border, #26262a);
+    border-radius: 14px;
+    background: var(--d2p-surface, #141416);
+    color: var(--d2p-text, #ede7db);
+  }
+
+  .d2p-size__dialog::backdrop {
+    background: rgb(0 0 0 / 55%);
+  }
+
+  .d2p-size__panel {
+    padding: 22px;
+  }
+
+  .d2p-size__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 10px;
+  }
+
+  .d2p-size__title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .d2p-size__close {
+    inline-size: 36px;
+    block-size: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--d2p-surface-alt, #17171a);
+    color: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .d2p-size__intro,
+  .d2p-size__tip {
+    margin: 0 0 14px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  .d2p-size__intro strong,
+  .d2p-size__tip strong {
+    color: var(--d2p-text, #ede7db);
+  }
+
+  .d2p-size__table {
+    inline-size: 100%;
+    margin-block-end: 14px;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .d2p-size__table th,
+  .d2p-size__table td {
+    padding: 9px 10px;
+    border-block-end: 1px solid var(--d2p-border, #26262a);
+    text-align: start;
+  }
+
+  .d2p-size__table th {
+    color: var(--d2p-gold-text, #c9a45c);
+    font-weight: 600;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('click', (event) => {
+    const open = event.target.closest('[data-d2p-size-open]');
+    if (open) {
+      open.closest('.d2p-size')?.querySelector('.d2p-size__dialog')?.showModal();
+      return;
+    }
+    const dialog = event.target.closest('.d2p-size__dialog');
+    // Close on the X button or a click on the dimmed backdrop.
+    if (event.target.closest('[data-d2p-size-close]') || (dialog && event.target === dialog)) {
+      dialog?.close();
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Ring size guide",
+  "settings": [
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Ring size guide" },
+    { "type": "text", "id": "note", "label": "Extra note", "info": "Optional line at the bottom of the guide." }
+  ],
+  "presets": [{ "name": "Ring size guide" }]
+}
+{% endschema %}
