@@ -27,7 +27,7 @@
   {% render 'skip-to-content-link', href: '#ResultsList', text: 'accessibility.skip_to_results_list' %}
 
   <div
-    class="collection-wrapper grid gap-style"
+    class="collection-wrapper grid gap-style d2p-grid--{{ section.settings.card_style | default: 'boutique' }}"
   >
     {% assign products_per_page = 24 %}
 
@@ -55,12 +55,7 @@
             data-product-id="{{ product.id }}"
             ref="cards[]"
           >
-            {% content_for 'block',
-              type: '_product-card',
-              id: 'product-card',
-              closest.product: product,
-              product_view_context: 'search'
-            %}
+            {%- render 'd2p-product-card', product: product, s: section.settings, section_id: section.id, tag: 'div' -%}
           </li>
         {% endfor %}
       {% endcapture %}
@@ -254,7 +249,26 @@
       "step": 1,
       "unit": "px",
       "default": 8
-    }
+    },
+    { "type": "header", "content": "Product card" },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        { "value": "panel", "label": "Panel — bordered card" },
+        { "value": "compact", "label": "Compact — marketplace grid" },
+        { "value": "boutique", "label": "Boutique — premium card" }
+      ],
+      "default": "boutique"
+    },
+    { "type": "checkbox", "id": "show_discount_badge", "label": "Show sale badge", "default": true },
+    { "type": "checkbox", "id": "show_discount_percent", "label": "Show discount percentage", "default": true },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "info": "Needs a reviews app that writes the reviews.rating metafield.", "default": true },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist heart", "info": "Saves the product to the shopper's wishlist in their browser.", "default": false },
+    { "type": "checkbox", "id": "show_add_to_cart", "label": "Show Add to Cart", "default": false },
+    { "type": "text", "id": "add_to_cart_label", "label": "Add to Cart label", "default": "Add to Cart" },
+    { "type": "text", "id": "wishlist_label", "label": "Wishlist label", "default": "Save for later" }
   ],
   "presets": []
 }

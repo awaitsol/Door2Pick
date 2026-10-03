@@ -1,0 +1,55 @@
+{%- comment -%}
+  Care text that suits the product: jewellery-specific tips for products whose
+  type is Jewellery, the general text for everything else. Sits inside the
+  "Care & handling" accordion row on the product page.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product
+  assign p_type = product.type | downcase
+-%}
+
+<div class="d2p-care rte" {{ block.shopify_attributes }}>
+  {%- if p_type == 'jewellery' -%}
+    {{ block.settings.jewellery_text }}
+  {%- else -%}
+    {{ block.settings.general_text }}
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .d2p-care {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .d2p-care ul {
+    margin: 0;
+    padding-inline-start: 1.1em;
+  }
+
+  .d2p-care li + li {
+    margin-block-start: 4px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Care text",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "jewellery_text",
+      "label": "Jewellery care",
+      "default": "<ul><li>Put jewellery on last, after perfume, lotion and hair spray.</li><li>Take it off before washing hands, bathing, swimming or exercising.</li><li>Wipe gently with a soft dry cloth after wearing.</li><li>Store each piece separately in a pouch or box, away from moisture.</li></ul>"
+    },
+    {
+      "type": "richtext",
+      "id": "general_text",
+      "label": "Other products",
+      "default": "<p>Store in a dry place away from direct sunlight. Clean with a soft dry cloth; avoid solvents and abrasive cleaners.</p>"
+    }
+  ],
+  "presets": [{ "name": "Care text" }]
+}
+{% endschema %}

@@ -1,0 +1,168 @@
+{%- comment -%}
+  One product card, used everywhere products are listed (home grids, new
+  arrivals, recommendations, collection and search pages) so they all match.
+
+  Accepts:
+  - product: the product to show
+  - s: the calling section's settings (card options such as show_rating)
+  - section_id: the calling section's id, for the AJAX add-to-cart form
+  - tag: optional wrapper element, default 'li'; pass 'div' when the caller
+    already supplies the <li> (collection and search grids)
+
+  Usage:
+  {% render 'd2p-product-card', product: product, s: section.settings, section_id: section.id %}
+{%- endcomment -%}
+{%- comment -%}
+  selected_or_first_available_variant is nil when every variant is sold
+  out, which would leave the card with no price and no button. Falling
+  back to the first variant keeps the price and a Sold out state.
+{%- endcomment -%}
+{%- assign variant = product.selected_or_first_available_variant | default: product.variants.first -%}
+{%- assign has_sale = false -%}
+{%- if variant.compare_at_price > variant.price -%}
+  {%- assign has_sale = true -%}
+  {%- assign saving = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round -%}
+{%- endif -%}
+{%- assign rating = product.metafields.reviews.rating.value.rating -%}
+{%- assign rating_count = product.metafields.reviews.rating_count.value -%}
+{%- liquid
+  assign boutique = false
+  if s.card_style == 'boutique'
+    assign boutique = true
+    assign hover_media = product.media[1]
+  endif
+-%}
+{%- assign tag = tag | default: 'li' -%}
+<{{ tag }} class="d2p-card{% unless variant.available %} d2p-card--sold-out{% endunless %}">
+  <div class="d2p-card__media">
+    <a class="d2p-card__link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+      {%- if product.featured_media -%}
+        {{
+          product.featured_media
+          | image_url: width: 600
+          | image_tag:
+            class: 'd2p-card__image',
+            alt: product.featured_media.alt | default: product.title,
+            widths: '200, 300, 400, 600',
+            sizes: '(max-width: 749px) 45vw, 20vw',
+            loading: 'lazy'
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'd2p-card__image d2p-card__image--placeholder' }}
+      {%- endif -%}
+      {%- comment -%}
+        Boutique cards swap to the second photo on hover, the way most
+        fashion stores show another angle. Only images qualify: a video
+        or 3D model as the second media would render as a still poster.
+      {%- endcomment -%}
+      {%- if boutique and hover_media.media_type == 'image' -%}
+        {{
+          hover_media
+          | image_url: width: 600
+          | image_tag:
+            class: 'd2p-card__image d2p-card__image--hover',
+            alt: '',
+            widths: '200, 300, 400, 600',
+            sizes: '(max-width: 749px) 45vw, 20vw',
+            loading: 'lazy'
+        }}
+      {%- endif -%}
+      {%- if boutique -%}
+        <span class="d2p-card__view" aria-hidden="true">
+          View product
+          {{- 'icon-arrow.svg' | inline_asset_content -}}
+        </span>
+      {%- endif -%}
+    </a>
+
+    {%- if boutique and variant.available == false -%}
+      <span class="d2p-card__soldout">{{ 'products.product.sold_out' | t }}</span>
+    {%- endif -%}
+
+    {%- if has_sale and s.show_discount_badge -%}
+      {%- comment -%} Boutique states the saving in the price row, so the badge just flags the sale. {%- endcomment -%}
+      <span class="d2p-card__badge">{% if boutique %}Sale{% else %}{{ saving }}% OFF{% endif %}</span>
+    {%- endif -%}
+
+    {%- if s.show_wishlist -%}
+      <button class="d2p-card__wish" type="button" aria-pressed="false" aria-label="{{ s.wishlist_label | default: 'Save for later' }}" data-d2p-wish data-handle="{{ product.handle }}">
+        {%- render 'd2p-icon', name: 'heart' -%}
+      </button>
+    {%- endif -%}
+  </div>
+
+  <div class="d2p-card__body">
+    {%- if boutique and product.type != blank -%}
+      <span class="d2p-card__eyebrow">{{ product.type }}</span>
+    {%- endif -%}
+    <a class="d2p-card__title" href="{{ product.url }}">{{ product.title }}</a>
+
+    {%- if s.show_rating and rating != blank -%}
+      <div class="d2p-card__rating">
+        <span class="d2p-card__star" aria-hidden="true">{%- render 'd2p-icon', name: 'star' -%}</span>
+        <span class="d2p-card__rating-value">{{ rating | round: 1 }}</span>
+        {%- if rating_count != blank -%}
+          <span class="d2p-card__rating-count">({{ rating_count }})</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="d2p-card__prices">
+      <span class="d2p-card__price">{{ variant.price | money }}</span>
+      {%- if has_sale and boutique -%}
+        <s class="d2p-card__compare">{{ variant.compare_at_price | money }}</s>
+        {%- if s.show_discount_percent -%}
+          <span class="d2p-card__save">Save {{ saving }}%</span>
+        {%- endif -%}
+      {%- elsif has_sale -%}
+        {%- if s.show_discount_percent -%}
+          <span class="d2p-card__discount">-{{ saving }}%</span>
+        {%- else -%}
+          <s class="d2p-card__compare">{{ variant.compare_at_price | money }}</s>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    {%- if s.show_add_to_cart -%}
+      {%- if variant.available -%}
+        {%- comment -%}
+          product-form-component is the theme's own AJAX add-to-cart.
+          It needs the section and product ids, the submit handler, a
+          live region for screen-reader feedback and ref="variantId" on
+          the hidden input. A plain form would reload the page instead
+          of opening the cart drawer.
+        {%- endcomment -%}
+        <product-form-component
+          data-section-id="{{ section_id }}"
+          data-product-id="{{ product.id }}"
+          on:submit="/handleSubmit"
+          class="d2p-card__form-component"
+        >
+          <div
+            class="visually-hidden"
+            aria-live="assertive"
+            role="status"
+            aria-atomic="true"
+            ref="liveRegion"
+          ></div>
+          {%- form 'product', product, id: null, class: 'd2p-card__form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+            <input type="hidden" name="id" ref="variantId" value="{{ variant.id }}">
+            <input
+              type="hidden"
+              name="quantity"
+              value="{% if variant.quantity_rule.min %}{{ variant.quantity_rule.min }}{% else %}1{% endif %}"
+            >
+            <button class="d2p-card__add" type="submit" name="add">
+              <span aria-hidden="true">{{- 'icon-add-to-cart.svg' | inline_asset_content -}}</span>
+              {{ s.add_to_cart_label | default: 'Add to Cart' }}
+            </button>
+          {%- endform -%}
+        </product-form-component>
+      {%- else -%}
+        <button class="d2p-card__add d2p-card__add--disabled" type="button" disabled>
+          {{ 'products.product.sold_out' | t }}
+        </button>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</{{ tag }}>

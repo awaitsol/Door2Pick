@@ -2118,6 +2118,72 @@
     ]
   },
   {
+    "name": "Free delivery bar",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "A progress bar in the cart drawer and cart page showing how much more the shopper needs to spend for free delivery. Keep the threshold the same as your free-shipping rate in Settings > Shipping and delivery."
+      },
+      {
+        "type": "checkbox",
+        "id": "d2p_free_ship_enabled",
+        "label": "Show free delivery bar",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "d2p_free_ship_threshold",
+        "label": "Free delivery from (Rs.)",
+        "default": 1999
+      },
+      {
+        "type": "text",
+        "id": "d2p_free_ship_progress",
+        "label": "Progress message",
+        "info": "[amount] is replaced with what is left to spend.",
+        "default": "Add [amount] more for FREE delivery"
+      },
+      {
+        "type": "text",
+        "id": "d2p_free_ship_done",
+        "label": "Unlocked message",
+        "default": "You've unlocked FREE delivery!"
+      }
+    ]
+  },
+  {
+    "name": "Gift wrap",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Adds a 'Gift wrap this order' option and a gift message box to the cart. Pick the hidden Gift Wrapping product that carries the price."
+      },
+      {
+        "type": "checkbox",
+        "id": "d2p_gift_enabled",
+        "label": "Show gift options in cart",
+        "default": true
+      },
+      {
+        "type": "product",
+        "id": "d2p_gift_product",
+        "label": "Gift wrap product"
+      },
+      {
+        "type": "text",
+        "id": "d2p_gift_label",
+        "label": "Checkbox label",
+        "default": "Gift wrap this order"
+      },
+      {
+        "type": "text",
+        "id": "d2p_gift_message_label",
+        "label": "Message label",
+        "default": "Gift message (optional)"
+      }
+    ]
+  },
+  {
     "name": "WhatsApp",
     "settings": [
       {

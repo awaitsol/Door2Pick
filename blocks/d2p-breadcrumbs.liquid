@@ -1,0 +1,103 @@
+{%- comment -%}
+  Breadcrumb trail above the product title: Home > Collection > Product.
+
+  The collection is the product's first "real" collection, skipping the
+  catch-all and merchandising ones (All, Just For You, New Arrivals), so a pair
+  of earrings reads Home > Jewellery > ... rather than Home > Just For You.
+  Also outputs BreadcrumbList structured data for Google.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product
+  assign crumb_collection = blank
+  assign skip = 'all,frontpage,just-for-you,new-arrivals' | split: ','
+  if collection != blank
+    assign crumb_collection = collection
+  else
+    for c in product.collections
+      unless skip contains c.handle
+        assign crumb_collection = c
+        break
+      endunless
+    endfor
+  endif
+-%}
+
+{%- if product != blank -%}
+  <nav class="d2p-crumbs" aria-label="Breadcrumb" {{ block.shopify_attributes }}>
+    <ol class="d2p-crumbs__list" role="list">
+      <li><a href="{{ routes.root_url }}">Home</a></li>
+      {%- if crumb_collection != blank -%}
+        <li><a href="{{ crumb_collection.url }}">{{ crumb_collection.title }}</a></li>
+      {%- endif -%}
+      <li aria-current="page"><span>{{ product.title }}</span></li>
+    </ol>
+  </nav>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ shop.url | append: routes.root_url | json }} }
+        {%- if crumb_collection != blank -%}
+          , { "@type": "ListItem", "position": 2, "name": {{ crumb_collection.title | json }}, "item": {{ shop.url | append: crumb_collection.url | json }} }
+          , { "@type": "ListItem", "position": 3, "name": {{ product.title | json }} }
+        {%- else -%}
+          , { "@type": "ListItem", "position": 2, "name": {{ product.title | json }} }
+        {%- endif -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  .d2p-crumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--d2p-muted, #a9a296);
+  }
+
+  .d2p-crumbs__list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-inline-size: 0;
+  }
+
+  .d2p-crumbs__list li + li::before {
+    content: '/';
+    opacity: 0.6;
+  }
+
+  .d2p-crumbs__list a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .d2p-crumbs__list a:hover {
+    color: var(--d2p-gold-text, #c9a45c);
+  }
+
+  .d2p-crumbs__list [aria-current] span {
+    max-inline-size: 28ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--d2p-text, #ede7db);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Breadcrumbs",
+  "settings": [],
+  "presets": [{ "name": "Breadcrumbs" }]
+}
+{% endschema %}

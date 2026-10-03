@@ -8,6 +8,9 @@
 {% render 'text-component-shimmer-styles' %}
 {% render 'cart-typography-styles' %}
 
+{% render 'd2p-free-shipping-bar' %}
+{% render 'd2p-gift-wrap', section_id: section_id %}
+
 <div class="cart-totals">
   {% # We need to keep this node in place to allow morphing to work properly # %}
   <div class="cart-totals__original-container cart-primary-typography">

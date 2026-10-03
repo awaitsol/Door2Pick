@@ -11,6 +11,7 @@
   "current": {
     "logo_height": 36,
     "logo_height_mobile": 28,
+    "favicon": "shopify://shop_images/favicon.png",
     "page_text_color": "{{ settings.color_palette.foreground }}",
     "type_body_font": "jost_n4",
     "type_subheading_font": "jost_n5",
@@ -121,7 +122,9 @@
       "foreground": "#EDE7DB",
       "color1": "#C9A45C",
       "color2": "#26262A"
-    }
+    },
+    "d2p_gift_product": "gift-wrapping",
+    "d2p_gift_enabled": true
   },
   "presets": {
     "Horizon": {

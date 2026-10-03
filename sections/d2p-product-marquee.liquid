@@ -1,0 +1,279 @@
+{%- comment -%}
+  A single row of products that scrolls right to left on its own, in a loop:
+  the left-most card slides out while the next one comes in from the right.
+
+  The loop is pure CSS. The list is rendered twice side by side and the pair
+  slides left by exactly one copy's width, then restarts — at that moment the
+  second copy sits where the first began, so the jump is invisible. The copy
+  is aria-hidden and inert, so screen readers and the keyboard meet each
+  product once.
+
+  It pauses on hover and keyboard focus so a shopper can click a card, and it
+  stays still for visitors who ask for reduced motion, who get a row they can
+  scroll by hand instead.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+
+  if s.collection != blank
+    assign coll = s.collection
+  elsif s.collection_handle != blank
+    assign coll = collections[s.collection_handle]
+  endif
+
+  assign products = coll.products
+  assign fallback_used = false
+  if coll == blank or coll.products_count == 0
+    comment
+      No collection yet: the newest products in the store stand in, which is
+      what "new arrivals" means anyway.
+    endcomment
+    assign products = collections.all.products | sort: 'created_at' | reverse
+    assign fallback_used = true
+  endif
+
+  if s.hide_sold_out
+    assign products = products | where: 'available'
+  endif
+
+  assign count = products.size
+  if count > s.max_products
+    assign count = s.max_products
+  endif
+
+  assign moving = false
+  if count > s.visible_desktop
+    assign moving = true
+  endif
+  assign duration = count | times: s.seconds_per_product
+-%}
+
+<div class="section-background"></div>
+
+<div
+  class="d2p-grid d2p-grid--{{ s.card_style | default: 'boutique' }} d2p-marquee"
+  style="
+    {% if s.background_color != blank %}--d2p-grid-bg: {{ s.background_color }};{% endif %}
+    --marquee-visible: {{ s.visible_desktop }};
+    --marquee-visible-mobile: {{ s.visible_mobile }};
+    --marquee-duration: {{ duration }}s;
+    padding-block-start: {{ s.padding_top }}px;
+    padding-block-end: {{ s.padding_bottom }}px;
+  "
+>
+  <div class="d2p-grid__inner">
+    <div class="d2p-grid__header">
+      <div class="d2p-grid__titles">
+        {%- if s.heading != blank -%}
+          <h2 class="d2p-grid__heading">{{ s.heading }}</h2>
+        {%- endif -%}
+        {%- if s.subheading != blank -%}
+          <p class="d2p-grid__subheading">{{ s.subheading }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if s.show_view_all -%}
+        <div class="d2p-grid__controls">
+          <a class="d2p-grid__viewall" href="{{ coll.url | default: routes.all_products_collection_url }}">
+            {{ s.view_all_label | default: 'View All' }}
+            <span aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if fallback_used and request.design_mode -%}
+      <p class="d2p-grid__notice">
+        The collection is empty or was not found, so the newest products in the store are shown.
+      </p>
+    {%- endif -%}
+
+    {%- if count > 0 -%}
+      <div class="d2p-marquee__viewport{% if moving %} is-moving{% endif %}">
+        <div class="d2p-marquee__track">
+          <ul class="d2p-marquee__list" role="list">
+            {%- for product in products limit: count -%}
+              {%- render 'd2p-product-card', product: product, s: s, section_id: section.id -%}
+            {%- endfor -%}
+          </ul>
+          {%- if moving -%}
+            <ul class="d2p-marquee__list d2p-marquee__list--copy" role="list" aria-hidden="true" inert>
+              {%- for product in products limit: count -%}
+                {%- render 'd2p-product-card', product: product, s: s, section_id: section.id -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- else -%}
+      <p class="d2p-grid__empty">{{ s.empty_text }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .d2p-marquee__viewport {
+    --marquee-gap: 16px;
+    /* Card width is worked out from the viewport's own width, so exactly the
+       chosen number of cards fit whatever the screen size. */
+    container-type: inline-size;
+    overflow: hidden;
+    /* Room for the card's hover lift and shadow, which overflow would clip. */
+    padding-block: 6px 14px;
+    margin-block: -6px -14px;
+  }
+
+  /* Cards fade out at the edges rather than being sliced off. */
+  .d2p-marquee__viewport.is-moving {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+  }
+
+  .d2p-marquee__track {
+    display: flex;
+    inline-size: max-content;
+  }
+
+  .d2p-marquee__viewport.is-moving .d2p-marquee__track {
+    animation: d2p-marquee var(--marquee-duration, 60s) linear infinite;
+  }
+
+  /* Hold still while a shopper is looking at or tabbing through the cards. */
+  .d2p-marquee__viewport.is-moving:hover .d2p-marquee__track,
+  .d2p-marquee__viewport.is-moving:focus-within .d2p-marquee__track {
+    animation-play-state: paused;
+  }
+
+  .d2p-marquee__list {
+    display: flex;
+    gap: var(--marquee-gap);
+    margin: 0;
+    /* The trailing gap makes each copy exactly one card-plus-gap per product
+       wide, so sliding by 50% lands the copy precisely where the original
+       started. */
+    padding: 0 var(--marquee-gap) 0 0;
+    list-style: none;
+  }
+
+  .d2p-marquee__list .d2p-card {
+    flex: 0 0 auto;
+    inline-size: calc(
+      (100cqw - (var(--marquee-visible) - 1) * var(--marquee-gap)) / var(--marquee-visible)
+    );
+  }
+
+  @keyframes d2p-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-marquee__list .d2p-card {
+      inline-size: calc((100cqw - 2 * var(--marquee-gap)) / 3);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-marquee__viewport {
+      --marquee-gap: 10px;
+    }
+
+    .d2p-marquee__list .d2p-card {
+      inline-size: calc(
+        (100cqw - (var(--marquee-visible-mobile) - 1) * var(--marquee-gap)) / var(--marquee-visible-mobile)
+      );
+    }
+  }
+
+  /* No automatic motion for visitors who ask for less: the row stays put and
+     can be scrolled by hand, and the copy used for the loop is dropped. */
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-marquee__viewport.is-moving {
+      overflow-x: auto;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .d2p-marquee__viewport.is-moving .d2p-marquee__track {
+      animation: none;
+    }
+
+    .d2p-marquee__list--copy {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product marquee",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "New Arrivals" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Fresh picks, just landed." },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    {
+      "type": "text",
+      "id": "collection_handle",
+      "label": "Or collection handle",
+      "info": "Used when no collection is picked above. If neither has products, the newest products in the store are shown.",
+      "default": "new-arrivals"
+    },
+    { "type": "range", "id": "max_products", "label": "Products", "min": 4, "max": 40, "step": 1, "default": 16 },
+    { "type": "checkbox", "id": "hide_sold_out", "label": "Hide sold-out products", "default": false },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "range", "id": "visible_desktop", "label": "Cards visible on desktop", "min": 3, "max": 7, "step": 1, "default": 6 },
+    { "type": "range", "id": "visible_mobile", "label": "Cards visible on mobile", "min": 1, "max": 3, "step": 1, "default": 2 },
+    {
+      "type": "range",
+      "id": "seconds_per_product",
+      "label": "Speed",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "info": "Seconds for each card to pass. Lower is faster. Pauses while the mouse is over the row.",
+      "default": 7
+    },
+
+    { "type": "header", "content": "Card" },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        { "value": "panel", "label": "Panel — bordered card" },
+        { "value": "compact", "label": "Compact — marketplace grid" },
+        { "value": "boutique", "label": "Boutique — premium card" }
+      ],
+      "default": "boutique"
+    },
+    { "type": "checkbox", "id": "show_discount_badge", "label": "Show sale badge", "default": true },
+    { "type": "checkbox", "id": "show_discount_percent", "label": "Show discount percentage", "default": true },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "info": "Needs a reviews app that writes the reviews.rating metafield.", "default": true },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist heart", "info": "Saves the product to the shopper's wishlist in their browser.", "default": false },
+    { "type": "checkbox", "id": "show_add_to_cart", "label": "Show Add to Cart", "default": false },
+    { "type": "text", "id": "add_to_cart_label", "label": "Add to Cart label", "default": "Add to Cart" },
+    { "type": "text", "id": "wishlist_label", "label": "Wishlist label", "default": "Save for later" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show View All link", "default": true },
+    { "type": "text", "id": "view_all_label", "label": "View All label", "default": "View All" },
+    { "type": "text", "id": "empty_text", "label": "Empty state text", "default": "New products will appear here soon." },
+    { "type": "color", "id": "background_color", "label": "Background color" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "presets": [
+    {
+      "name": "Product marquee"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,159 @@
+{%- comment -%}
+  "You may also like" on the product page, using the same product cards and
+  header as the home page grids.
+
+  Shopify only fills `recommendations` when the section is requested through
+  the recommendations endpoint, so the page first renders an empty shell and
+  the script below fetches this same section from
+  /recommendations/products?section_id=…&product_id=…, then swaps the list in.
+  With no recommendations the section stays hidden rather than showing an
+  empty heading.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign has_products = false
+  if recommendations.performed? and recommendations.products_count > 0
+    assign has_products = true
+  endif
+-%}
+
+<div class="section-background"></div>
+
+<d2p-recommendations
+  class="d2p-recs"
+  data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ s.max_products }}&intent=related"
+  {% if has_products %}data-loaded{% endif %}
+  {% unless has_products %}hidden{% endunless %}
+>
+  {%- if has_products -%}
+    <div
+      class="d2p-grid d2p-grid--{{ s.card_style | default: 'boutique' }}"
+      style="
+        {% if s.background_color != blank %}--d2p-grid-bg: {{ s.background_color }};{% endif %}
+        --d2p-grid-columns: {{ s.columns }};
+        padding-block-start: {{ s.padding_top }}px;
+        padding-block-end: {{ s.padding_bottom }}px;
+      "
+    >
+      <div class="d2p-grid__inner">
+        <div class="d2p-grid__header">
+          <div class="d2p-grid__titles">
+            {%- if s.heading != blank -%}
+              <h2 class="d2p-grid__heading">{{ s.heading }}</h2>
+            {%- endif -%}
+            {%- if s.subheading != blank -%}
+              <p class="d2p-grid__subheading">{{ s.subheading }}</p>
+            {%- endif -%}
+          </div>
+
+          {%- if s.show_view_all -%}
+            <div class="d2p-grid__controls">
+              <a class="d2p-grid__viewall" href="{{ s.view_all_link | default: routes.all_products_collection_url }}">
+                {{ s.view_all_label | default: 'View All' }}
+                <span aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+              </a>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <ul class="d2p-grid__list" data-wrapped>
+          {%- for product in recommendations.products -%}
+            {%- render 'd2p-product-card', product: product, s: s, section_id: section.id -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+  {%- endif -%}
+</d2p-recommendations>
+
+{% javascript %}
+  class D2PRecommendations extends HTMLElement {
+    connectedCallback() {
+      if (this.hasAttribute('data-loaded') || !this.dataset.url) return;
+
+      // Load when the section nears the screen, so it does not compete with
+      // the product images above it.
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          this.observer.disconnect();
+          this.load();
+        },
+        { rootMargin: '400px 0px' }
+      );
+      // A hidden element never intersects, so watch the section wrapper.
+      this.observer.observe(this.closest('.shopify-section') || this.parentElement);
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+    }
+
+    async load() {
+      try {
+        const response = await fetch(this.dataset.url);
+        if (!response.ok) return;
+        const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const fresh = doc.querySelector('d2p-recommendations[data-loaded]');
+        if (!fresh) return;
+        this.innerHTML = fresh.innerHTML;
+        this.setAttribute('data-loaded', '');
+        this.hidden = false;
+      } catch (err) {
+        // Recommendations are optional; on failure the section stays hidden.
+      }
+    }
+  }
+
+  if (!customElements.get('d2p-recommendations')) {
+    customElements.define('d2p-recommendations', D2PRecommendations);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "You may also like",
+  "tag": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "You May Also Like" },
+    { "type": "text", "id": "subheading", "label": "Subheading" },
+    { "type": "range", "id": "max_products", "label": "Products", "min": 2, "max": 10, "step": 1, "default": 8 },
+    { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 6, "step": 1, "default": 4 },
+
+    { "type": "header", "content": "View All" },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show View All link", "default": true },
+    { "type": "text", "id": "view_all_label", "label": "Label", "default": "View All" },
+    { "type": "url", "id": "view_all_link", "label": "Link", "info": "Leave empty to link to all products." },
+
+    { "type": "header", "content": "Card" },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        { "value": "panel", "label": "Panel — bordered card" },
+        { "value": "compact", "label": "Compact — marketplace grid" },
+        { "value": "boutique", "label": "Boutique — premium card" }
+      ],
+      "default": "boutique"
+    },
+    { "type": "checkbox", "id": "show_discount_badge", "label": "Show sale badge", "default": true },
+    { "type": "checkbox", "id": "show_discount_percent", "label": "Show discount percentage", "default": true },
+    { "type": "checkbox", "id": "show_rating", "label": "Show rating", "info": "Needs a reviews app that writes the reviews.rating metafield.", "default": true },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show wishlist heart", "info": "Saves the product to the shopper's wishlist in their browser.", "default": false },
+    { "type": "checkbox", "id": "show_add_to_cart", "label": "Show Add to Cart", "default": false },
+    { "type": "text", "id": "add_to_cart_label", "label": "Add to Cart label", "default": "Add to Cart" },
+    { "type": "text", "id": "wishlist_label", "label": "Wishlist label", "default": "Save for later" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "color", "id": "background_color", "label": "Background color" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "presets": [{ "name": "You may also like" }]
+}
+{% endschema %}

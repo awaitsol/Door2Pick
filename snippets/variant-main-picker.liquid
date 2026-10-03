@@ -58,6 +58,16 @@
           assign swatch_count = product_option.values | map: 'swatch' | compact | size
           assign variant_style = block_settings.variant_style
 
+          # Door2Pick: options without Shopify swatch data still show photo
+          # swatches when every value has its own variant photo, so a colour
+          # choice shows the actual item rather than a text button.
+          if swatch_count == 0 and product_option.values.size > 1
+            assign photo_count = product_option.values | map: 'variant' | compact | map: 'featured_media' | compact | size
+            if photo_count == product_option.values.size
+              assign swatch_count = photo_count
+            endif
+          endif
+
           if swatch_count > 0 and block_settings.show_swatches
             if block_settings.variant_style == 'dropdown'
               assign variant_style = 'swatch_dropdown'
