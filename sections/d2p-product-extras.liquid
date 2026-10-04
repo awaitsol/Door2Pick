@@ -316,6 +316,13 @@
 {% endjavascript %}
 
 {% stylesheet %}
+  /* With no reassurance items the section exists only for the share control,
+     which the script moves beside the product title; the empty panel left
+     behind is hidden rather than shown as a blank bordered box. */
+  .d2p-extras:not(:has(.d2p-extras__item, [data-d2p-share-host])) {
+    display: none;
+  }
+
   .d2p-extras {
     background: var(--d2p-page);
     color: var(--d2p-text);

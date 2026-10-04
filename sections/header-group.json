@@ -171,7 +171,8 @@
         "logo_asset_light": "logo-light.png",
         "utility_scroll": true,
         "utility_scroll_speed": 40,
-        "show_category_rail": true
+        "show_category_rail": true,
+        "hide_rail_on_home": true
       }
     }
   },

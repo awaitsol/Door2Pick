@@ -15,7 +15,7 @@
 -%}
 
 {%- if items.size > 0 -%}
-  <div class="d2p-cats" style="
+  <div class="d2p-cats d2p-cats--{{ s.style | default: 'circles' }}" style="
     --d2p-cats-bg: {{ s.background_color }};
     padding-block-start: {{ s.padding_top }}px;
     padding-block-end: {{ s.padding_bottom }}px;
@@ -25,6 +25,38 @@
         <h2 class="d2p-cats__heading">{{ s.heading }}</h2>
       {%- endif -%}
 
+      {%- if s.style == 'cards' -%}
+        <ul class="d2p-cats__cards" role="list">
+          {%- for block in items -%}
+            {%- liquid
+              assign cat = block.settings.collection
+              assign cat_image = block.settings.image
+              if cat_image == blank and cat != blank
+                assign cat_image = cat.featured_image | default: cat.products.first.featured_image
+              endif
+              assign cat_label = block.settings.label | default: cat.title
+              assign cat_link = block.settings.link | default: cat.url
+            -%}
+            <li class="d2p-cats__card-item" {{ block.shopify_attributes }}>
+              <a class="d2p-cats__card{% if cat_image == blank %} d2p-cats__card--icon{% endif %}" href="{{ cat_link }}">
+                {%- if cat_image != blank -%}
+                  {{
+                    cat_image
+                    | image_url: width: 480
+                    | image_tag: class: 'd2p-cats__card-img', alt: '', widths: '200, 300, 400, 480', sizes: '(max-width: 749px) 34vw, 16vw', loading: 'lazy'
+                  }}
+                {%- else -%}
+                  <span class="d2p-cats__card-icon" aria-hidden="true">{%- render 'd2p-icon', name: block.settings.icon -%}</span>
+                {%- endif -%}
+                <span class="d2p-cats__card-label">
+                  {{ cat_label }}
+                  <span class="d2p-cats__card-cta" aria-hidden="true">Shop →</span>
+                </span>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
       <ul class="d2p-cats__list">
         {%- for block in items -%}
           {%- liquid
@@ -56,6 +88,7 @@
           </li>
         {%- endfor -%}
       </ul>
+      {%- endif -%}
     </div>
   </div>
 {%- endif -%}
@@ -74,7 +107,8 @@
   .d2p-cats__heading {
     margin: 0 0 20px;
     text-align: center;
-    font-family: var(--font-heading--family);
+    font-family: var(--font-subheading--family);
+    font-weight: 600;
     font-size: clamp(1.25rem, 2.2vw, 1.75rem);
   }
 
@@ -213,6 +247,128 @@
       transform: none;
     }
   }
+  /* ---------- card style ----------
+     Rectangular photo tiles with the name on a dark fade: 6 across on
+     desktop, a swipeable row of about three on mobile. */
+  .d2p-cats__cards {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .d2p-cats__card {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid var(--d2p-border, #26262a);
+    background: var(--d2p-surface-alt, #17171a);
+    color: #fff;
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  .d2p-cats__card-img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .d2p-cats__card:hover .d2p-cats__card-img {
+    transform: scale(1.06);
+  }
+
+  .d2p-cats__card::after {
+    content: '';
+    position: absolute;
+    inset: 40% 0 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 78%), transparent);
+    pointer-events: none;
+  }
+
+  /* No photo (e.g. Top Deals): a gold panel with the icon. */
+  .d2p-cats__card--icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--d2p-gold-gradient, #c9a45c);
+    border-color: transparent;
+  }
+
+  .d2p-cats__card-icon {
+    display: flex;
+    color: #0b0b0d;
+    margin-block-end: 30%;
+  }
+
+  .d2p-cats__card-icon svg {
+    inline-size: 46px;
+    block-size: 46px;
+  }
+
+  .d2p-cats__card-label {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px;
+    font-family: var(--font-subheading--family);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+  }
+
+  .d2p-cats__card-cta {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e3c989;
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-cats__cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-cats__cards {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .d2p-cats__cards::-webkit-scrollbar {
+      display: none;
+    }
+
+    .d2p-cats__card-item {
+      flex: 0 0 31%;
+      scroll-snap-align: start;
+    }
+
+    .d2p-cats__card-label {
+      padding: 8px;
+      font-size: 0.8125rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d2p-cats__card-img {
+      transition: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -226,6 +382,22 @@
     ]
   },
   "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "circles",
+          "label": "Circles"
+        },
+        {
+          "value": "cards",
+          "label": "Image cards"
+        }
+      ],
+      "default": "circles"
+    },
     {
       "type": "text",
       "id": "heading",

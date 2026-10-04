@@ -1440,3 +1440,46 @@ main[data-template='product'] .product-details .rte ul li::before {
   color: var(--d2p-gold-text, #c9a45c);
   font-weight: 600;
 }
+
+/* ---------- cart: tax & shipping note ----------
+ * "Taxes and shipping calculated at checkout" (cart drawer and cart page) and
+ * any product tax note use --color-foreground-subdued, which is derived from
+ * the dark palette and fades out, most of all on the light page. They use the
+ * mode's muted token instead (dark #A9A296, light #66625C, both well above
+ * 4.5:1) at a slightly larger size. */
+.cart-totals__tax-note,
+.cart-totals__tax-note a,
+.tax-note.tax-note.tax-note {
+  color: var(--d2p-muted, #a9a296);
+  font-size: 0.8125rem;
+  opacity: 1;
+}
+
+.cart-totals__tax-note a {
+  text-decoration: underline;
+}
+
+/* ---------- header: cart count ----------
+ * Jost's figures sit high in their line box, so the count looked off-centre in
+ * the 20px circle on desktop. The count uses a system face whose digits are
+ * vertically centred, on a line box the height of the circle. */
+.d2p-header__cart .cart-bubble__text {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.d2p-header__cart .cart-bubble__text-count,
+.d2p-header__wish-count {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.d2p-header__wish-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 18px;
+}

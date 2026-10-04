@@ -124,7 +124,8 @@
       "color2": "#26262A"
     },
     "d2p_gift_product": "gift-wrapping",
-    "d2p_gift_enabled": true
+    "d2p_gift_enabled": true,
+    "auto_open_cart_drawer": true
   },
   "presets": {
     "Horizon": {

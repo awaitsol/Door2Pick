@@ -77,6 +77,10 @@
     {%- render 'stylesheets' -%}
     {%- render 'card-hover-effect-styles' -%}
     {%- render 'fonts' -%}
+    {%- comment -%} Jost semi-bold for section headings (theme loads only 400 and 500). {%- endcomment -%}
+    <style>
+      {{ settings.type_subheading_font | font_modify: 'weight', '600' | font_face: font_display: 'swap' }}
+    </style>
     {%- render 'scripts' -%}
     <script src="{{ 'd2p-wishlist.js' | asset_url }}" defer></script>
     <script src="{{ 'd2p-cart-extras.js' | asset_url }}" defer></script>

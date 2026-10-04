@@ -113,7 +113,7 @@
         "fallback_to_all": false,
         "heading": "Just For You",
         "subheading": "",
-        "max_products": 30,
+        "max_products": 12,
         "columns": 6,
         "show_discount_badge": true,
         "show_rating": true,
@@ -125,11 +125,12 @@
         "add_to_cart_label": "Add to Cart",
         "wishlist_label": "Save for later",
         "show_view_all": true,
-        "view_all_label": "Show All",
+        "view_all_label": "View All",
         "empty_text": "Products from this collection will appear here.",
         "background_color": "",
         "padding_top": 48,
-        "padding_bottom": 48
+        "padding_bottom": 48,
+        "layout": "grid"
       }
     },
     "new_arrivals": {
@@ -239,13 +240,255 @@
         "padding_top": 40,
         "padding_bottom": 48
       }
+    },
+    "promo_tiles_2": {
+      "type": "d2p-promo-banners",
+      "blocks": {
+        "promo_jewellery": {
+          "type": "panel",
+          "settings": {
+            "collection": "jewellery",
+            "heading": "Jewellery",
+            "subheading": "Everyday sparkle, gift-ready",
+            "offer": "",
+            "auto_offer": true,
+            "button_label": "Shop Jewellery",
+            "button_link": "shopify://collections/jewellery"
+          }
+        },
+        "promo_decor": {
+          "type": "panel",
+          "settings": {
+            "collection": "home-decor-1",
+            "heading": "Home Decor",
+            "subheading": "Little touches, big difference",
+            "offer": "",
+            "auto_offer": true,
+            "button_label": "Shop Home Decor",
+            "button_link": "shopify://collections/home-decor-1"
+          }
+        }
+      },
+      "block_order": [
+        "promo_jewellery",
+        "promo_decor"
+      ],
+      "settings": {
+        "columns": 2,
+        "background_color": "",
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
+    "shop_by_category": {
+      "type": "d2p-category-icons",
+      "blocks": {
+        "card_1": {
+          "type": "category",
+          "settings": {
+            "collection": "jewellery",
+            "icon": "diamond",
+            "label": "Jewellery",
+            "link": "shopify://collections/jewellery"
+          }
+        },
+        "card_2": {
+          "type": "category",
+          "settings": {
+            "collection": "home-decor-1",
+            "icon": "house",
+            "label": "Home Decor",
+            "link": "shopify://collections/home-decor-1"
+          }
+        },
+        "card_3": {
+          "type": "category",
+          "settings": {
+            "collection": "kitchen-1",
+            "icon": "pot",
+            "label": "Kitchen",
+            "link": "shopify://collections/kitchen-1"
+          }
+        },
+        "card_4": {
+          "type": "category",
+          "settings": {
+            "collection": "tech-gadgets-1",
+            "icon": "phone",
+            "label": "Tech & Gadgets",
+            "link": "shopify://collections/tech-gadgets-1"
+          }
+        },
+        "card_5": {
+          "type": "category",
+          "settings": {
+            "collection": "new-arrivals",
+            "icon": "sparkle",
+            "label": "New Arrivals",
+            "link": "shopify://collections/new-arrivals"
+          }
+        },
+        "card_6": {
+          "type": "category",
+          "settings": {
+            "icon": "tag",
+            "label": "Top Deals",
+            "link": "/#top-deals"
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_2",
+        "card_3",
+        "card_4",
+        "card_5",
+        "card_6"
+      ],
+      "settings": {
+        "style": "circles",
+        "heading": "Shop by Category",
+        "background_color": "",
+        "padding_top": 32,
+        "padding_bottom": 16
+      }
+    },
+    "row_kitchen": {
+      "type": "d2p-product-grid",
+      "settings": {
+        "collection_handle": "kitchen-1",
+        "use_all_products": false,
+        "fallback_to_all": false,
+        "heading": "Kitchen",
+        "subheading": "Smart picks for every kitchen",
+        "max_products": 12,
+        "columns": 5,
+        "show_discount_badge": true,
+        "show_rating": true,
+        "show_wishlist": true,
+        "card_style": "boutique",
+        "show_add_to_cart": false,
+        "show_discount_percent": true,
+        "hide_sold_out": false,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "show_view_all": true,
+        "view_all_label": "View All",
+        "empty_text": "Products from this collection will appear here.",
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "layout": "carousel",
+        "autoplay_seconds": 5,
+        "deals_only": false,
+        "anchor": ""
+      }
+    },
+    "row_jewellery": {
+      "type": "d2p-product-grid",
+      "settings": {
+        "collection_handle": "jewellery",
+        "use_all_products": false,
+        "fallback_to_all": false,
+        "heading": "Jewellery",
+        "subheading": "Everyday sparkle, gift-ready",
+        "max_products": 12,
+        "columns": 5,
+        "show_discount_badge": true,
+        "show_rating": true,
+        "show_wishlist": true,
+        "card_style": "boutique",
+        "show_add_to_cart": false,
+        "show_discount_percent": true,
+        "hide_sold_out": false,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "show_view_all": true,
+        "view_all_label": "View All",
+        "empty_text": "Products from this collection will appear here.",
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "layout": "carousel",
+        "autoplay_seconds": 5,
+        "deals_only": false,
+        "anchor": ""
+      }
+    },
+    "row_decor": {
+      "type": "d2p-product-grid",
+      "settings": {
+        "collection_handle": "home-decor-1",
+        "use_all_products": false,
+        "fallback_to_all": false,
+        "heading": "Home Decor",
+        "subheading": "Little touches, big difference",
+        "max_products": 12,
+        "columns": 5,
+        "show_discount_badge": true,
+        "show_rating": true,
+        "show_wishlist": true,
+        "card_style": "boutique",
+        "show_add_to_cart": false,
+        "show_discount_percent": true,
+        "hide_sold_out": false,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "show_view_all": true,
+        "view_all_label": "View All",
+        "empty_text": "Products from this collection will appear here.",
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "layout": "carousel",
+        "autoplay_seconds": 5,
+        "deals_only": false,
+        "anchor": ""
+      }
+    },
+    "row_tech": {
+      "type": "d2p-product-grid",
+      "settings": {
+        "collection_handle": "tech-gadgets-1",
+        "use_all_products": false,
+        "fallback_to_all": false,
+        "heading": "Tech & Gadgets",
+        "subheading": "Gear that just works",
+        "max_products": 12,
+        "columns": 5,
+        "show_discount_badge": true,
+        "show_rating": true,
+        "show_wishlist": true,
+        "card_style": "boutique",
+        "show_add_to_cart": false,
+        "show_discount_percent": true,
+        "hide_sold_out": false,
+        "add_to_cart_label": "Add to Cart",
+        "wishlist_label": "Save for later",
+        "show_view_all": true,
+        "view_all_label": "View All",
+        "empty_text": "Products from this collection will appear here.",
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "layout": "carousel",
+        "autoplay_seconds": 5,
+        "deals_only": false,
+        "anchor": ""
+      }
     }
   },
   "order": [
     "hero_banner",
+    "shop_by_category",
     "new_arrivals",
+    "row_kitchen",
     "promo_tiles",
+    "row_jewellery",
     "top_deals",
+    "row_decor",
+    "promo_tiles_2",
+    "row_tech",
     "just_for_you_v2",
     "guarantee",
     "watch_in_action"

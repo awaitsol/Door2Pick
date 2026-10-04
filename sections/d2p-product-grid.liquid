@@ -131,7 +131,7 @@
           Arrows steer a single-line row. With more products than columns the
           grid wraps into rows instead, so there is nothing to scroll.
         {%- endcomment -%}
-        {%- if s.max_products <= s.columns -%}
+        {%- if s.max_products <= s.columns or s.layout == 'carousel' -%}
         <div class="d2p-grid__arrows">
           <button class="d2p-grid__arrow" type="button" data-d2p-scroll="prev" aria-label="{{ 'accessibility.slideshow_previous' | t }}">
             {{- 'icon-chevron-left.svg' | inline_asset_content -}}
@@ -151,7 +151,19 @@
       </p>
     {%- endif -%}
 
-    <ul class="d2p-grid__list" data-d2p-track{% if s.max_products > s.columns %} data-wrapped{% endif %}>
+    {%- comment -%}
+      Carousel: one swipeable line, the given number of cards visible, moving
+      one card every few seconds (see the script at the bottom).
+    {%- endcomment -%}
+    <ul
+      class="d2p-grid__list"
+      data-d2p-track
+      {% if s.layout == 'carousel' %}
+        data-carousel data-autoplay="{{ s.autoplay_seconds }}"
+      {% elsif s.max_products > s.columns %}
+        data-wrapped
+      {% endif %}
+    >
       {%- for product in products limit: limit -%}
         {%- render 'd2p-product-card', product: product, s: s, section_id: section.id -%}
       {%- else -%}
@@ -195,9 +207,12 @@
     margin-block-end: 20px;
   }
 
+  /* Section headings use Jost (the subheading font) at 600, matching product
+     titles and promo tiles, rather than the display serif. */
   .d2p-grid__heading {
     margin: 0;
-    font-family: var(--font-heading--family);
+    font-family: var(--font-subheading--family);
+    font-weight: 600;
     font-size: clamp(1.375rem, 2.4vw, 1.875rem);
     line-height: 1.2;
     color: var(--color-foreground);
@@ -790,15 +805,56 @@
     background: rgb(255 255 255 / 92%);
   }
 
+  /* ---------- carousel layout ----------
+     One line that scrolls sideways; --d2p-grid-columns cards fit the width
+     on desktop, about 2.2 on mobile so the next card peeks in. Comes before
+     the responsive rules, which leave [data-carousel] alone. */
+  .d2p-grid__list[data-carousel] {
+    --gap: 16px;
+    display: flex;
+    gap: var(--gap);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding-block: 6px 14px;
+    margin-block: -6px -14px;
+  }
+
+  .d2p-grid__list[data-carousel]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .d2p-grid__list[data-carousel] > .d2p-card {
+    flex: 0 0 calc((100% - (var(--d2p-grid-columns, 5) - 1) * var(--gap)) / var(--d2p-grid-columns, 5));
+    scroll-snap-align: start;
+  }
+
+  @media screen and (max-width: 989px) {
+    .d2p-grid__list[data-carousel] > .d2p-card {
+      flex-basis: calc((100% - 2 * var(--gap)) / 3);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .d2p-grid__list[data-carousel] {
+      --gap: 10px;
+    }
+
+    .d2p-grid__list[data-carousel] > .d2p-card {
+      flex-basis: 44%;
+    }
+  }
+
   /* ---------- responsive ---------- */
   @media screen and (max-width: 1199px) {
-    .d2p-grid__list {
+    .d2p-grid__list:not([data-carousel]) {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
   @media screen and (max-width: 989px) {
-    .d2p-grid__list {
+    .d2p-grid__list:not([data-carousel]) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
@@ -815,7 +871,7 @@
     /* A single-line row becomes a swipeable strip; a wrapped grid (more
        products than columns) stays a 2-up grid so it does not turn into one
        very long scroll. */
-    .d2p-grid__list:not([data-wrapped]) {
+    .d2p-grid__list:not([data-wrapped]):not([data-carousel]) {
       display: flex;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
@@ -828,11 +884,11 @@
       gap: 12px;
     }
 
-    .d2p-grid__list:not([data-wrapped])::-webkit-scrollbar {
+    .d2p-grid__list:not([data-wrapped]):not([data-carousel])::-webkit-scrollbar {
       display: none;
     }
 
-    .d2p-grid__list:not([data-wrapped]) .d2p-card {
+    .d2p-grid__list:not([data-wrapped]):not([data-carousel]) .d2p-card {
       flex: 0 0 46%;
       scroll-snap-align: start;
     }
@@ -886,6 +942,49 @@
     });
 
     // Hearts are handled by assets/d2p-wishlist.js, which saves them.
+
+    // Carousel rows move one card every few seconds while on screen, loop
+    // back to the start at the end, and hold still while the shopper hovers,
+    // focuses or touches the row (resuming a few seconds after a touch).
+    const startCarousel = (track) => {
+      if (track.dataset.d2pAuto) return;
+      track.dataset.d2pAuto = 'on';
+      const seconds = parseInt(track.dataset.autoplay, 10);
+      if (!(seconds > 0) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let visible = false;
+      let held = false;
+      let resume;
+      const step = () => {
+        if (!visible || held || document.hidden) return;
+        const card = track.querySelector('.d2p-card');
+        if (!card) return;
+        const gap = parseFloat(getComputedStyle(track).columnGap) || 16;
+        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+        if (atEnd) track.scrollTo({ left: 0, behavior: 'smooth' });
+        else track.scrollBy({ left: card.getBoundingClientRect().width + gap, behavior: 'smooth' });
+      };
+      setInterval(step, seconds * 1000);
+
+      new IntersectionObserver((entries) => {
+        visible = entries.some((e) => e.isIntersecting);
+      }, { threshold: 0.4 }).observe(track);
+
+      const hold = () => { held = true; clearTimeout(resume); };
+      const release = (delay) => { clearTimeout(resume); resume = setTimeout(() => (held = false), delay); };
+      track.addEventListener('pointerenter', hold);
+      track.addEventListener('pointerleave', () => release(0));
+      track.addEventListener('focusin', hold);
+      track.addEventListener('focusout', () => release(0));
+      track.addEventListener('touchstart', hold, { passive: true });
+      track.addEventListener('touchend', () => release(6000), { passive: true });
+    };
+
+    const scanCarousels = () => document.querySelectorAll('[data-carousel]').forEach(startCarousel);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scanCarousels);
+    else scanCarousels();
+    // Theme editor re-renders sections in place.
+    document.addEventListener('shopify:section:load', scanCarousels);
   })();
 {% endjavascript %}
 
@@ -954,6 +1053,34 @@
       "max": 6,
       "step": 1,
       "default": 5
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel (one row)"
+        }
+      ],
+      "default": "grid",
+      "info": "Carousel shows one swipeable row; Columns sets how many cards are visible."
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Carousel auto-move",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5,
+      "info": "Seconds between moves. 0 turns it off."
     },
     {
       "type": "header",

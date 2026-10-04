@@ -188,10 +188,13 @@
     inline-size: 100%;
   }
 
+  /* Headings use the sans-serif subheading font (Jost), like product titles,
+     rather than the display serif, which reads poorly at this size. */
   .d2p-promo__heading {
     color: var(--d2p-text, #ffffff);
     margin: 0;
-    font-family: var(--font-heading--family);
+    font-family: var(--font-subheading--family);
+    font-weight: 600;
     font-size: clamp(1.25rem, 2.2vw, 1.75rem);
     line-height: 1.15;
   }
@@ -199,7 +202,8 @@
   .d2p-promo__sub {
     color: var(--d2p-gold-text, #c9a45c);
     margin: 0;
-    font-family: var(--font-heading--family);
+    font-family: var(--font-subheading--family);
+    font-weight: var(--font-subheading--weight, 500);
     font-size: clamp(1.05rem, 1.8vw, 1.375rem);
     color: var(--d2p-gold, #c9a45c);
   }

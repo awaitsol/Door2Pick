@@ -155,6 +155,7 @@
                   "type": "price",
                   "settings": {
                     "show_sale_price_first": true,
+                    "show_savings": true,
                     "show_installments": false,
                     "show_tax_info": false,
                     "type_preset": "paragraph",
@@ -169,8 +170,7 @@
                     "padding-block-start": 4,
                     "padding-block-end": 0,
                     "padding-inline-start": 0,
-                    "padding-inline-end": 0,
-                    "show_savings": true
+                    "padding-inline-end": 0
                   },
                   "blocks": {}
                 }
@@ -621,7 +621,8 @@
       "type": "d2p-complete-look",
       "settings": {
         "heading": "Complete the Look",
-        "offer_text": "Buy any 3 products, get 10% off. Applied automatically at checkout.",
+        "heading_other": "Pairs Well With",
+        "offer_text": "Buy any 3 products, save Rs 200. Applied automatically at checkout.",
         "collection": "jewellery",
         "max_products": 4,
         "card_style": "boutique",
@@ -633,13 +634,22 @@
         "add_to_cart_label": "Add to Cart",
         "wishlist_label": "Save for later",
         "padding_top": 24,
-        "padding_bottom": 32,
-        "heading_other": "Pairs Well With"
+        "padding_bottom": 32
+      }
+    },
+    "d2p_extras": {
+      "type": "d2p-product-extras",
+      "settings": {
+        "show_share": true,
+        "share_label": "Share",
+        "padding_top": 8,
+        "padding_bottom": 8
       }
     }
   },
   "order": [
     "main",
+    "d2p_extras",
     "d2p_look",
     "d2p_flash",
     "d2p_features",
