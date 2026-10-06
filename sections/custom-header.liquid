@@ -185,22 +185,44 @@
       {%- endif -%}
 
       {%- if s.show_search -%}
-        <form class="d2p-header__search" action="{{ routes.search_url }}" method="get" role="search">
-          <input type="hidden" name="type" value="product">
-          <label class="visually-hidden" for="d2p-search-input">{{ 'content.search' | t }}</label>
-          <input
-            id="d2p-search-input"
-            class="d2p-header__search-input"
-            type="search"
-            name="q"
-            value="{{ search.terms | escape }}"
-            placeholder="{{ s.search_placeholder | escape }}"
-            autocomplete="off"
-          >
-          <button class="d2p-header__search-submit" type="submit" aria-label="{{ 'content.search' | t }}">
-            {{- 'icon-search.svg' | inline_asset_content -}}
-          </button>
-        </form>
+        {%- comment -%}
+          Suggestions come from Shopify's predictive search endpoint, which is
+          built for this and needs no app. The form still submits normally, so
+          search works with JavaScript off or before the script loads.
+        {%- endcomment -%}
+        <d2p-search class="d2p-header__search-wrap">
+          <form class="d2p-header__search" action="{{ routes.search_url }}" method="get" role="search">
+            <input type="hidden" name="type" value="product">
+            <label class="visually-hidden" for="d2p-search-input">{{ 'content.search' | t }}</label>
+            <input
+              id="d2p-search-input"
+              class="d2p-header__search-input"
+              type="search"
+              name="q"
+              value="{{ search.terms | escape }}"
+              placeholder="{{ s.search_placeholder | escape }}"
+              autocomplete="off"
+              role="combobox"
+              aria-expanded="false"
+              aria-controls="d2p-search-results"
+              aria-autocomplete="list"
+              data-d2p-search-input
+            >
+            <button class="d2p-header__search-submit" type="submit" aria-label="{{ 'content.search' | t }}">
+              {{- 'icon-search.svg' | inline_asset_content -}}
+            </button>
+          </form>
+
+          <div
+            class="d2p-search-panel"
+            id="d2p-search-results"
+            role="listbox"
+            aria-label="{{ 'content.search' | t }}"
+            hidden
+            data-d2p-search-panel
+          ></div>
+          <span class="visually-hidden" role="status" aria-live="polite" data-d2p-search-status></span>
+        </d2p-search>
       {%- endif -%}
 
       <div class="d2p-header__actions">
@@ -890,13 +912,118 @@
   }
 
   /* pill search */
+  /* The wrapper is the positioning context for the suggestions panel, and a
+     custom element is inline by default so it would ignore the layout. */
+  .d2p-header__search-wrap {
+    position: relative;
+    display: block;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    max-inline-size: 560px;
+    margin-inline-start: auto;
+  }
+
+  .d2p-search-panel {
+    position: absolute;
+    inset-block-start: calc(100% + 8px);
+    inset-inline: 0;
+    z-index: 60;
+    max-block-size: 420px;
+    overflow-y: auto;
+    padding: 6px;
+    border: 1px solid var(--d2p-h-border);
+    border-radius: 14px;
+    background: var(--d2p-h-menu-bg);
+    color: var(--d2p-h-menu-fg);
+    box-shadow: 0 20px 48px -22px rgb(0 0 0 / 55%);
+  }
+
+  .d2p-search-panel[hidden] {
+    display: none;
+  }
+
+  .d2p-search-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .d2p-search-row:hover,
+  .d2p-search-row[aria-selected='true'] {
+    background: color-mix(in srgb, var(--d2p-h-accent) 14%, transparent);
+  }
+
+  .d2p-search-row__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 48px;
+    block-size: 48px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--d2p-h-border) 55%, transparent);
+  }
+
+  .d2p-search-row__media img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .d2p-search-row__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+
+  .d2p-search-row__title {
+    font-size: 0.875rem;
+    line-height: 1.3;
+    /* Two lines maximum, so one long name cannot push the panel tall. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .d2p-search-row__price {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--d2p-h-accent);
+  }
+
+  .d2p-search-panel__all {
+    display: block;
+    margin-block-start: 4px;
+    padding: 11px 10px;
+    border-block-start: 1px solid var(--d2p-h-border);
+    color: var(--d2p-h-accent);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .d2p-search-panel__empty {
+    margin: 0;
+    padding: 18px 12px;
+    font-size: 0.875rem;
+    text-align: center;
+    opacity: 0.75;
+  }
+
   .d2p-header__search {
     position: relative;
     display: flex;
     align-items: center;
-    flex: 1 1 auto;
-    max-inline-size: 560px;
-    margin-inline-start: auto;
+    inline-size: 100%;
     background: rgb(255 255 255 / 5%);
     border: 1px solid var(--d2p-h-accent);
     border-radius: 999px;
@@ -1768,6 +1895,154 @@
 {% endstylesheet %}
 
 {% javascript %}
+  class D2PSearch extends HTMLElement {
+    connectedCallback() {
+      this.input = this.querySelector('[data-d2p-search-input]');
+      this.panel = this.querySelector('[data-d2p-search-panel]');
+      this.status = this.querySelector('[data-d2p-search-status]');
+      this.form = this.querySelector('form');
+      if (!this.input || !this.panel) return;
+
+      this.index = -1;
+      this.onDocClick = this.onDocClick.bind(this);
+
+      // Shopify's predictive endpoint matches on near-complete words, so
+      // querying on every keystroke mostly returns nothing and wastes calls.
+      // Waiting for a pause also keeps the request count sane while typing.
+      this.input.addEventListener('input', () => {
+        window.clearTimeout(this.timer);
+        const q = this.input.value.trim();
+        if (q.length < 2) return this.close();
+        this.timer = window.setTimeout(() => this.search(q), 220);
+      });
+
+      this.input.addEventListener('keydown', (e) => this.onKey(e));
+      this.input.addEventListener('focus', () => {
+        if (this.input.value.trim().length >= 2 && this.panel.innerHTML) this.open();
+      });
+    }
+
+    disconnectedCallback() {
+      document.removeEventListener('click', this.onDocClick);
+      window.clearTimeout(this.timer);
+    }
+
+    async search(q) {
+      // Abort the previous request so a slow early response cannot overwrite
+      // results for what the person has since typed.
+      if (this.controller) this.controller.abort();
+      this.controller = new AbortController();
+
+      const url = '/search/suggest.json?q=' + encodeURIComponent(q) +
+        '&resources[type]=product&resources[limit]=6&resources[options][unavailable_products]=last';
+
+      try {
+        const res = await fetch(url, { signal: this.controller.signal });
+        if (!res.ok) return;
+        const data = await res.json();
+        this.render(data.resources.results.products || [], q);
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        this.close();
+      }
+    }
+
+    render(products, q) {
+      if (!products.length) {
+        this.panel.innerHTML =
+          '<p class="d2p-search-panel__empty">No matches for &ldquo;' +
+          this.escape(q) + '&rdquo;</p>';
+        this.say('No results');
+        return this.open();
+      }
+
+      const rows = products.map((p, i) => {
+        const img = p.featured_image && p.featured_image.url
+          ? '<img src="' + p.featured_image.url + '&width=120" alt="" loading="lazy" width="48" height="48">'
+          : '<span class="d2p-search-row__noimg" aria-hidden="true"></span>';
+        return '<a class="d2p-search-row" role="option" id="d2p-search-opt-' + i +
+          '" aria-selected="false" href="' + p.url + '">' +
+          '<span class="d2p-search-row__media">' + img + '</span>' +
+          '<span class="d2p-search-row__text">' +
+          '<span class="d2p-search-row__title">' + this.escape(p.title) + '</span>' +
+          '<span class="d2p-search-row__price">' + (p.price ? this.money(p.price) : '') + '</span>' +
+          '</span></a>';
+      }).join('');
+
+      this.panel.innerHTML = rows +
+        '<a class="d2p-search-panel__all" href="/search?q=' + encodeURIComponent(q) +
+        '&type=product">See all results for &ldquo;' + this.escape(q) + '&rdquo;</a>';
+      this.say(products.length + ' results');
+      this.index = -1;
+      this.open();
+    }
+
+    money(cents) {
+      // suggest.json returns a decimal string in the shop currency, not cents.
+      const n = Number(cents);
+      if (Number.isNaN(n)) return '';
+      return 'Rs. ' + n.toLocaleString('en-PK', { maximumFractionDigits: 0 });
+    }
+
+    escape(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    say(msg) {
+      if (this.status) this.status.textContent = msg;
+    }
+
+    get options() {
+      return Array.from(this.panel.querySelectorAll('.d2p-search-row'));
+    }
+
+    onKey(e) {
+      if (e.key === 'Escape') return this.close();
+      if (this.panel.hidden) return;
+      const opts = this.options;
+      if (!opts.length) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.index += e.key === 'ArrowDown' ? 1 : -1;
+        if (this.index < 0) this.index = opts.length - 1;
+        if (this.index >= opts.length) this.index = 0;
+        opts.forEach((o, i) => o.setAttribute('aria-selected', String(i === this.index)));
+        opts[this.index].scrollIntoView({ block: 'nearest' });
+        this.input.setAttribute('aria-activedescendant', opts[this.index].id);
+      } else if (e.key === 'Enter' && this.index > -1) {
+        // Only hijack Enter when a suggestion is highlighted; otherwise the
+        // form submits as normal and runs a full search.
+        e.preventDefault();
+        opts[this.index].click();
+      }
+    }
+
+    open() {
+      this.panel.hidden = false;
+      this.input.setAttribute('aria-expanded', 'true');
+      document.addEventListener('click', this.onDocClick);
+    }
+
+    close() {
+      this.panel.hidden = true;
+      this.input.setAttribute('aria-expanded', 'false');
+      this.input.removeAttribute('aria-activedescendant');
+      this.index = -1;
+      document.removeEventListener('click', this.onDocClick);
+    }
+
+    onDocClick(e) {
+      if (!this.contains(e.target)) this.close();
+    }
+  }
+
+  if (!customElements.get('d2p-search')) {
+    customElements.define('d2p-search', D2PSearch);
+  }
+
   // Colour-mode toggle. The initial mode is set before first paint by
   // snippets/theme-mode.liquid; this switches it and keeps the control's
   // label and pressed state honest.
