@@ -653,20 +653,23 @@ main[data-template='product'] .product-details .border-style {
 
 /* --- description ------------------------------------------------------- */
 /* The description arrives as one long bulleted list from the supplier. Gold
-   markers and looser spacing make it scannable rather than a wall. */
-main[data-template='product'] .product-details .rte ul {
+   markers and looser spacing make it scannable rather than a wall.
+   Scoped to the template, not .product-details: the description renders
+   outside that wrapper, so the narrower scope stripped the default markers
+   without ever applying the replacement dot, leaving bullets invisible. */
+main[data-template='product'] .rte ul {
   list-style: none;
   padding-inline-start: 0;
 }
 
-main[data-template='product'] .product-details .rte ul li {
+main[data-template='product'] .rte ul li {
   position: relative;
   padding-inline-start: 24px;
   margin-block-end: 10px;
   line-height: 1.7;
 }
 
-main[data-template='product'] .product-details .rte ul li::before {
+main[data-template='product'] .rte ul li::before {
   content: '';
   position: absolute;
   inset-inline-start: 0;
@@ -1111,14 +1114,14 @@ main[data-template='product'] .product-details .rte {
   max-inline-size: 60ch;
 }
 
-main[data-template='product'] .product-details .rte ul li {
+main[data-template='product'] .rte ul li {
   line-height: 1.75;
   margin-block-end: 12px;
 }
 
 /* A smaller, lighter marker: present enough to separate items, quiet enough
    to stay out of the way of the text. */
-main[data-template='product'] .product-details .rte ul li::before {
+main[data-template='product'] .rte ul li::before {
   inline-size: 5px;
   block-size: 5px;
   inset-block-start: 0.72em;
